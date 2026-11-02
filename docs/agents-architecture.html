@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strong Hire Agents</title>
+<meta name="description" content="How the Strong Hire LLM agents work: roles, flows, memory, guardrails, tracing and monitoring.">
+<style>
+:root{
+  --bg:#f7f8fb; --panel:#ffffff; --panel2:#f0f2f7; --ink:#1b2130; --muted:#5b6478; --line:#d9dde7;
+  --accent:#3a5bd9; --accent2:#0f9d8a; --warn:#d97706; --bad:#c2410c; --good:#15803d; --violet:#7c3aed; --pink:#db2777;
+  --code:#eef1f8; --shadow:0 1px 2px rgba(20,30,60,.06),0 4px 16px rgba(20,30,60,.06);
+  --lane:#eef1f8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f131b; --panel:#171c27; --panel2:#1d2331; --ink:#e6e9f0; --muted:#9aa3b6; --line:#2c3446;
+    --accent:#7d97ff; --accent2:#2dd4bf; --warn:#fbbf24; --bad:#fb923c; --good:#4ade80; --violet:#a78bfa; --pink:#f472b6;
+    --code:#1f2636; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); --lane:#1b2130;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f131b; --panel:#171c27; --panel2:#1d2331; --ink:#e6e9f0; --muted:#9aa3b6; --line:#2c3446;
+  --accent:#7d97ff; --accent2:#2dd4bf; --warn:#fbbf24; --bad:#fb923c; --good:#4ade80; --violet:#a78bfa; --pink:#f472b6;
+  --code:#1f2636; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); --lane:#1b2130;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif}
+a{color:var(--accent)}
+code,kbd,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em}
+code{background:var(--code);padding:.08em .35em;border-radius:4px}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.5}
+h1,h2,h3,h4{line-height:1.25}
+h2{font-size:1.6rem;margin:0 0 .4rem}
+h3{font-size:1.15rem;margin:1.6rem 0 .5rem}
+h4{font-size:1rem;margin:1.1rem 0 .3rem}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+nav.toc{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:18px 14px}
+nav.toc .brand{font-weight:700;font-size:1.05rem;margin-bottom:2px}
+nav.toc .sub{color:var(--muted);font-size:.8rem;margin-bottom:14px}
+nav.toc a{display:block;color:var(--ink);text-decoration:none;padding:5px 8px;border-radius:6px;font-size:.9rem}
+nav.toc a:hover{background:var(--panel2)}
+nav.toc a.active{background:var(--accent);color:#fff}
+nav.toc .grp{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 8px 4px}
+main{padding:28px 36px 80px;max-width:1180px;width:100%;min-width:0}
+section{overflow-wrap:break-word;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:0 0 26px;box-shadow:var(--shadow);scroll-margin-top:12px}
+.lead{color:var(--muted);font-size:1.02rem;margin-top:0}
+.hero{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 14%,var(--panel)),var(--panel) 60%)}
+.hero h1{font-size:2.1rem;margin:0 0 .3rem}
+.pill{display:inline-block;font-size:.75rem;padding:2px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);margin:2px 4px 2px 0}
+.pill.llm{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.pill.code{color:var(--accent2);border-color:color-mix(in srgb,var(--accent2) 40%,var(--line))}
+.pill.test{color:var(--violet);border-color:color-mix(in srgb,var(--violet) 40%,var(--line))}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{min-width:0;overflow-wrap:anywhere;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h4{margin-top:0}
+.card p{margin:.3rem 0}
+.callout{border-left:4px solid var(--accent);background:var(--panel2);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.callout.warn{border-color:var(--warn)}
+.callout.good{border-color:var(--good)}
+.callout.bad{border-color:var(--bad)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;margin:8px 0}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-weight:600}
+.tbl-wrap{overflow-x:auto}
+.btn{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:.88rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.svgbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px;overflow-x:auto}
+svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.explain{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:10px;min-height:76px}
+.explain .step{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:var(--panel2)}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:6px}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:4px 12px;font-size:.9rem}
+.kv div:nth-child(odd){color:var(--muted)}
+.theme-toggle{margin-top:16px}
+.small{font-size:.85rem;color:var(--muted)}
+.flowdash{stroke-dasharray:6 6;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-24}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.node rect{transition:all .3s}
+.node.hl rect{stroke:var(--accent);stroke-width:3}
+.stage{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 10px}
+.stage .st{min-width:150px;flex:1;border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:10px;transition:all .35s;opacity:.55}
+.stage .st.on{opacity:1;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent);transform:translateY(-2px)}
+.stage .st .n{font-size:.72rem;color:var(--muted)}
+.stage .st .t{font-weight:600;font-size:.92rem}
+.stage .st .r{font-size:.75rem;margin-top:4px}
+.slider-row{display:grid;grid-template-columns:150px 1fr 40px 70px;gap:10px;align-items:center;margin:6px 0;font-size:.9rem}
+.result{font-size:1.25rem;font-weight:700}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-weight:700;color:#fff}
+.log{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:var(--code);border-radius:8px;padding:10px;max-height:240px;overflow:auto;white-space:pre-wrap}
+.window-demo{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.window-demo .t{width:30px;height:30px;border-radius:5px;display:grid;place-items:center;font-size:.7rem;border:1px solid var(--line);background:var(--panel);transition:all .25s}
+.window-demo .t.i{color:var(--accent)}
+.window-demo .t.c{color:var(--accent2)}
+.window-demo .t.in{background:color-mix(in srgb,var(--accent) 22%,var(--panel));border-color:var(--accent)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  nav.toc{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+  main{padding:16px}
+  section{padding:18px 16px}
+  .g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}
+  .slider-row{grid-template-columns:110px minmax(0,1fr) 34px;} .slider-row .small{display:none}
+  .kv{grid-template-columns:1fr}
+  .svgbox svg{min-width:760px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" id="toc">
+  <div class="brand">Strong Hire</div>
+  <div class="sub">Agents architecture guide</div>
+  <div class="grp">Big picture</div>
+  <a href="#overview">1. Overview and system map</a>
+  <a href="#roster">2. Agent roster</a>
+  <a href="#lifecycle">3. End-to-end lifecycle</a>
+  <div class="grp">Foundations</div>
+  <a href="#gateway">4. Model gateway and prompts</a>
+  <div class="grp">The agents</div>
+  <a href="#interviewer">5. Interviewer agent</a>
+  <a href="#voice">6. Voice pipeline</a>
+  <a href="#planner">7. Extractor and planner</a>
+  <a href="#scorer">8. Scorer agent</a>
+  <a href="#coach">9. Coach agent and suggestions</a>
+  <div class="grp">Cross-cutting</div>
+  <a href="#memory">10. Memory management</a>
+  <a href="#guardrails">11. Guardrails and safety</a>
+  <a href="#tracing">12. Tracing and monitoring</a>
+  <a href="#evals">13. Evals and the AI candidate</a>
+  <div class="grp">Reference</div>
+  <a href="#qa">14. Q&amp;A cheat sheet</a>
+  <a href="#gaps">15. Known gaps</a>
+  <a href="#files">16. File map</a>
+  <button class="btn theme-toggle" id="themeBtn" type="button">Toggle light/dark</button>
+</nav>
+
+<main>
+
+<!-- =============================================================== OVERVIEW -->
+<section class="hero" id="overview">
+  <h1>How the Strong Hire agents work</h1>
+  <p class="lead">This guide covers every LLM-driven component in Strong Hire: what each agent does, how it is wired, what it remembers, which guardrails surround it, and how its actions and reasoning are traced and monitored. It was written from the code on <code>main</code>. File references point to the repo.</p>
+
+  <div class="callout">
+    <b>The core idea in one sentence.</b> Strong Hire is not one free-roaming agent. It is a set of <b>role-based LLM workers</b> (extractor, planner, interviewer, scorer, coach). Each one is wrapped in deterministic code that decides the flow, checks every output, and keeps the state. <b>The code is in charge. The model only fills in what to say or how to judge.</b>
+  </div>
+
+  <h3>System map</h3>
+  <p class="small">The dashed lines are animated request flows. Blue nodes call models. The gateway is the only path to any model.</p>
+  <div class="svgbox">
+  <svg viewBox="0 0 1080 470" width="100%" role="img" aria-label="System map">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker>
+    </defs>
+    <!-- browser -->
+    <g class="node"><rect x="20" y="190" width="150" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="95" y="222" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="14">Browser</text>
+      <text x="95" y="242" text-anchor="middle" fill="var(--muted)" font-size="11">React + LiveKit client</text></g>
+    <!-- api -->
+    <g class="node"><rect x="250" y="60" width="190" height="110" rx="10" fill="var(--panel)" stroke="var(--accent)"/>
+      <text x="345" y="88" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="14">API (FastAPI)</text>
+      <text x="345" y="108" text-anchor="middle" fill="var(--muted)" font-size="11">sessions, text channel,</text>
+      <text x="345" y="124" text-anchor="middle" fill="var(--muted)" font-size="11">coach engine, custom check,</text>
+      <text x="345" y="140" text-anchor="middle" fill="var(--muted)" font-size="11">admin and ops pages</text></g>
+    <!-- voice -->
+    <g class="node"><rect x="250" y="300" width="190" height="110" rx="10" fill="var(--panel)" stroke="var(--accent)"/>
+      <text x="345" y="328" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="14">Voice agent</text>
+      <text x="345" y="348" text-anchor="middle" fill="var(--muted)" font-size="11">LiveKit Agents, VAD,</text>
+      <text x="345" y="364" text-anchor="middle" fill="var(--muted)" font-size="11">turn detector, interview</text>
+      <text x="345" y="380" text-anchor="middle" fill="var(--muted)" font-size="11">runner, voice coach</text></g>
+    <!-- worker -->
+    <g class="node"><rect x="520" y="180" width="190" height="110" rx="10" fill="var(--panel)" stroke="var(--accent)"/>
+      <text x="615" y="208" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="14">Worker (Arq)</text>
+      <text x="615" y="228" text-anchor="middle" fill="var(--muted)" font-size="11">extract, gap analysis,</text>
+      <text x="615" y="244" text-anchor="middle" fill="var(--muted)" font-size="11">brief, scorer, suggestions,</text>
+      <text x="615" y="260" text-anchor="middle" fill="var(--muted)" font-size="11">crons: alerts, sampler</text></g>
+    <!-- gateway -->
+    <g class="node"><rect x="790" y="140" width="170" height="80" rx="10" fill="color-mix(in srgb,var(--accent) 15%,var(--panel))" stroke="var(--accent)" stroke-width="2"/>
+      <text x="875" y="172" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="14">strong_core.gateway</text>
+      <text x="875" y="192" text-anchor="middle" fill="var(--muted)" font-size="11">role → alias, Pydantic AI</text></g>
+    <g class="node"><rect x="790" y="250" width="170" height="60" rx="10" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="875" y="276" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="13">LiteLLM proxy</text>
+      <text x="875" y="294" text-anchor="middle" fill="var(--muted)" font-size="11">aliases → real models</text></g>
+    <g class="node"><rect x="790" y="340" width="170" height="70" rx="10" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="875" y="366" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="13">Models</text>
+      <text x="875" y="384" text-anchor="middle" fill="var(--muted)" font-size="11">LLM, Whisper STT,</text>
+      <text x="875" y="398" text-anchor="middle" fill="var(--muted)" font-size="11">Kokoro TTS</text></g>
+    <!-- stores -->
+    <g class="node"><rect x="520" y="40" width="190" height="60" rx="30" fill="var(--panel)" stroke="var(--accent2)"/>
+      <text x="615" y="66" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="13">Postgres</text>
+      <text x="615" y="84" text-anchor="middle" fill="var(--muted)" font-size="11">source of truth + traces</text></g>
+    <g class="node"><rect x="520" y="370" width="190" height="60" rx="30" fill="var(--panel)" stroke="var(--accent2)"/>
+      <text x="615" y="396" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="13">Redis</text>
+      <text x="615" y="414" text-anchor="middle" fill="var(--muted)" font-size="11">job queue, heartbeats</text></g>
+    <g class="node"><rect x="980" y="40" width="90" height="60" rx="10" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="1025" y="66" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="12">MinIO / S3</text>
+      <text x="1025" y="84" text-anchor="middle" fill="var(--muted)" font-size="10">resume files</text></g>
+    <!-- edges -->
+    <g fill="none" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#ar)">
+      <path class="flowdash" d="M170,215 C210,200 220,140 250,125"/>
+      <path class="flowdash" d="M170,245 C210,260 220,330 250,345"/>
+      <path class="flowdash" d="M440,140 C480,160 490,200 520,215"/>
+      <path class="flowdash" d="M440,80 L520,72"/>
+      <path class="flowdash" d="M710,72 L980,70"/>
+      <path class="flowdash" d="M615,180 L615,100"/>
+      <path class="flowdash" d="M710,215 C740,200 760,185 790,180"/>
+      <path class="flowdash" d="M440,350 C600,330 700,230 790,200"/>
+      <path class="flowdash" d="M440,130 C620,120 700,150 790,165"/>
+      <path class="flowdash" d="M875,220 L875,250"/>
+      <path class="flowdash" d="M875,310 L875,340"/>
+      <path class="flowdash" d="M615,290 L615,370"/>
+      <path class="flowdash" d="M440,380 C480,395 500,400 520,400"/>
+    </g>
+    <text x="180" y="168" fill="var(--muted)" font-size="10">HTTPS</text>
+    <text x="180" y="300" fill="var(--muted)" font-size="10">WebRTC audio</text>
+    <text x="452" y="185" fill="var(--muted)" font-size="10">enqueue jobs</text>
+    <text x="452" y="372" fill="var(--muted)" font-size="10">/internal/... end, coach</text>
+    <!-- moving packets -->
+    <circle r="5" fill="var(--accent)"><animateMotion dur="3.2s" repeatCount="indefinite" path="M440,350 C600,330 700,230 790,200"/></circle>
+    <circle r="5" fill="var(--accent2)"><animateMotion dur="2.6s" repeatCount="indefinite" path="M710,215 C740,200 760,185 790,180"/></circle>
+    <circle r="5" fill="var(--pink)"><animateMotion dur="2.2s" repeatCount="indefinite" path="M170,245 C210,260 220,330 250,345"/></circle>
+    <circle r="4" fill="var(--warn)"><animateMotion dur="1.6s" repeatCount="indefinite" path="M875,220 L875,250 L875,310 L875,340"/></circle>
+  </svg>
+  </div>
+
+  <h3>Five rules that explain most of the design</h3>
+  <div class="grid g2">
+    <div class="card"><h4>1. Everything goes through one gateway</h4><p>Only <code>strong_core.gateway</code> may import a model SDK (Pydantic AI). The code asks for a <b>role</b>, and <code>config/models.&lt;profile&gt;.yaml</code> picks the model. An architecture test enforces this.</p></div>
+    <div class="card"><h4>2. The controller owns the flow</h4><p>Phase changes, the clock, probe limits, when the session ends: all of these are code (<code>SessionController</code>). The interviewer model never decides to end the interview.</p></div>
+    <div class="card"><h4>3. Judgment and arithmetic are separate</h4><p>The scorer model gives rubric scores with quotes. <b>Code</b> computes the hire signal. The gap match score and story <code>missing</code> parts are also computed in code.</p></div>
+    <div class="card"><h4>4. Every output is checked</h4><p>Pydantic schemas (one gateway retry), the output guard, quote verification, fact grounding and fixed fallback lines. A weak model degrades the result but never breaks the flow.</p></div>
+    <div class="card"><h4>5. Prompts are versioned files</h4><p><code>prompts/&lt;role&gt;/&lt;name&gt;[.&lt;tier&gt;].v&lt;N&gt;.txt</code>. Each message carries a <code>prompt_ref</code>, and outputs store the refs (for example <code>Scorecard.rubric_version</code>).</p></div>
+    <div class="card"><h4>6. Tests never call a real model</h4><p><code>MODEL_PROFILE=fake</code> replays fixtures from <code>gateway/fixtures/&lt;role&gt;/</code>. CI is deterministic, and evals can switch to real profiles.</p></div>
+  </div>
+</section>
+
+<!-- =============================================================== ROSTER -->
+<section id="roster">
+  <h2>2. Agent roster</h2>
+  <p class="lead">"Agent" here means a <b>gateway role plus the code loop around it</b>. Some important "agents" have no model at all. They are deterministic components that steer the models.</p>
+  <div class="legend"><span style="--c:var(--accent)">LLM role (product)</span><span style="--c:var(--accent2)">Deterministic component</span><span style="--c:var(--violet)">Test-only LLM role</span></div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Agent</th><th>Kind</th><th>Where it runs</th><th>What it does</th><th>Main outputs (contracts)</th></tr></thead>
+    <tbody>
+      <tr><td><b>Extractor</b></td><td><span class="pill llm">role: extractor</span></td><td>Worker, plus the API for custom checks</td><td>Checks that the input is a job posting or a resume, parses it, builds the auto-profile, finds story-idea skills, checks custom questions</td><td><code>InputCheck</code>, <code>JobPosting</code>, <code>Resume</code>, <code>AutoProfileSummary</code>, <code>StoryIdeas</code>, <code>CustomQuestionCheck</code></td></tr>
+      <tr><td><b>Planner</b></td><td><span class="pill llm">role: planner</span></td><td>Worker</td><td>Gap analysis (resume vs job), the interviewer brief, the role-play buyer brief, story fit</td><td><code>GapAssessment</code>, <code>BriefDraft</code> → <code>InterviewerBrief</code>, <code>RolePlayDraft</code>, <code>StoryFit</code></td></tr>
+      <tr><td><b>Interviewer</b></td><td><span class="pill llm">role: interviewer</span></td><td>Voice agent, or the API text channel</td><td>Says each move (<code>say</code>), decides probe or move on (<code>decide</code>), checks conduct (<code>check_answer</code>)</td><td>Spoken text, <code>ProbeDecision</code>, <code>AnswerCheck</code></td></tr>
+      <tr><td><b>Session controller</b></td><td><span class="pill code">code</span></td><td>Inside the interview runner</td><td>State machine, clock, probe limits, curveball, must-ask questions, conduct strikes</td><td><code>Move</code> with <code>Why</code> reasons</td></tr>
+      <tr><td><b>Output guard</b> and <b>conduct screen</b></td><td><span class="pill code">code</span></td><td>Inside the interview runner</td><td>Removes meta talk and feedback, fixes the stated duration, catches repeats, screens for abuse</td><td><code>GuardResult</code>, fixed lines</td></tr>
+      <tr><td><b>Scorer</b></td><td><span class="pill llm">role: scorer</span></td><td>Worker</td><td>Rubric scores with quotes, re-quote, rationale, story match, take scoring</td><td><code>ScorerOutput</code> → <code>Scorecard</code>, plain-text rationale</td></tr>
+      <tr><td><b>Coach</b> (Strova story coach)</td><td><span class="pill llm">role: coach</span></td><td>API (text), plus voice relaying to the API</td><td>Builds STAR-style stories with the candidate, checks conduct, writes suggestions and story versions</td><td><code>CoachReply</code>, <code>StoryVersions</code>, suggestion payloads</td></tr>
+      <tr><td><b>STT / TTS</b></td><td><span class="pill llm">roles: stt, tts</span></td><td>Voice agent</td><td>Speech in and out through the gateway's OpenAI-compatible audio endpoints</td><td>Text, PCM/WAV</td></tr>
+      <tr><td><b>AI candidate</b></td><td><span class="pill test">role: candidate</span></td><td><code>apps/sim</code>, evals</td><td>Plays a job seeker with a persona, a quality level and a behavior</td><td>Spoken or typed replies</td></tr>
+      <tr><td><b>Judge</b></td><td><span class="pill test">role: judge</span></td><td><code>apps/sim</code>, evals</td><td>Grades the interviewer (or the coach) against fixed rules</td><td><code>JudgeVerdict</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout warn"><b>Naming.</b> "Strova" is the product persona the candidate meets (the UX spec in <code>docs/ux-strova/</code>). In code, the interviewer's default name is <code>"Alex"</code> (<code>Interviewer(name=...)</code>), and role-play casts the interviewer as the "Buyer". The coach engine code does not use the name Strova.</div>
+</section>
+
+<!-- =============================================================== LIFECYCLE -->
+<section id="lifecycle">
+  <h2>3. End-to-end lifecycle</h2>
+  <p class="lead">This is how a candidate's data moves through the agents, from pasting a job to getting a debrief. Press <b>Play</b> to animate it, or click a stage.</p>
+  <div class="controls"><button class="btn primary" id="lcPlay" type="button">▶ Play</button><button class="btn" id="lcPrev" type="button">◀</button><button class="btn" id="lcNext" type="button">▶</button><span class="small" id="lcPos"></span></div>
+  <div class="stage" id="lcStages"></div>
+  <div class="explain" id="lcExplain"></div>
+  <p class="small">Each stage is triggered by an API route that enqueues an Arq job (job ids such as <code>jt:&lt;id&gt;</code>, <code>ga:&lt;id&gt;</code>, <code>brief:&lt;sid&gt;:&lt;hex&gt;</code>, <code>score:&lt;sid&gt;:&lt;hex&gt;</code>). The live interview is the only stage on the latency-critical path, and it reads only the compact brief.</p>
+</section>
+
+<!-- =============================================================== GATEWAY -->
+<section id="gateway">
+  <h2>4. Model gateway, profiles and prompts</h2>
+  <p class="lead">The gateway is the agents' shared "brain stem". Every call takes the same path, so usage, cost and prompt versions are captured in one place.</p>
+
+  <div class="svgbox">
+  <svg viewBox="0 0 1060 250" width="100%" role="img" aria-label="Gateway call path">
+    <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--accent)"/></marker></defs>
+    <g font-size="12" fill="var(--ink)">
+      <rect x="10" y="80" width="150" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="85" y="110" text-anchor="middle" font-weight="700">Caller</text><text x="85" y="128" text-anchor="middle" fill="var(--muted)" font-size="11">complete(role,</text><text x="85" y="143" text-anchor="middle" fill="var(--muted)" font-size="11">messages, output_type)</text>
+      <rect x="200" y="80" width="150" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="275" y="110" text-anchor="middle" font-weight="700">Role → alias</text><text x="275" y="128" text-anchor="middle" fill="var(--muted)" font-size="11">models.&lt;profile&gt;.yaml</text><text x="275" y="143" text-anchor="middle" fill="var(--muted)" font-size="11">MODEL_ROLE_* override</text>
+      <rect x="390" y="80" width="160" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="470" y="110" text-anchor="middle" font-weight="700">Capabilities</text><text x="470" y="128" text-anchor="middle" fill="var(--muted)" font-size="11">tools? → ToolOutput</text><text x="470" y="143" text-anchor="middle" fill="var(--muted)" font-size="11">json? → Native : Prompted</text>
+      <rect x="590" y="80" width="160" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="670" y="110" text-anchor="middle" font-weight="700">Pydantic AI Agent</text><text x="670" y="128" text-anchor="middle" fill="var(--muted)" font-size="11">validate output,</text><text x="670" y="143" text-anchor="middle" fill="var(--muted)" font-size="11">retries = 1</text>
+      <rect x="790" y="80" width="120" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="850" y="115" text-anchor="middle" font-weight="700">LiteLLM</text><text x="850" y="135" text-anchor="middle" fill="var(--muted)" font-size="11">/v1 OpenAI API</text>
+      <rect x="940" y="80" width="110" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="995" y="115" text-anchor="middle" font-weight="700">Completion</text><text x="995" y="135" text-anchor="middle" fill="var(--muted)" font-size="10">output, model, refs, usage</text>
+      <rect x="590" y="195" width="320" height="44" rx="8" fill="color-mix(in srgb,var(--accent2) 12%,var(--panel))" stroke="var(--accent2)"/><text x="750" y="222" text-anchor="middle" font-size="11">_report_chat → usage sink → usage_events (only inside usage_context)</text>
+      <rect x="200" y="10" width="350" height="44" rx="8" fill="color-mix(in srgb,var(--violet) 12%,var(--panel))" stroke="var(--violet)"/><text x="375" y="37" text-anchor="middle" font-size="11">MODEL_PROFILE=fake → FakeBackend (fixtures), no network</text>
+    </g>
+    <g stroke="var(--accent)" stroke-width="2" fill="none" marker-end="url(#ar2)">
+      <path class="flowdash" d="M160,120 L200,120"/><path class="flowdash" d="M350,120 L390,120"/><path class="flowdash" d="M550,120 L590,120"/><path class="flowdash" d="M750,120 L790,120"/><path class="flowdash" d="M910,120 L940,120"/>
+      <path class="flowdash" d="M995,160 C995,215 950,217 910,217"/>
+      <path class="flowdash" d="M275,80 L275,54"/>
+    </g>
+  </svg>
+  </div>
+
+  <h3>Model profiles: pick one to see the role mapping</h3>
+  <div class="controls" id="profBtns"></div>
+  <div class="tbl-wrap"><table id="profTable"></table></div>
+  <p class="small" id="profNote"></p>
+
+  <h3>Prompt loader (PL-5, PL-6)</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>How a prompt is chosen</h4>
+      <ol>
+        <li><code>load_prompt(role, name)</code> looks in <code>prompts/&lt;role&gt;/</code>.</li>
+        <li>It reads the <b>tier</b> of the model that serves the role (<code>capabilities(role).tier</code>: small, medium or large). It never looks at the model name.</li>
+        <li>If <code>&lt;name&gt;.&lt;tier&gt;.vN.txt</code> exists, that variant wins. Otherwise the default variant <code>&lt;name&gt;.vN.txt</code> is used.</li>
+        <li>The highest version wins, unless the caller pins one.</li>
+        <li><code>$placeholders</code> are filled with <code>string.Template</code>. A missing value raises an error.</li>
+        <li><code>.message(role, ...)</code> returns a <code>Message</code> with <code>prompt_ref</code> set, for example <code>interviewer/turn.small.v3</code>.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>Where the refs end up</h4>
+      <div class="kv">
+        <div>Interview session</div><div><code>sessions.prompt_version</code> (sorted interviewer refs), <code>interviewer_model_id</code>, <code>model_profile</code></div>
+        <div>Each interviewer call</div><div><code>interviewer_traces.prompt_refs</code> and the full <code>messages_json</code></div>
+        <div>Scorecard</div><div><code>scorer_model</code> (alias), <code>rubric_version</code> (prompt ref)</div>
+        <div>Gap analysis</div><div><code>model_version</code> = "alias refs"</div>
+        <div>Coach session</div><div><code>prompt_version</code>, <code>model_id</code></div>
+        <div>Auto-profile, story fit, takes</div><div><code>prompt_version</code> and <code>model_id</code> columns</div>
+        <div>Suggestions</div><div><code>suggestions.prompt_ref</code></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>The fake model (tests and CI)</h3>
+  <p><code>FakeBackend</code> answers <code>complete()</code> with the first match, in this order:</p>
+  <ol>
+    <li><code>fixtures/&lt;role&gt;/&lt;messages-hash&gt;.json|.txt</code>: an exact recording. The hash is sha256 of <code>[[role, content], ...]</code>, first 16 hex characters.</li>
+    <li><code>&lt;role&gt;/&lt;OutputType&gt;.json</code>: the default output for that contract.</li>
+    <li><code>&lt;role&gt;/text.txt</code> for plain-text replies.</li>
+  </ol>
+  <p>If nothing matches, <code>FakeFixtureMissingError</code> names the file to add. <code>RecordingGateway</code> (<code>gateway/recorder.py</code>) wraps a real gateway and saves every call as a replayable fixture.</p>
+</section>
+
+<!-- =============================================================== INTERVIEWER -->
+<section id="interviewer">
+  <h2>5. The interviewer agent (deep dive)</h2>
+  <p class="lead">The package <code>packages/interview</code> (<code>strong_interview</code>) holds three collaborating parts. The voice agent, the text channel and the eval harness all run this same code.</p>
+  <div class="grid g3">
+    <div class="card"><h4><code>SessionController</code></h4><p class="small">controller.py</p><p>A pure-code state machine. It decides the next <b>Move</b> (greet, ask, probe, curveball, warn, wrap up and so on) and records <b>why</b> (the <code>Why</code> enum) for the traces.</p></div>
+    <div class="card"><h4><code>Interviewer</code></h4><p class="small">interviewer.py</p><p>Turns a move into words (<code>say</code>), chooses probe or move on (<code>decide</code>), and checks conduct (<code>check_answer</code>). All three use the interviewer role.</p></div>
+    <div class="card"><h4><code>InterviewRunner</code></h4><p class="small">runner.py</p><p>Keeps the transcript, sequences each candidate turn, runs the checks in parallel, emits trace records, and recovers when a turn fails.</p></div>
+  </div>
+
+  <h3>5.1 Conversation state machine</h3>
+  <p>Click a phase for its rules. The dot shows a normal 30-minute session.</p>
+  <div class="svgbox">
+  <svg id="fsm" viewBox="0 0 1060 230" width="100%" role="img" aria-label="Interview phases">
+    <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker></defs>
+    <g id="fsmNodes"></g>
+    <path d="M520,95 C470,20 640,20 590,95" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ar3)"/>
+    <text x="555" y="22" text-anchor="middle" font-size="11" fill="var(--accent)">ask → answer → probe ≤ limit</text>
+    <circle id="fsmDot" r="9" fill="var(--pink)" class="pulse"/>
+  </svg>
+  </div>
+  <div class="explain" id="fsmExplain"><span class="step">Phase</span><div>Click a phase.</div></div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Default time plan (minutes)</th><th>INTRO</th><th>SMALL_TALK</th><th>AGENDA</th><th>CORE</th><th>CAND. QUESTIONS</th><th>WRAP_UP</th></tr></thead>
+    <tbody>
+      <tr><td>10 (mini)</td><td>1</td><td>0 (skipped)</td><td>0 (one short turn)</td><td>8</td><td>0 (skipped)</td><td>1</td></tr>
+      <tr><td>30</td><td>1</td><td>2</td><td>1</td><td>21</td><td>4</td><td>1</td></tr>
+      <tr><td>45</td><td>1</td><td>2</td><td>1</td><td>35</td><td>5</td><td>1</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="small">The brief's <code>time_plan</code> overrides these defaults. CORE does not start a new question with less than 2 minutes left (<code>MIN_QUESTION_MS</code>). Lower-priority questions are dropped. The candidate may ask at most 3 questions.</p>
+
+  <h3>5.2 One candidate turn, step by step</h3>
+  <p>This sequence is <code>InterviewRunner.respond()</code> for an answer in CORE. Step through it or press Play.</p>
+  <div class="controls"><button class="btn primary" data-seq="turn" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="turn" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="turn" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="turn" data-act="reset" type="button">Reset</button><span class="small" id="seq-turn-pos"></span></div>
+  <div class="svgbox"><svg id="seq-turn" width="100%"></svg></div>
+  <div class="explain" id="seq-turn-explain"></div>
+
+  <h3>5.3 Probe-or-move-on: try the controller</h3>
+  <p>The model only <i>proposes</i> a probe (<code>ProbeDecision{action, missing[]}</code>). The controller decides whether to follow it. Pick settings, then click what the model says after each answer.</p>
+  <div class="grid g2">
+    <div class="card">
+      <div class="controls">
+        <label>Difficulty <select id="psDiff" class="btn"><option value="1">Friendly (1 probe)</option><option value="2" selected>Realistic (2)</option><option value="3">Tough (3)</option></select></label>
+        <label><input type="checkbox" id="psMini"> Mini (10 min, max 1)</label>
+      </div>
+      <div class="controls">
+        <button class="btn" data-ps="own_role" type="button">probe: own_role</button>
+        <button class="btn" data-ps="measurable_result" type="button">probe: measurable_result</button>
+        <button class="btn" data-ps="concrete_example" type="button">probe: concrete_example</button>
+        <button class="btn" data-ps="tradeoff_reasoning" type="button">probe: tradeoff_reasoning</button>
+        <button class="btn" data-ps="move_on" type="button">move_on</button>
+        <button class="btn" data-ps="fail" type="button">model call fails</button>
+        <button class="btn" id="psReset" type="button">New question</button>
+      </div>
+      <div class="kv"><div>probes_used</div><div id="psUsed">0</div><div>probe_limit</div><div id="psLimit">2</div><div>probed_missing</div><div id="psMissing">[]</div></div>
+    </div>
+    <div class="log" id="psLog">Question q1 asked. Waiting for the answer's decision…</div>
+  </div>
+  <p class="small">Rules reproduced from <code>SessionController.after_answer</code>: the limit is <code>min(brief.max_probes_per_question, PROBE_LIMIT[difficulty])</code>, capped at 1 for minis. A later probe must target a gap that has not been probed on this question yet. Otherwise the controller moves on with <code>same_gap_not_filled</code>. If <code>decide</code> fails, the interviewer moves on (<code>ProbeDecision(action="move_on")</code>).</p>
+
+  <h3>5.4 What the interviewer sees (its prompt)</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>System: <code>interviewer/turn</code> (or a type variant)</h4>
+      <p class="small">Recruiter screen uses <code>turn_recruiter_screen</code>. Role-play uses <code>turn_role_play</code> with the hidden buyer brief.</p>
+      <ul>
+        <li>Persona: name, interview type, level, company line, tone, pushback style, closing style, seniority bar</li>
+        <li>Hard rules: speak only the words to say, at most 2 sentences and <code>max_words</code> (35, or 30 on small tier), one question, no feedback, no meta talk</li>
+        <li>Session facts it may share (company, job, team, notes). For anything else it says it doesn't know.</li>
+        <li>The meaning of each move: greet, small_talk, agenda, ask, probe, curveball, …</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>User: <code>interviewer/turn_input</code></h4>
+<pre>Transcript so far:      ← last 16 turns (6 on small tier)
+Session length / plan   ← from the time plan
+Move: probe
+Question: …             ← candidate-written = JSON-quoted data
+What the last answer lacks: measurable result
+Pushback: on|off
+Extra instruction: note_* or none</pre>
+    </div>
+  </div>
+  <div class="callout"><b>The brief is the interviewer's compressed knowledge.</b> The interviewer never sees the raw resume or posting. The planner condenses them into an <code>InterviewerBrief</code> of at most about 1500 tokens: 4–6 target competencies, 6–12 ranked questions with probe hints, probe areas, persona, time plan, curveball and seniority bar. This keeps the prompts short and the latency low.</div>
+
+  <h3>5.5 Special modes</h3>
+  <div class="grid g3">
+    <div class="card"><h4>Coach mode (IV-8)</h4><p>The candidate can pause, ask for a hint (at most 2 per question) or redo a question. <code>CoachNotAllowedError</code> outside Coach mode.</p></div>
+    <div class="card"><h4>Custom sessions (CU-4)</h4><p>Categories run in the candidate's order. Must-ask questions are guaranteed by the controller, never the model, using a time reserve. Verbatim questions: the model writes only a lead-in of 12 words or fewer, and the code appends the exact text.</p></div>
+    <div class="card"><h4>Role-play (RP-5/6)</h4><p>The interviewer plays a buyer from a hidden <code>RolePlayBrief</code> (pains, budget, objections). The buyer has its own decide prompt with triggers: <code>needs_discovery</code>, <code>objection_unresolved</code>, <code>no_value_link</code> and <code>no_next_step</code>.</p></div>
+    <div class="card"><h4>Conduct (IV-12)</h4><p>Strikes 1 and 2 get fixed warning lines, and the same question stays open. Strike 3 gets a fixed closing line and the session ends.</p></div>
+    <div class="card"><h4>Dropped connection (IV-9)</h4><p><code>hold()</code> stops the clock. Within 120 s the agent says "welcome back" and repeats its last line. <code>rebuild(turns)</code> can rebuild controller state from the saved transcript.</p></div>
+    <div class="card"><h4>Take-back (barge-in)</h4><p>If the candidate keeps talking while a reply is being prepared, <code>runner.rollback(checkpoint)</code> restores the controller snapshot and removes the turns. A <code>rollback</code> trace is written.</p></div>
+  </div>
+</section>
+
+<!-- =============================================================== VOICE -->
+<section id="voice">
+  <h2>6. Voice pipeline</h2>
+  <p class="lead">The voice agent (<code>apps/voice</code>, LiveKit Agents) handles audio only. It uses LiveKit for VAD, end-of-turn detection and barge-in, but <b>suppresses LiveKit's own LLM reply</b> (<code>raise StopResponse</code>) and hands the text to the shared <code>InterviewRunner</code>.</p>
+  <div class="svgbox">
+  <svg viewBox="0 0 1060 210" width="100%" role="img" aria-label="Voice turn pipeline">
+    <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--accent)"/></marker></defs>
+    <g font-size="12" fill="var(--ink)" text-anchor="middle">
+      <rect x="10" y="60" width="120" height="70" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="70" y="90" font-weight="700">Mic audio</text><text x="70" y="108" fill="var(--muted)" font-size="10">WebRTC</text>
+      <rect x="160" y="60" width="130" height="70" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="225" y="90" font-weight="700">Silero VAD</text><text x="225" y="108" fill="var(--muted)" font-size="10">+ turn detector</text>
+      <rect x="320" y="60" width="130" height="70" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="385" y="90" font-weight="700">GatewaySTT</text><text x="385" y="108" fill="var(--muted)" font-size="10">segment → transcribe</text>
+      <rect x="480" y="60" width="150" height="70" rx="10" fill="color-mix(in srgb,var(--accent) 12%,var(--panel))" stroke="var(--accent)"/><text x="555" y="85" font-weight="700">CandidateTurns</text><text x="555" y="103" fill="var(--muted)" font-size="10">late STT wait, thinking,</text><text x="555" y="117" fill="var(--muted)" font-size="10">prep time, barge-in</text>
+      <rect x="660" y="60" width="150" height="70" rx="10" fill="color-mix(in srgb,var(--accent) 12%,var(--panel))" stroke="var(--accent)"/><text x="735" y="90" font-weight="700">InterviewRunner</text><text x="735" y="108" fill="var(--muted)" font-size="10">same as text mode</text>
+      <rect x="840" y="60" width="100" height="70" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="890" y="90" font-weight="700">GatewayTTS</text><text x="890" y="108" fill="var(--muted)" font-size="10">phrase streaming</text>
+      <rect x="960" y="60" width="90" height="70" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="1005" y="98" font-weight="700">Speaker</text>
+    </g>
+    <g stroke="var(--accent)" stroke-width="2" fill="none" marker-end="url(#ar4)">
+      <path class="flowdash" d="M130,95 L160,95"/><path class="flowdash" d="M290,95 L320,95"/><path class="flowdash" d="M450,95 L480,95"/><path class="flowdash" d="M630,95 L660,95"/><path class="flowdash" d="M810,95 L840,95"/><path class="flowdash" d="M940,95 L960,95"/>
+    </g>
+    <circle r="6" fill="var(--pink)"><animateMotion dur="4s" repeatCount="indefinite" path="M70,95 L1005,95"/></circle>
+    <g font-size="11" fill="var(--muted)" text-anchor="middle">
+      <text x="225" y="160">end-of-turn 0.8–6 s (dynamic)</text>
+      <text x="385" y="160">stt_ms</text>
+      <text x="735" y="160">llm_ttft_ms</text>
+      <text x="890" y="160">tts_ttfb_ms</text>
+      <text x="530" y="195">e2e_ms = end of candidate speech → first interviewer audio (target p50 &lt; 800 ms; gate p50 &lt; 1000 ms)</text>
+    </g>
+  </svg>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <h4>Room dispatch (<code>agent.py</code>)</h4>
+      <ul>
+        <li><code>session-&lt;uuid&gt;</code> → real interview. Sets the DB usage sink, plus <code>log_context</code> and <code>usage_context(org, session)</code> <b>before</b> connecting, so every task inherits them.</li>
+        <li><code>coach-&lt;uuid&gt;</code> → voice coach. It relays each turn to the API's internal coach endpoint and keeps no LLM state of its own.</li>
+        <li>Any other name → latency spike room.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Turn-taking details (<code>turns.py</code>)</h4>
+      <ul>
+        <li>Replies are prepared one at a time, under a lock.</li>
+        <li>If STT is still busy at end of turn, the reply waits so the rest of the answer can join.</li>
+        <li>"Let me think" phrases → the fixed <code>TAKE_YOUR_TIME</code> line and a check-in after 60 s of silence.</li>
+        <li>Prep-time requests (IV-11): hold the clock for 1–3 minutes.</li>
+        <li>Data channel topics <code>coach</code> (hint, redo, pause, end…) and <code>session</code> (live state, captions).</li>
+      </ul>
+    </div>
+  </div>
+  <p class="small">At the end, <code>VoiceInterview.finish</code> flushes the turns, saves <code>prompt_version</code>, flushes the traces (5 s limit), then POSTs <code>/internal/sessions/{id}/end</code>. The API bills the minutes and enqueues scoring.</p>
+</section>
+
+<!-- =============================================================== PLANNER / EXTRACTOR -->
+<section id="planner">
+  <h2>7. Extractor and planner agents</h2>
+  <p class="lead">These run before the interview, in the Arq worker. Each follows the same pattern: <b>sanitize the input → model call (up to 2 attempts) → pure-code assembly that caps, dedupes and verifies → persist</b>.</p>
+
+  <h3>Extractor jobs</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Job</th><th>Prompts</th><th>Contract</th><th>Code around the model</th><th>Persisted</th></tr></thead>
+    <tbody>
+      <tr><td>Input check (IN-6/7)</td><td><code>check_job_posting</code> / <code>check_resume</code> + <code>check_input</code></td><td><code>InputCheck</code></td><td>First 6000 characters. <b>Fails open</b>: a model error accepts the input. The refusal reason is cut to 200 characters and dropped if it looks like instructions.</td><td>Nothing. A refused CV file is never stored.</td></tr>
+      <tr><td><code>extract_job_target</code>, <code>parse_resume</code></td><td><code>job_posting</code> v3, <code>resume</code> v2 + inputs</td><td><code>JobPosting</code>, <code>Resume</code></td><td>2 attempts with semantic checks (no skills, bad dates). Injected items are dropped. Per-field confidence comes from grounding in the source text.</td><td><code>job_targets.parsed_json</code>, <code>resumes.parsed_json</code></td></tr>
+      <tr><td><code>build_auto_profile</code> (AP-1)</td><td><code>auto_profile</code></td><td><code>AutoProfileSummary</code></td><td>Fetches up to 3 pages from the company's own domain. Keeps only sources that were really fetched.</td><td><code>company_auto_profiles</code> (PENDING until an admin approves)</td></tr>
+      <tr><td><code>story_idea_skills</code> (RM-4)</td><td><code>story_idea_skills</code></td><td><code>StoryIdeas</code></td><td><code>missing_parts</code> is computed in code.</td><td><code>suggestions</code> (STORY_IDEA)</td></tr>
+      <tr><td>Custom question check (CU-5)</td><td><code>custom_question_check</code></td><td><code>CustomQuestionCheck</code></td><td>21 injection regexes first, then the model. Rate limited to 20 per minute and 300 per day.</td><td>Only accepted questions</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Planner jobs</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>Gap analysis (GA-1..3)</h4>
+      <p><b>In:</b> posting text, requirements <code>r1..rn</code> (up to 12 must-haves and 6 nice-to-haves), family competencies, a compact resume, user notes (1500 characters), company line.</p>
+      <p><b>Model:</b> <code>GapAssessment</code>, with each requirement rated 0–3 plus evidence.</p>
+      <p><b>Code:</b> unrated items count as 0. A rating of 2 or more without resume evidence is capped at 1. Strengths without evidence are dropped. <b>match = 0.7 × requirements + 0.3 × competencies</b>.</p>
+      <p><b>Out:</b> <code>gap_analyses</code> (score, breakdown, session plan, <code>model_version</code>).</p>
+    </div>
+    <div class="card">
+      <h4>Interviewer brief (on session create)</h4>
+      <p><b>In:</b> the latest ready gap analysis, the resume, the company profile version (or an approved auto-profile), family guidance, level bar, difficulty, tone, duration.</p>
+      <p><b>Model:</b> <code>BriefDraft</code> (6–12 questions + curveball), or <code>RolePlayDraft</code>.</p>
+      <p><b>Code:</b> repairs ids, forces every target competency to be covered, drops off-limits recruiter questions (salary history, protected traits), sets probes by difficulty, adds the curveball only on Tough, builds the time plan, trims to 1500 tokens. Tone comes from a parsed prompt file the planner never sees.</p>
+      <p><b>Out:</b> <code>sessions.brief_json</code>. 2 tries, then the session is FAILED.</p>
+    </div>
+    <div class="card">
+      <h4>Story fit (ST-5)</h4>
+      <p>Matches the user's stories (up to 30) to the job's tested skills: strong, thin or missing. Small tier makes one call per skill. The result is cached by an input hash in <code>role_story_fits</code>, and can be reused across roles with the same hash.</p>
+    </div>
+    <div class="card">
+      <h4>Profiles are not built by agents at runtime</h4>
+      <p>Curated company profiles are researched offline, reviewed, versioned and imported. No research runs inside the app or during an interview. Each session records the profile version it used, so scores stay explainable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== SCORER -->
+<section id="scorer">
+  <h2>8. The scorer agent</h2>
+  <p class="lead">The scorer is deliberately separate from the interviewer: it reads the whole transcript afterwards, like a debrief panel. The live model therefore never softens its judgment mid-conversation, and scoring can use a stronger, slower model.</p>
+  <div class="controls"><button class="btn primary" data-seq="score" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="score" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="score" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="score" data-act="reset" type="button">Reset</button><span class="small" id="seq-score-pos"></span></div>
+  <div class="svgbox"><svg id="seq-score" width="100%"></svg></div>
+  <div class="explain" id="seq-score-explain"></div>
+
+  <h3>Hire signal calculator (computed in code, never by the model)</h3>
+  <p>Move the per-competency rubric averages. Weights stand in for a company profile's scoring weights.</p>
+  <div class="grid g2">
+    <div class="card" id="hsSliders"></div>
+    <div class="card">
+      <div class="small">Weighted average</div><div class="result" id="hsAvg">–</div>
+      <div class="small" style="margin-top:8px">Band from the average</div><div id="hsBand">–</div>
+      <div class="small" style="margin-top:8px">Final signal after hard rules</div><div class="result" id="hsSignal">–</div>
+      <div class="small" style="margin-top:8px" id="hsRules"></div>
+      <p class="small">Bands: ≥ 3.5 Strong Hire · ≥ 3.0 Hire · ≥ 2.6 Lean Hire · ≥ 2.0 Lean No Hire · else No Hire. Rules use each average rounded half up to a whole point. In company mode, <code>values_share</code> of the average comes from company-value scores.</p>
+    </div>
+  </div>
+
+  <h3>After the scorecard</h3>
+  <ul>
+    <li><b>Delivery metrics</b> (words per minute, fillers) come from voice timestamps. This is code, not a model.</li>
+    <li><b>Progress snapshots</b> (one per competency) are written only for Realistic sessions that are not minis.</li>
+    <li><b>Story match (ST-6)</b>: for each answer, which library story it used (<code>STORY: S3 | NONE</code>, <code>FIX: …</code>). A Realistic answer that scores 3 or more on a real-model profile makes the story <b>Proven</b> (ST-7).</li>
+    <li><b>Suggestions</b>: the coach role proposes story tunes and new stories (see section 9).</li>
+    <li><b>Takes (CO-7)</b>: one telling of a story is scored by the same scorer with a synthetic one-question brief. The rationale is written in code.</li>
+  </ul>
+</section>
+
+<!-- =============================================================== COACH -->
+<section id="coach">
+  <h2>9. The coach agent and suggestions</h2>
+  <p class="lead">The coach helps the candidate build interview stories (context, stakes, action, result, reflection). Its defining rule is <b>CO-3: it may only record what the candidate actually said</b>. Every story update must quote the candidate's words.</p>
+  <div class="controls"><button class="btn primary" data-seq="coach" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="coach" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="coach" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="coach" data-act="reset" type="button">Reset</button><span class="small" id="seq-coach-pos"></span></div>
+  <div class="svgbox"><svg id="seq-coach" width="100%"></svg></div>
+  <div class="explain" id="seq-coach-explain"></div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4>What to ask next is chosen in code (CO-4)</h4>
+      <p>In order: concrete example (context) → stakes → own role (asked when the action says "we" but not "I") → measurable result (asked when there is no number) → trade-offs → reflection. The model is told which <b>one</b> thing to ask about.</p>
+    </div>
+    <div class="card">
+      <h4>Styles (CO-5)</h4>
+      <p><code>style_gentle</code> or <code>style_direct</code> is a section of the system prompt. Code also enforces it: a direct reply keeps only the question, and a gentle reply that praises ("a meaningful outcome") becomes "Thank you."</p>
+    </div>
+  </div>
+
+  <h3>Suggestion generators (coach role, worker)</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Kind</th><th>Trigger</th><th>Contract</th><th>Grounding check</th></tr></thead>
+    <tbody>
+      <tr><td>TUNE_STORY (SG-2)</td><td>After scoring, when an answer used a story and has a fix</td><td><code>StoryPartEdit</code></td><td rowspan="5">All use <code>_complete_checked</code>: up to 2 calls. On a problem, the second call adds a <code>suggest_fix</code> message listing the problems. Fact checks: each quote has 3+ words and is found in the user's words, every number appears in the quotes, and 50% or more of each sentence's content words appear in the quotes. A second miss stores nothing. Dismissed suggestions never come back (dedupe).</td></tr>
+      <tr><td>NEW_STORY (SG-3)</td><td>An answer used no story and scored 3 or more</td><td><code>NewStoryPayload</code></td></tr>
+      <tr><td>IMPROVE_RESUME_LINE (SG-6)</td><td>A story's result has a number and a matching resume line does not</td><td><code>ResumeLineEdit</code></td></tr>
+      <tr><td>REVIEW (ST-11)</td><td>The user asks for a story review</td><td><code>StoryReview</code></td></tr>
+      <tr><td>TAILOR_ROLE (SG-5)</td><td>After story fit, for up to 3 lead stories</td><td><code>TailorRolePayload</code></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">MISSING_SKILL (SG-4) is rule-based and makes no model call. At most 6 model suggestions are made per session.</p>
+</section>
+
+<!-- =============================================================== MEMORY -->
+<section id="memory">
+  <h2>10. Memory management</h2>
+  <p class="lead">No agent has hidden or long-lived "chat memory", and there is no vector store or embeddings. <b>Every model call is stateless.</b> Memory is explicit data that code assembles into each prompt from Postgres, in layers.</p>
+
+  <div class="svgbox">
+  <svg viewBox="0 0 1060 330" width="100%" role="img" aria-label="Memory layers">
+    <g font-size="12" fill="var(--ink)">
+      <rect x="20" y="15" width="1020" height="56" rx="10" fill="color-mix(in srgb,var(--pink) 12%,var(--panel))" stroke="var(--pink)"/>
+      <text x="40" y="40" font-weight="700">L1 · Prompt working memory (per call)</text>
+      <text x="40" y="58" fill="var(--muted)" font-size="11">Interviewer: brief + last 16 turns (6 on small tier). Coach: story state + last 20 turns. Scorer: full transcript, budgeted at 55% of the context window.</text>
+      <rect x="20" y="81" width="1020" height="56" rx="10" fill="color-mix(in srgb,var(--accent) 12%,var(--panel))" stroke="var(--accent)"/>
+      <text x="40" y="106" font-weight="700">L2 · Live session state (in process)</text>
+      <text x="40" y="124" fill="var(--muted)" font-size="11">runner.turns + SessionController (phase, queue, probes_used, probed_missing, strikes, clock). snapshot() / restore() / rebuild(turns).</text>
+      <rect x="20" y="147" width="1020" height="56" rx="10" fill="color-mix(in srgb,var(--accent2) 12%,var(--panel))" stroke="var(--accent2)"/>
+      <text x="40" y="172" font-weight="700">L3 · Session record (Postgres)</text>
+      <text x="40" y="190" fill="var(--muted)" font-size="11">sessions.brief_json · turns (seq-ordered transcript, text only, no audio) · interviewer_traces · coach_turns · voice_turn_timings · usage_events</text>
+      <rect x="20" y="213" width="1020" height="56" rx="10" fill="color-mix(in srgb,var(--violet) 12%,var(--panel))" stroke="var(--violet)"/>
+      <text x="40" y="238" font-weight="700">L4 · Candidate long-term memory (Postgres)</text>
+      <text x="40" y="256" fill="var(--muted)" font-size="11">resumes · job_targets · gap_analyses · stories (+notes, Proven) · scorecards · progress_snapshots · role_story_fits · suggestions · takes</text>
+      <rect x="20" y="279" width="1020" height="44" rx="10" fill="color-mix(in srgb,var(--warn) 12%,var(--panel))" stroke="var(--warn)"/>
+      <text x="40" y="306" font-weight="700">L5 · Shared knowledge</text>
+      <text x="300" y="306" fill="var(--muted)" font-size="11">versioned company_profiles · approved auto-profiles · prompts/ files · role-family registry · question bank</text>
+    </g>
+  </svg>
+  </div>
+
+  <h3>Sliding transcript window (interviewer)</h3>
+  <p>Drag to grow the conversation and see which turns the interviewer model actually sees. The <b>brief</b> is always included, so the plan is never forgotten even when old turns drop out.</p>
+  <div class="controls"><label>Turns so far <input type="range" id="winN" min="1" max="40" value="22"></label><label><input type="checkbox" id="winSmall"> Small-tier model (window 6)</label><span class="small" id="winInfo"></span></div>
+  <div class="window-demo" id="winDemo"></div>
+  <div class="legend"><span style="--c:var(--accent)">I = interviewer turn</span><span style="--c:var(--accent2)">C = candidate turn</span><span style="--c:color-mix(in srgb,var(--accent) 40%,var(--panel))">in the prompt</span></div>
+
+  <h3>How each agent assembles memory</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Agent</th><th>Reads from</th><th>Window and compression</th><th>Writes back</th></tr></thead>
+    <tbody>
+      <tr><td>Interviewer <code>say</code></td><td>brief, <code>runner.turns</code>, session facts</td><td>Last 16 or 6 turns. The brief stands in for the raw documents.</td><td>One <code>turns</code> row per line (<code>on_turn</code> hook), one trace per call</td></tr>
+      <tr><td>Interviewer <code>decide</code> / <code>check_answer</code></td><td>Current question + probe hints, the answer, recent turns</td><td>Same window. Only the previous interviewer line goes to <code>check_answer</code>.</td><td>Traces only. The decision steers the controller.</td></tr>
+      <tr><td>Controller</td><td>Brief questions and time plan</td><td>Keeps <code>probed_missing</code> so a follow-up never repeats a gap</td><td>Nothing directly. Rebuildable from <code>question_ref</code>s on the turns.</td></tr>
+      <tr><td>Planner (brief)</td><td>Latest READY gap analysis, resume, profile version, gap probe areas</td><td>Trimmed to 1500 tokens</td><td><code>sessions.brief_json</code></td></tr>
+      <tr><td>Scorer</td><td><code>brief_json</code>, <code>turns</code>, the profile version the session used</td><td>When over budget, drops small talk, then intro, agenda and wrap-up</td><td><code>scorecards</code>, <code>progress_snapshots</code>, story notes and status</td></tr>
+      <tr><td>Coach</td><td><code>stories</code> row, <code>coach_turns</code></td><td>Last 20 turns + the full current story</td><td>Story parts (only when quote-backed), <code>coach_turns</code></td></tr>
+      <tr><td>Story fit / story match</td><td>Up to 30 stories / 12 ranked stories</td><td>Story parts capped at 400 characters</td><td><code>role_story_fits</code> (hash cache), <code>per_question_json</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Durability and recovery</h3>
+  <div class="grid g3">
+    <div class="card"><h4>Failed turn</h4><p><code>respond()</code> takes a checkpoint. If a model error, a save error or a timeout happens before anything is said, the controller is restored and an unsaved turn is popped. The candidate can resend the same answer.</p></div>
+    <div class="card"><h4>Reconnect</h4><p>The clock is held. The live state stays in the voice process for 120 s. <code>rebuild(turns)</code> can rebuild the queue, the asked and dropped questions, the probes used and the clock from the transcript.</p></div>
+    <div class="card"><h4>Text-channel caveat</h4><p>Text runners live in the API process (<code>app.state.text_runners</code>), and only in local and test environments. If the API restarts, an open text session must be ended.</p></div>
+  </div>
+  <p class="small">Retention: interviewer traces and voice timings are kept 90 days. Ops samples and error events are kept 30 days. Transcripts and error groups are kept. Audio is never written by the voice agent.</p>
+</section>
+
+<!-- =============================================================== GUARDRAILS -->
+<section id="guardrails">
+  <h2>11. Guardrails and safety layers</h2>
+  <p class="lead">Defense in depth around every agent. Most layers are deterministic, so a confused model cannot bypass them.</p>
+  <h3>Interviewer output guard: animated</h3>
+  <div class="controls"><label>Scenario <select id="gdSel" class="btn">
+    <option value="clean">Clean reply</option>
+    <option value="fix">Reply with feedback ("Great answer! …")</option>
+    <option value="retry">Reply that is pure reasoning</option>
+    <option value="fallback">Two bad replies in a row</option>
+  </select></label><button class="btn primary" id="gdRun" type="button">▶ Run</button></div>
+  <div class="svgbox">
+  <svg id="guardSvg" viewBox="0 0 1060 170" width="100%" role="img" aria-label="Guard flow">
+    <defs><marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker></defs>
+    <g font-size="12" text-anchor="middle" fill="var(--ink)">
+      <g id="gd0" class="node"><rect x="10" y="50" width="140" height="64" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="80" y="78" font-weight="700">LLM call #1</text><text x="80" y="96" fill="var(--muted)" font-size="10">turn prompt</text></g>
+      <g id="gd1" class="node"><rect x="190" y="50" width="160" height="64" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="270" y="74" font-weight="700">guard_reply</text><text x="270" y="92" fill="var(--muted)" font-size="10">meta · feedback · duration</text><text x="270" y="105" fill="var(--muted)" font-size="10">· repeat</text></g>
+      <g id="gd2" class="node"><rect x="390" y="50" width="150" height="64" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="465" y="78" font-weight="700">LLM call #2</text><text x="465" y="96" fill="var(--muted)" font-size="10">+ turn_retry (stricter)</text></g>
+      <g id="gd3" class="node"><rect x="580" y="50" width="150" height="64" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="655" y="78" font-weight="700">guard_reply</text><text x="655" y="96" fill="var(--muted)" font-size="10">again</text></g>
+      <g id="gd4" class="node"><rect x="770" y="10" width="130" height="54" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="835" y="42" font-weight="700">Speak reply</text></g>
+      <g id="gd5" class="node"><rect x="770" y="100" width="130" height="54" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="835" y="124" font-weight="700">fallback_line</text><text x="835" y="140" fill="var(--muted)" font-size="10">fixed text per move</text></g>
+      <g id="gd6" class="node"><rect x="930" y="50" width="120" height="64" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="990" y="78" font-weight="700">Trace</text><text x="990" y="96" fill="var(--muted)" font-size="10">guard{attempt,action}</text></g>
+    </g>
+    <g stroke="var(--muted)" fill="none" stroke-width="1.5" marker-end="url(#ar5)">
+      <path d="M150,82 L190,82"/><path d="M350,82 L390,82"/><path d="M540,82 L580,82"/><path d="M730,70 L770,40"/><path d="M730,94 L770,125"/><path d="M350,64 C500,0 700,10 770,30"/><path d="M900,37 L930,70"/><path d="M900,127 L930,95"/>
+    </g>
+    <circle id="gdDot" r="8" fill="var(--pink)" cx="80" cy="82" opacity="0"/>
+  </svg>
+  </div>
+  <div class="explain" id="gdExplain">Pick a scenario and press Run.</div>
+
+  <h3>All guardrail layers</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Layer</th><th>Where</th><th>What it stops</th></tr></thead>
+    <tbody>
+      <tr><td>Schema validation + one retry</td><td>Gateway (Pydantic AI)</td><td>Malformed or partial structured output</td></tr>
+      <tr><td>Controller authority</td><td><code>SessionController</code></td><td>A model ending the session, looping probes, skipping must-ask questions</td></tr>
+      <tr><td>Output guard + retry + fixed line</td><td><code>guard.py</code></td><td>Reasoning leaks, feedback or praise, wrong duration, repeated questions</td></tr>
+      <tr><td>Conduct screen + model check</td><td><code>conduct.py</code>, <code>check_answer</code></td><td>Abuse and off-scope turns. Warnings and the close are fixed lines.</td></tr>
+      <tr><td>Untrusted-text quoting</td><td><code>quote_untrusted</code></td><td>Candidate-written text acting as instructions (JSON-quoted, angle brackets removed)</td></tr>
+      <tr><td>Input sanitizing</td><td><code>inputs/sanitize.py</code></td><td>Invisible characters and chat markup in postings and resumes. Caps at 40k characters. Drops injected list items.</td></tr>
+      <tr><td>Custom question check</td><td><code>custom/check.py</code></td><td>21 injection patterns, then the extractor model. Rate limited.</td></tr>
+      <tr><td>Quote verification</td><td>Scorer <code>QuoteChecker</code></td><td>Invented evidence. A quote needs 3+ words, in order, inside one candidate turn.</td></tr>
+      <tr><td>Fact grounding</td><td>Coach engine, <code>suggestions/facts.py</code></td><td>Invented story facts or numbers</td></tr>
+      <tr><td>Hire signal in code</td><td><code>scoring/signal.py</code></td><td>A model picking a signal that its scores don't support</td></tr>
+      <tr><td>Rationale check</td><td><code>check_rationale</code></td><td>A rationale that names another signal or has the wrong length → code fallback</td></tr>
+      <tr><td>Ops controls</td><td>OC-2/3/5</td><td>New sessions while paused or over the daily spend cap. Paused job kinds retry later.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- =============================================================== TRACING -->
+<section id="tracing">
+  <h2>12. Tracing and monitoring</h2>
+  <p class="lead">Observability is <b>built in-app on Postgres and Redis</b>. The admin spec says: "There is no Grafana, Prometheus, Loki or Sentry". No OpenTelemetry, Sentry, Langfuse or LangSmith code is imported anywhere. (The original <code>docs/spec.md</code> still lists Sentry, Prometheus, PostHog and OTel as plans. The admin spec superseded that.)</p>
+
+  <h3>12.1 Interviewer reasoning traces (R2)</h3>
+  <p>Every interviewer model call and every fixed line becomes one <code>TraceRecord</code>. This is how you see <b>why</b> the agent did something: the controller's reasons, the model's decision, the exact prompt, the raw reply, the guard result and what was actually spoken.</p>
+  <div class="controls"><button class="btn primary" id="trPlay" type="button">▶ Animate a turn's traces</button></div>
+  <div class="svgbox">
+  <svg id="trSvg" viewBox="0 0 1060 200" width="100%" role="img" aria-label="Trace flow">
+    <defs><marker id="ar6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker></defs>
+    <g font-size="12" text-anchor="middle" fill="var(--ink)">
+      <rect x="10" y="60" width="170" height="80" rx="10" fill="var(--panel)" stroke="var(--accent)"/><text x="95" y="92" font-weight="700">InterviewRunner._emit</text><text x="95" y="112" fill="var(--muted)" font-size="10">errors swallowed</text>
+      <rect x="250" y="60" width="170" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="335" y="92" font-weight="700">SqlTraceSink.write</text><text x="335" y="112" fill="var(--muted)" font-size="10">returns at once</text>
+      <rect x="490" y="60" width="190" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="585" y="88" font-weight="700">background task</text><text x="585" y="106" fill="var(--muted)" font-size="10">lock, 10 s timeout,</text><text x="585" y="120" fill="var(--muted)" font-size="10">lock_timeout / stmt_timeout</text>
+      <rect x="750" y="60" width="150" height="80" rx="30" fill="var(--panel)" stroke="var(--accent2)"/><text x="825" y="96" font-weight="700">interviewer_traces</text><text x="825" y="114" fill="var(--muted)" font-size="10">90-day retention</text>
+      <rect x="930" y="60" width="120" height="80" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="990" y="92" font-weight="700">Admin</text><text x="990" y="110" fill="var(--muted)" font-size="10">consent-gated,</text><text x="990" y="124" fill="var(--muted)" font-size="10">audited view</text>
+    </g>
+    <g stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#ar6)"><path d="M180,100 L250,100"/><path d="M420,100 L490,100"/><path d="M680,100 L750,100"/><path d="M900,100 L930,100"/></g>
+    <g id="trPackets"></g>
+    <text x="530" y="180" text-anchor="middle" font-size="11" fill="var(--muted)" id="trLabel">check → decide → say (attempt 1) → say (retry) …</text>
+  </svg>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4><code>TraceRecord</code> fields</h4>
+      <div class="kv">
+        <div>seq, turn_index</div><div>Order in the session; transcript length at the call</div>
+        <div>call</div><div><code>say | decide | check | line | rollback</code></div>
+        <div>move</div><div>Controller move or fixed-line name</div>
+        <div>reason</div><div><code>why[]</code>, <code>missing[]</code>, pushback, decision, probes_used/limit, time left in phase and session, must_ask_left, <code>guard{attempt, action, rules, hits}</code></div>
+        <div>phase, elapsed_ms, phase_deadline_ms</div><div>Timer state</div>
+        <div>question_ref</div><div>Brief question id in CORE</div>
+        <div>messages</div><div>The full prompt sent (role, content, prompt_ref)</div>
+        <div>raw_reply / spoken_text</div><div>What the model said vs what was spoken</div>
+        <div>model, prompt_refs</div><div>Gateway alias, prompt versions</div>
+        <div>tokens, cost_usd, latency_ms, error</div><div>Per-call economics and failures</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4>Example: one CORE answer produces</h4>
+<pre>#41 check  check_answer  {"check":{"conduct":"ok"}, probes_used:0 …}
+#42 decide decide        {"decision":{"action":"probe",
+                           "missing":["measurable_result"]}}
+#43 say    probe         why:[model_chose_probe] guard:{attempt:1,
+                           action:"retry", rules:["meta"]}
+#44 say    probe         guard:{attempt:2, action:"none"}
+                           spoken_text:"What changed in the numbers?"</pre>
+      <p class="small">Only the last <code>say</code> record of a move carries <code>spoken_text</code>. Fixed lines (warnings, "take your time", "welcome back") are <code>line</code> records. A barge-in take-back is a <code>rollback</code> record with <code>turns_taken_back</code>.</p>
+      <p class="small"><b>Privacy:</b> <code>GET /admin/sessions/{id}</code> returns traces and the transcript only while the user's <code>training_consent</code> is on, and writes an audit row (<code>admin.traces_viewed</code>).</p>
+    </div>
+  </div>
+
+  <h3>12.2 Monitoring signals for all agents</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Signal</th><th>How it is collected</th><th>Stored in</th><th>Seen in</th></tr></thead>
+    <tbody>
+      <tr><td><b>Usage and cost per call</b> (OB-2)</td><td>The gateway reports every call inside a <code>usage_context(org, session)</code>: tokens, audio seconds or characters, priced from <code>litellm.&lt;profile&gt;.yaml</code>. <code>cost_known=false</code> when there is no price.</td><td><code>usage_events</code> (role, component llm/stt/tts)</td><td>Admin Spend, Overview, session detail</td></tr>
+      <tr><td><b>Voice latency per turn</b> (OB-3)</td><td><code>LatencyRecorder</code> from LiveKit metrics + STT timing</td><td><code>voice_turn_timings</code> (e2e, turn detection, stt, llm_ttft, tts_ttfb, other)</td><td>Ops → Performance (p50/p95)</td></tr>
+      <tr><td><b>LLM latency</b></td><td><code>latency_ms</code> on each trace</td><td><code>interviewer_traces</code></td><td>Performance, per call type. Other roles show "not measured".</td></tr>
+      <tr><td><b>Errors</b> (OB-4)</td><td><code>ErrorCapture</code> logging handler at ERROR. Fingerprint = exception type + top 3 in-app frames. PII scrubbed.</td><td><code>error_groups</code>, <code>error_events</code> (with request_id and session_id)</td><td>Ops → Errors inbox (resolve or reopen)</td></tr>
+      <tr><td><b>Structured logs</b> (OB-7)</td><td><code>configure_logging</code>, JSON with <code>service, request_id, session_id</code>. The API middleware sets <code>X-Request-ID</code>; worker jobs use the Arq job id.</td><td>stdout / <code>docker logs</code></td><td>Not searchable in-app</td></tr>
+      <tr><td><b>Heartbeats</b> (OB-1)</td><td>Redis key <code>heartbeat:&lt;service&gt;:&lt;instance&gt;</code> every 15 s, TTL 60 s</td><td>Redis</td><td>Ops → Health, <code>/api/health</code></td></tr>
+      <tr><td><b>Samples and probes</b> (OB-5/6)</td><td>Worker cron every minute: probes of Postgres, Redis, LiteLLM, LiveKit, STT, TTS, SMTP; queue depth; host disk, memory, load</td><td><code>ops_samples</code></td><td>Ops → Health sparklines</td></tr>
+      <tr><td><b>Alerts</b> (AL-1..8)</td><td>Worker cron every minute. Rules move ok → pending → firing → resolved, guarded by an advisory lock. Email alerts.</td><td><code>alert_rules</code>, <code>alert_events</code></td><td>Admin Alerts</td></tr>
+      <tr><td><b>Job results</b></td><td>Each Arq job returns a JSON dict (model, prompt refs, attempts, flags, counters)</td><td>Redis, 24 h for most jobs</td><td>Ops → Jobs (with retry)</td></tr>
+      <tr><td><b>Step timings, text mode</b></td><td><code>_StepLog</code>: "text/turn &lt;sid&gt;: decide_done at 812 ms"</td><td>Logs</td><td>Logs</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>12.3 Default alert rules</h3>
+  <p class="small">API down · Worker or voice down · Dependency down · Disk 85%/95% · Memory 90% · Session failures &gt; 5% · Voice p95 &gt; 1500 ms over 30 min · Scoring stuck · Spend ≥ 80% and 100% of the daily cap · New error group · Stripe webhooks silent &gt; 48 h. Critical alerts re-notify every 4 h, warnings every 24 h.</p>
+
+  <h3>12.4 Correlation: following one session across services</h3>
+  <div class="callout">Use <b><code>session_id</code></b> as the join key. It appears on <code>turns</code>, <code>interviewer_traces</code>, <code>usage_events</code>, <code>voice_turn_timings</code>, <code>error_events</code>, every log line (ContextVar, or derived from the LiveKit room name), and the scorecard. <b><code>request_id</code></b> joins an API request or worker job to its logs and errors.</div>
+</section>
+
+<!-- =============================================================== EVALS -->
+<section id="evals">
+  <h2>13. Evals, the AI candidate and the judge</h2>
+  <p class="lead">Two harnesses test the agents. Keep them apart when you explain them.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h4>In-process eval harness (<code>evals/</code>)</h4>
+      <p><code>python -m strong_evals run --suite … --gate</code>. Calls the interviewer, planner, scorer and coach as library code. Profiles: fake, tiny, local, hosted, claude. <code>--record</code> saves fixtures.</p>
+      <ul>
+        <li><b>Gold set</b>: scripted transcripts with human labels (median of the raters)</li>
+        <li><b>Simulated candidates</b>: strong, average or weak</li>
+        <li>Reports in <code>evals/reports/*.html|json</code>, with the git sha, the role → alias map and the prompt refs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Live AI-candidate sim (<code>apps/sim</code>, P13)</h4>
+      <p>Drives the <b>deployed</b> app over HTTPS or LiveKit as a real user would. The candidate uses a different provider from the interviewer on purpose. A judge model then grades the interviewer.</p>
+      <ul>
+        <li>Persona × quality × <b>behavior</b>: off_topic, prompt_injection, interrupts, drops_connection, argues, silent…</li>
+        <li>Budget isolated with its own LiteLLM key ($5/day), gated, started from the admin UI</li>
+        <li>Results saved in run folders (transcript, audio, judge, debrief, meta)</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Gated metrics (<code>evals/config/thresholds.yaml</code>)</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Metric</th><th>Gate</th><th>What it protects</th></tr></thead>
+    <tbody>
+      <tr><td>scorer_within_one_band</td><td>≥ 0.85</td><td>Scorer agrees with the human hire signal</td></tr>
+      <tr><td>follow_up_rate</td><td>≥ 0.80</td><td>The interviewer probes vague answers</td></tr>
+      <tr><td>competency_coverage</td><td>≥ 0.80</td><td>The questions cover the target competencies</td></tr>
+      <tr><td>cost_per_session_usd</td><td>≤ 0.80</td><td>Unit economics</td></tr>
+      <tr><td>debrief_ready_s</td><td>≤ 60</td><td>Scoring speed (FB-3)</td></tr>
+      <tr><td>gap_score_spread / gap_fit_order</td><td>≤ 3 / ≥ 1.0</td><td>Gap analysis is stable and ordered sensibly</td></tr>
+      <tr><td>coach_invented_facts, suggestions_invented_facts</td><td>≤ 0</td><td>Grounding (CO-3)</td></tr>
+      <tr><td>coach_one_question / iv3_followup / judge_pass / style_distinct / versions_faithful</td><td>1.0 / 0.8 / 0.9 / 0.75 / 1.0</td><td>Coach behavior</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Judge rules (sim)</h3>
+  <p><code>probe_limit</code>, <code>phases</code>, <code>tone</code>, <code>no_coaching</code>, <code>injection</code>, <code>behavior_handling</code>, <code>no_repetition</code>, <code>stays_in_role</code>. Each rule gets pass, fail or not_applicable, plus a quoted reason. The sim report also checks <b>scorer order</b>: within comparable scenarios, a stronger candidate must not get a worse hire signal.</p>
+</section>
+
+<!-- =============================================================== QA -->
+<section id="qa">
+  <h2>14. Q&amp;A cheat sheet</h2>
+  <p class="lead">Short answers to questions you are likely to get.</p>
+  <details><summary>Is this a multi-agent system? Do agents talk to each other?</summary><p>Not directly. The agents form a <b>pipeline</b> that hands typed artifacts over through Postgres: extractor → <code>JobPosting</code>/<code>Resume</code> → planner → <code>GapAnalysis</code>, <code>InterviewerBrief</code> → interviewer → <code>turns</code> → scorer → <code>Scorecard</code> → coach suggestions. Arq jobs and API routes do the orchestration. No agent calls another agent, and none chooses tools on its own.</p></details>
+  <details><summary>Do the agents use tool calling or autonomous planning?</summary><p>No. "Tool output" is only a way to get structured JSON when a model supports tools. The next action is always chosen in code (controller moves, coach "ask for", job chains).</p></details>
+  <details><summary>How does the interviewer "remember" earlier answers?</summary><p>Each call gets the brief plus the last 16 turns (6 on small models). The controller keeps structured state (questions asked, probes used, which gaps were probed). The full transcript is in the <code>turns</code> table, and the scorer reads all of it.</p></details>
+  <details><summary>What prevents the interviewer from giving feedback or leaking its reasoning?</summary><p>The prompt forbids it, and the deterministic output guard enforces it. The guard removes meta sentences and evaluative clauses, retries once with a stricter instruction, then says a fixed line. Every step is traced with <code>guard.rules</code> and <code>guard.action</code>.</p></details>
+  <details><summary>Who decides when the interview ends?</summary><p>Only the <code>SessionController</code>: the time plan, no questions left, the candidate questions limit, the conduct limit, or an explicit end. The model never does.</p></details>
+  <details><summary>How is the hire signal computed? Can the model change it?</summary><p>The model gives per-question rubric scores (1–4) with quotes. Code verifies the quotes, averages per competency, applies the profile weights (and the values share), maps the average to a band, and applies the hard rules. The model then writes a 3–5 sentence rationale for that signal. A rationale that names another signal is replaced by a code-built one.</p></details>
+  <details><summary>How do you see why the interviewer asked a given follow-up?</summary><p>Open the session in admin (training consent required). Find the <code>decide</code> trace (<code>missing</code> list), then the <code>say</code> trace with <code>reason.why = ["model_chose_probe"]</code>, the timer state, the full prompt messages, the raw reply and the spoken text.</p></details>
+  <details><summary>How is cost tracked?</summary><p>Every gateway call made inside a <code>usage_context</code> writes a <code>usage_events</code> row (role, units, cost from the LiteLLM price table, <code>cost_known</code>). Interviewer traces also carry per-call cost. Admin Spend compares this with the daily spend cap, which can block new sessions (OC-3).</p></details>
+  <details><summary>How do you switch models (for example to a bigger interviewer)?</summary><p>Change <code>MODEL_PROFILE</code>, or set <code>MODEL_ROLE_INTERVIEWER=&lt;alias&gt;</code>, or edit <code>config/models.&lt;profile&gt;.yaml</code>. The capability tier selects prompt variants automatically. No code changes, because code never names a model. Re-run the eval gates afterwards.</p></details>
+  <details><summary>How is prompt injection handled?</summary><p>Inputs are sanitized, candidate text is JSON-quoted as data, custom questions pass 21 regexes plus a model check, instruction-like output items are dropped, conduct checks run, and the controller owns the flow, so the model has no control over phases or scoring. The sim has a <code>prompt_injection</code> behavior and an <code>injection</code> judge rule.</p></details>
+  <details><summary>What happens if the LLM is down mid-interview?</summary><p><code>decide</code> fails → move on. <code>check_answer</code> fails → the turn counts as OK. A <code>say</code> retry fails → a fixed line. A first <code>say</code> failure is raised: the runner restores its checkpoint so the candidate can resend, and the text API answers 504. Errors are logged, grouped in the error inbox, and recorded in the trace's <code>error</code> field.</p></details>
+  <details><summary>Why are interviewer and scorer separate?</summary><p>So the live model never softens its judgment mid-conversation, the scorer can be a slower and stronger model, and live latency stays low because the interviewer only reads the compact brief.</p></details>
+  <details><summary>How do tests run without models?</summary><p><code>MODEL_PROFILE=fake</code>: <code>FakeBackend</code> replays exact recordings by messages hash, else a default fixture per output type, else <code>text.txt</code>. A missing fixture error names the file to add.</p></details>
+</section>
+
+<!-- =============================================================== GAPS -->
+<section id="gaps">
+  <h2>15. Known gaps (as of this writing)</h2>
+  <ul>
+    <li><b>Only interviewer calls are traced.</b> Extractor, planner, scorer and coach calls have usage rows but no prompt or reply traces and no latency. Ops Performance shows them as "not measured".</li>
+    <li><b>Some provenance is not persisted.</b> Brief <code>model_version</code> and refs, and extraction provenance, live only in Arq results (24 h). Story match persists no prompt ref.</li>
+    <li><b>Story fit and tailoring run without a <code>usage_context</code></b> (<code>gap/story_fit.py</code>), so they write no <code>usage_events</code> and have no request_id log context.</li>
+    <li><b>Coach usage rows carry no session_id</b> (org only).</li>
+    <li><b>The auto-profile job bypasses the sim-org key</b> (<code>profiles/jobs.py</code>).</li>
+    <li><b>The text channel's runners are in-process</b> and lost on API restart (dev and test only).</li>
+    <li><b>The sim judge has no role-play rules</b>, and admin-started sim runs can't run role-play yet.</li>
+    <li>The in-process eval candidate uses <code>Role.PLANNER</code>, while the live sim candidate uses <code>Role.CANDIDATE</code>.</li>
+    <li><code>docs/spec.md</code> still lists Sentry, Prometheus, OTel and PostHog. The implementation follows <code>docs/admin-spec.md</code> (in-app only).</li>
+  </ul>
+</section>
+
+<!-- =============================================================== FILES -->
+<section id="files">
+  <h2>16. File map</h2>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Topic</th><th>Files</th></tr></thead>
+    <tbody>
+      <tr><td>Gateway</td><td><code>packages/core/src/strong_core/gateway/</code> client.py, types.py, registry.py, fake.py, recorder.py, usage.py, prices.py</td></tr>
+      <tr><td>Prompts</td><td><code>packages/core/src/strong_core/prompts.py</code>, <code>prompts/&lt;role&gt;/</code>, <code>prompts/README.md</code></td></tr>
+      <tr><td>Profiles</td><td><code>config/models.*.yaml</code>, <code>config/litellm.*.yaml</code></td></tr>
+      <tr><td>Interviewer</td><td><code>packages/interview/src/strong_interview/</code> controller.py, interviewer.py, runner.py, guard.py, conduct.py, trace.py, trace_store.py, harness.py</td></tr>
+      <tr><td>Voice</td><td><code>apps/voice/src/strong_voice/</code> agent.py, interview_agent.py, interview.py, turns.py, plugins.py, latency.py, coach_agent.py, coach.py</td></tr>
+      <tr><td>Text channel and sessions</td><td><code>apps/api/src/strong_api/sessions/router.py</code></td></tr>
+      <tr><td>Extractor</td><td><code>apps/worker/src/strong_worker/inputs/</code>, <code>profiles/</code>; <code>apps/api/src/strong_api/custom/</code></td></tr>
+      <tr><td>Planner</td><td><code>apps/worker/src/strong_worker/gap/</code> analysis.py, brief.py, story_fit.py, jobs.py</td></tr>
+      <tr><td>Scorer</td><td><code>apps/worker/src/strong_worker/scoring/</code> scorer.py, signal.py, quotes.py, stories.py, takes.py, jobs.py</td></tr>
+      <tr><td>Coach</td><td><code>apps/api/src/strong_api/coach/engine.py</code>, <code>router.py</code>; <code>apps/worker/src/strong_worker/suggestions/</code></td></tr>
+      <tr><td>Contracts</td><td><code>packages/core/src/strong_core/schemas/</code> session.py, scoring.py, coach.py, analysis.py, inputs.py</td></tr>
+      <tr><td>DB models</td><td><code>packages/core/src/strong_core/db/models.py</code> (sessions, turns, interviewer_traces, scorecards, usage_events, voice_turn_timings, error_*, ops_samples, alert_*, stories, coach_*)</td></tr>
+      <tr><td>Ops</td><td><code>packages/core/src/strong_core/ops/</code>; <code>apps/worker/src/strong_worker/ops/</code>, <code>alerts/</code>; <code>apps/api/src/strong_api/observability.py</code>, <code>admin/ops.py</code>, <code>admin/overview.py</code></td></tr>
+      <tr><td>Evals and sim</td><td><code>evals/</code>, <code>apps/sim/src/strong_sim/</code>, <code>docs/sim-candidate.md</code></td></tr>
+      <tr><td>Specs</td><td><code>docs/spec.md</code>, <code>docs/admin-spec.md</code>, <code>docs/alerts.md</code>, <code>docs/custom-interview-spec.md</code>, <code>docs/role-play-spec.md</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function txt(parent,x,y,s,attrs){const t=el("text",Object.assign({x,y,fill:"var(--ink)","font-size":12},attrs||{}),parent);t.textContent=s;return t;}
+
+/* theme */
+const root=document.documentElement;
+try{const t=localStorage.getItem("sh-theme");if(t)root.dataset.theme=t;}catch(e){}
+$("#themeBtn").addEventListener("click",()=>{
+  const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme=dark?"light":"dark";
+  try{localStorage.setItem("sh-theme",root.dataset.theme);}catch(e){}
+});
+
+/* toc highlight */
+const links=$$("nav.toc a");
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+e.target.id));}});},{rootMargin:"-30% 0px -65% 0px"});
+$$("main section").forEach(s=>obs.observe(s));
+
+/* ---------------- lifecycle ---------------- */
+const LC=[
+ {t:"Job posting in",r:"extractor",d:"<b>extract_job_target</b>: fetch the URL (Playwright fallback), or take pasted text. The <b>input check</b> asks the extractor whether this is really a job posting (fails open). Then the posting is extracted into <code>JobPosting</code>, and the company is matched to a curated profile (no LLM)."},
+ {t:"Resume in",r:"extractor",d:"<b>parse_resume</b>: check, then extract into <code>Resume</code> with grounding-based confidence per field. The file is stored encrypted. <b>story_idea_skills</b> then turns achievement lines into STORY_IDEA suggestions."},
+ {t:"Auto-profile",r:"extractor",d:"Only in generic mode: <b>build_auto_profile</b> reads up to 3 pages from the company's own domain and writes a PENDING <code>company_auto_profiles</code> row. Only admin-approved summaries ever reach a brief."},
+ {t:"Gap analysis",r:"planner",d:"<b>run_gap_analysis_job</b>: the planner rates each requirement (0–3) and competency with evidence. Code caps unsupported ratings, computes the match score (0.7 × requirements + 0.3 × competencies) and the session plan."},
+ {t:"Brief",r:"planner",d:"On <code>POST /sessions</code>, <b>build_interviewer_brief</b>: the planner drafts 6–12 questions. Code assembles an <code>InterviewerBrief</code> of at most 1500 tokens (competencies, probes, persona and tone, time plan, curveball) into <code>sessions.brief_json</code>."},
+ {t:"Live interview",r:"interviewer · stt · tts",d:"Voice (LiveKit) or text. The <b>SessionController</b> drives the phases, and the interviewer model says each move, decides probes and checks conduct. Every call is traced to <code>interviewer_traces</code>, and every turn is saved to <code>turns</code>."},
+ {t:"End and bill",r:"code",d:"<code>/sessions/{id}/end</code> (or the voice agent's internal end) bills the minutes and enqueues <b>score_session</b>."},
+ {t:"Scoring",r:"scorer",d:"Rubric call → quote verification → optional re-quote → averages → <b>hire signal in code</b> → rationale call (code fallback). Writes the <code>scorecards</code> row and progress snapshots."},
+ {t:"Stories and suggestions",r:"scorer · coach",d:"Story match per answer (ST-6), Proven stories (ST-7), then coach-role suggestions: tune a story, a new story from a good answer, missing skills. All suggestions are fact-checked against the user's own words."},
+ {t:"Practice loop",r:"coach · planner",d:"The candidate refines stories with the <b>coach</b> (text or voice). Story changes re-run <b>story fit</b> for each target role, which then queues <b>tailor</b> suggestions. Takes are scored by the scorer."}
+];
+const lcBox=$("#lcStages");let lcI=0,lcTimer=null;
+LC.forEach((s,i)=>{const d=document.createElement("div");d.className="st";d.innerHTML=`<div class="n">Stage ${i+1}</div><div class="t">${s.t}</div><div class="r"><span class="pill ${s.r==="code"?"code":"llm"}">${s.r}</span></div>`;d.addEventListener("click",()=>{stopLc();lcShow(i);});lcBox.appendChild(d);});
+function lcShow(i){lcI=(i+LC.length)%LC.length;$$("#lcStages .st").forEach((d,j)=>d.classList.toggle("on",j===lcI));$("#lcExplain").innerHTML=`<span class="step">Stage ${lcI+1} of ${LC.length} · ${LC[lcI].r}</span><div><b>${LC[lcI].t}.</b> ${LC[lcI].d}</div>`;$("#lcPos").textContent=`${lcI+1}/${LC.length}`;const c=lcBox.children[lcI];lcBox.scrollTo({left:c.offsetLeft-lcBox.offsetLeft-20,behavior:"smooth"});}
+function stopLc(){if(lcTimer){clearInterval(lcTimer);lcTimer=null;$("#lcPlay").textContent="▶ Play";}}
+$("#lcPlay").addEventListener("click",()=>{if(lcTimer){stopLc();return;}$("#lcPlay").textContent="⏸ Pause";lcTimer=setInterval(()=>lcShow(lcI+1),2600);});
+$("#lcPrev").addEventListener("click",()=>{stopLc();lcShow(lcI-1);});
+$("#lcNext").addEventListener("click",()=>{stopLc();lcShow(lcI+1);});
+lcShow(0);
+
+/* ---------------- profiles ---------------- */
+const ROLES=["extractor","planner","interviewer","scorer","coach","stt","tts","candidate","judge"];
+const PROF={
+ fake:{note:"Built in code, with no YAML: every role maps to fake-<role>, a 32k context window, and 16 kHz TTS. Used by all tests and CI.",m:{extractor:"fake-extractor",planner:"fake-planner",interviewer:"fake-interviewer",scorer:"fake-scorer",coach:"fake-coach",stt:"fake-stt",tts:"fake-tts",candidate:"fake-candidate",judge:"fake-judge"},t:{}},
+ tiny:{note:"Laptop minimum: one small model for every chat role, CPU inference. Small tier → .small prompt variants and a 6-turn window.",m:{extractor:"tiny-chat",planner:"tiny-chat",interviewer:"tiny-chat",scorer:"tiny-chat",coach:"tiny-chat",stt:"tiny-stt",tts:"tiny-tts",candidate:"tiny-chat",judge:"tiny-chat"},t:{extractor:"small",planner:"small",interviewer:"small",scorer:"small",coach:"small",candidate:"small",judge:"small"}},
+ local:{note:"Docker CPU: a small model for the fast roles and a mid model (with tool calls) for planning and scoring. 8k context.",m:{extractor:"local-small",planner:"local-mid",interviewer:"local-small",scorer:"local-mid",coach:"local-small",stt:"local stt",tts:"local tts",candidate:"local-small",judge:"local-mid"},t:{extractor:"small",planner:"medium",interviewer:"small",scorer:"medium",coach:"small",candidate:"small",judge:"medium"}},
+ hosted:{note:"Hosted open-weight APIs (zero-retention providers). All large tier, 131k context. Only the extractor uses tool calls; the others use native JSON mode. The coach and candidate reuse the interviewer alias, and the judge reuses the scorer alias.",m:{extractor:"hosted-extractor",planner:"hosted-planner",interviewer:"hosted-interviewer",scorer:"hosted-scorer",coach:"hosted-interviewer",stt:"hosted-stt",tts:"hosted-tts",candidate:"hosted-interviewer",judge:"hosted-scorer"},t:{extractor:"large",planner:"large",interviewer:"large",scorer:"large",coach:"large",candidate:"large",judge:"large"}},
+ claude:{note:"A fast alias for the latency-sensitive roles, and a strong alias for the planner, scorer and judge. Large tier, 200k context, JSON mode.",m:{extractor:"claude-fast",planner:"claude-strong",interviewer:"claude-fast",scorer:"claude-strong",coach:"claude-fast",stt:"claude-stt",tts:"claude-tts",candidate:"claude-fast",judge:"claude-strong"},t:{extractor:"large",planner:"large",interviewer:"large",scorer:"large",coach:"large",candidate:"large",judge:"large"}},
+ sim:{note:"For the AI-candidate sim: the candidate uses a different provider (sim-candidate). Every other chat role uses sim-judge.",m:{extractor:"sim-judge",planner:"sim-judge",interviewer:"sim-judge",scorer:"sim-judge",coach:"sim-judge",stt:"sim-stt",tts:"sim-tts",candidate:"sim-candidate",judge:"sim-judge"},t:{extractor:"large",planner:"large",interviewer:"large",scorer:"large",coach:"large",candidate:"large",judge:"large"}}
+};
+const pb=$("#profBtns");
+Object.keys(PROF).forEach((k,i)=>{const b=document.createElement("button");b.className="btn";b.type="button";b.textContent=k;b.addEventListener("click",()=>showProf(k));pb.appendChild(b);});
+function showProf(k){
+  $$("#profBtns .btn").forEach(b=>b.classList.toggle("primary",b.textContent===k));
+  const p=PROF[k];let h="<thead><tr><th>Role</th><th>Alias</th><th>Tier (prompt variant)</th></tr></thead><tbody>";
+  ROLES.forEach(r=>{h+=`<tr><td>${r}${["candidate","judge"].includes(r)?' <span class="pill test">test</span>':""}</td><td><code>${p.m[r]}</code></td><td>${p.t[r]||"–"}</td></tr>`;});
+  $("#profTable").innerHTML=h+"</tbody>";$("#profNote").textContent=p.note+" Real provider model ids appear only in config/litellm.<profile>.yaml.";
+}
+showProf("hosted");
+
+/* ---------------- FSM ---------------- */
+const PH=[
+ {id:"INTRO",x:20,d:"The interviewer greets: name, role, thanks. <b>Move: greet.</b> The guard fixes any wrong session length in the greeting. A 10-minute mini puts the greeting and the agenda in minute 1."},
+ {id:"SMALL_TALK",x:190,d:"One short off-topic exchange. <b>Move: small_talk.</b> Skipped when the plan gives it 0 minutes. Not checked by the model for conduct (only the abuse regex)."},
+ {id:"AGENDA",x:360,d:"Always said, in one short turn, and expects no answer. The plan text comes from the time plan (and the categories, for Custom). The controller then immediately asks the first CORE question."},
+ {id:"CORE",x:530,d:"The ask → answer → (decide + check in parallel) → probe or next loop. The probe limit depends on difficulty (1/2/3, mini 1). The curveball (Tough only) is the second question. A new question needs 2+ minutes left. Custom: must-ask questions are guaranteed by a time reserve."},
+ {id:"CAND_QUESTIONS",x:700,d:"<b>Move: invite_questions</b>, then answer_question. At most 3 questions. <code>wants_to_ask()</code> uses regexes to tell a question from \"no, that's all\". If time is up, there is a short last answer, then the wrap-up."},
+ {id:"WRAP_UP",x:870,d:"The closing line in the persona's closing style. If the candidate's question was left open because time ran out, the line acknowledges it. The next candidate turn sets <code>ended=true</code>."}
+];
+const fsmG=$("#fsmNodes");
+PH.forEach((p,i)=>{
+  const g=el("g",{class:"node",style:"cursor:pointer"},fsmG);
+  el("rect",{x:p.x,y:95,width:150,height:56,rx:12,fill:"var(--panel)",stroke:i===3?"var(--accent)":"var(--line)","stroke-width":i===3?2:1},g);
+  txt(g,p.x+75,128,p.id.replace("_"," ").replace("CAND","CANDIDATE"),{"text-anchor":"middle","font-weight":700,"font-size":p.id.length>10?11:13});
+  if(i<PH.length-1)el("path",{d:`M${p.x+150},123 L${p.x+170},123`,stroke:"var(--muted)","stroke-width":1.6,"marker-end":"url(#ar3)",fill:"none"},fsmG);
+  g.addEventListener("click",()=>{$$("#fsmNodes .node").forEach(n=>n.classList.remove("hl"));g.classList.add("hl");$("#fsmExplain").innerHTML=`<span class="step">Phase · ${p.id}</span><div>${p.d}</div>`;});
+});
+el("path",{d:"M445,151 C445,200 955,200 955,151",fill:"none",stroke:"var(--bad)","stroke-dasharray":"4 4","stroke-width":1.4,"marker-end":"url(#ar3)"},fsmG);
+txt(fsmG,700,212,"session time up · conduct limit · end_now → WRAP_UP",{"text-anchor":"middle","font-size":11,fill:"var(--bad)"});
+const dot=$("#fsmDot");let fsmStep=0;
+const fsmPath=[0,1,2,3,3,3,3,4,5];
+function moveDot(){const i=fsmPath[fsmStep%fsmPath.length];const p=PH[i];dot.setAttribute("cx",p.x+75);dot.setAttribute("cy",95);fsmStep++;}
+dot.style.transition="cx .8s, cy .8s";moveDot();setInterval(moveDot,1300);
+
+/* ---------------- sequence diagrams ---------------- */
+const SEQS={
+ turn:{lanes:["Candidate","Channel (voice/text)","InterviewRunner","SessionController","Interviewer (LLM)","Output guard","Trace sink / DB"],
+  steps:[
+   [0,1,"answer (STT text or typed)","The candidate finishes speaking. In voice, LiveKit VAD and the turn detector end the turn, and GatewaySTT transcribes the segment. <code>CandidateTurns</code> waits for late STT, then calls <code>runner.respond(text, start_ms, end_ms)</code>."],
+   [1,2,"respond() under lock + checkpoint","Turns are answered one at a time (asyncio lock). A checkpoint (transcript length + controller snapshot) allows recovery if anything fails."],
+   [2,6,"save candidate Turn (on_turn)","The candidate turn is appended and saved to <code>turns</code> (with <code>seq</code>, phase, question_ref). If the save fails, it is popped again."],
+   [2,2,"screen_turn(text)","A fixed abuse regex, with no model call. A hit becomes a conduct strike and skips the model checks."],
+   [2,4,"decide() ∥ check_answer()","<b>Run concurrently</b> with <code>asyncio.gather</code>. <code>decide</code> → <code>ProbeDecision{action, missing}</code>. <code>check_answer</code> → <code>AnswerCheck{conduct}</code>. Either can fail safely: move on, or the turn counts as OK."],
+   [2,6,"trace: check, then decide","Two TraceRecords in a fixed order, with the full prompt, the raw JSON reply, tokens, cost, latency and timer state."],
+   [2,3,"after_answer(decision) / conduct_strike","The controller applies its rules: probe limit, same-gap rule, CORE time, the curveball as the second question, must-ask reserve, phase changes. It returns 1–2 Moves with <code>Why</code> reasons."],
+   [3,2,"Move(kind=PROBE, missing, why)","Example: <code>PROBE</code> with <code>missing=[measurable_result]</code>, <code>why=[model_chose_probe]</code>. On another path it could be <code>ASK</code> of the next question with <code>why=[probe_limit_reached, next_question]</code>."],
+   [2,4,"say(move, turns)","Builds the system prompt (persona, tone, rules) and the user prompt (last 16 turns, move, question, missing, pushback, note). It is a non-streamed call, because spoken text must pass the guard."],
+   [4,5,"guard_reply(raw)","Removes meta and reasoning sentences and evaluative feedback, fixes a wrong duration, checks for a repeat of the previous question. If nothing usable remains: one stricter retry, then a fixed line."],
+   [2,6,"trace: say (+guard)","One record per model call of the move. Only the last one carries <code>spoken_text</code>."],
+   [2,6,"save interviewer Turn","The spoken line is saved as an interviewer turn with its phase and question_ref."],
+   [2,1,"interviewer turns","Voice: if the candidate started talking again meanwhile, <code>rollback(checkpoint)</code> takes the reply back and a rollback trace is written. Otherwise <code>session.say(line)</code> streams TTS phrase by phrase."],
+   [1,0,"speech / text reply","The candidate hears the follow-up. <code>voice_turn_timings</code> records e2e, STT, LLM time to first token and TTS time to first byte for this turn."]
+  ]},
+ score:{lanes:["score_session job","Postgres","Scorer (LLM)","QuoteChecker","signal.py (code)","Story/Suggest steps"],
+  steps:[
+   [0,1,"load brief_json, turns, profile version","The <code>@job_context</code> decorator sets the usage and log context (request_id = Arq job id). A pause check runs. The job is idempotent if a scorecard already exists. It loads the exact profile version the session used."],
+   [0,2,"rubric (+rubric_input)","One call returns <code>ScorerOutput</code>: per-question scores 1–4 per competency, with justification and quotes. Recruiter screen and role-play have their own rubric prompts. The transcript is budgeted at 55% of the context window."],
+   [2,3,"verify quotes","Each quote must be 3+ words appearing in order inside one candidate turn (ellipsis gaps allowed). Bad quotes are dropped. Unknown questions, competencies and values are dropped."],
+   [3,2,"requote (if a score lost all quotes)","The conversation continues with the model's own JSON plus a <code>scorer/requote</code> message listing the bad quotes. The drafts are merged. A score still without a valid quote is dropped."],
+   [0,4,"compute_hire_signal","Competency averages are weighted by the profile, blended with the values share, mapped to a band, then the hard rules apply. <b>The model never chooses the signal.</b>"],
+   [0,2,"rationale (plain text)","3–5 sentences explaining the computed signal. It is checked for length and for naming another signal, retried once, and replaced by a code-built rationale if it still fails."],
+   [0,1,"write scorecards + snapshots","<code>scorecards</code> (hire_signal, rationale, scores, per_question, <code>scorer_model</code>, <code>rubric_version</code>), <code>progress_snapshots</code> (Realistic, non-mini), session status COMPLETED. A warning is logged if it took over 60 s."],
+   [0,5,"story match → suggestions","For each answer, which story was used and one fix. Proven stories. Then coach-role suggestions (tune, new story), fact-checked against the user's words."]
+  ]},
+ coach:{lanes:["Candidate","Coach API router","engine.run_turn","Coach (LLM)","Grounding checks","Postgres"],
+  steps:[
+   [0,1,"turn text (≤ 4000 chars)","Text: <code>POST /coach/sessions/{id}/turn</code> under a row lock. Voice: the voice agent relays the STT text to <code>/internal/coach/sessions/{id}/turns</code>."],
+   [1,2,"run_turn","<code>asks(story)</code> picks <b>in code</b> the one thing to ask about next (context → stakes → own role → result → trade-offs → reflection)."],
+   [2,5,"save candidate coach_turn","Appended with seq = previous + 1. The candidate's own words become the grounding corpus."],
+   [2,3,"check_turn ∥ reply","Concurrent: the conduct <code>AnswerCheck</code> (after the abuse regex) and the <code>CoachReply{message, parts[], missing, skills}</code>, built from the story state, the last 20 turns and the style section."],
+   [3,4,"verify each part update","CO-3: a part is kept only if every quote has 3+ words and is found word for word in what the candidate said, and every number in the text is in the quotes. Dropped updates are logged."],
+   [4,5,"write kept parts to stories","<code>missing</code> and the next ask are <b>recomputed from the story</b>, never taken from the model."],
+   [2,2,"one_question + styled","Cuts everything after the first \"?\". Direct style keeps the question only. Gentle style turns praise into \"Thank you.\". If the model failed, a fixed ASK line is used."],
+   [2,1,"CoachTurnResult","Reply, updated story, asking_for, conduct, ended. Prompt refs are merged into <code>coach_sessions.prompt_version</code>."]
+  ]}
+};
+const seqState={};
+function drawSeq(name){
+  const S=SEQS[name],svg=$("#seq-"+name),n=S.lanes.length,W=1060,laneW=W/n,top=50,rowH=34,H=top+S.steps.length*rowH+30;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.innerHTML="";
+  const defs=el("defs",{},svg);const mk=el("marker",{id:"m-"+name,viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto"},defs);el("path",{d:"M0,0L10,5L0,10z",fill:"var(--accent)"},mk);
+  const mk2=el("marker",{id:"m2-"+name,viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto"},defs);el("path",{d:"M0,0L10,5L0,10z",fill:"var(--muted)"},mk2);
+  S.lanes.forEach((l,i)=>{const cx=laneW*i+laneW/2;el("rect",{x:laneW*i+6,y:6,width:laneW-12,height:30,rx:8,fill:"var(--panel)",stroke:"var(--line)"},svg);txt(svg,cx,26,l,{"text-anchor":"middle","font-weight":700,"font-size":l.length>18?10.5:11.5});el("line",{x1:cx,y1:36,x2:cx,y2:H-8,stroke:"var(--line)","stroke-dasharray":"3 4"},svg);});
+  const g=el("g",{},svg);const items=[];
+  S.steps.forEach((s,k)=>{
+    const y=top+k*rowH+14,x1=laneW*s[0]+laneW/2,x2=laneW*s[1]+laneW/2;const grp=el("g",{opacity:0},g);grp.style.transition="opacity .35s";
+    if(s[0]===s[1]){el("path",{d:`M${x1},${y-6} h34 v14 h-30`,fill:"none",stroke:"var(--muted)","stroke-width":1.5,"marker-end":`url(#m2-${name})`},grp);txt(grp,x1+40,y+4,s[2],{"font-size":11,fill:"var(--muted)"});}
+    else{const ln=el("line",{x1,y1:y,x2:x2+(x2>x1?-4:4),y2:y,stroke:"var(--muted)","stroke-width":1.5,"marker-end":`url(#m2-${name})`},grp);ln.dataset.k=k;const mx=(x1+x2)/2;const lab=txt(grp,mx,y-5,s[2],{"text-anchor":"middle","font-size":11,fill:"var(--muted)"});lab.dataset.lab=1;}
+    el("circle",{cx:12,cy:y,r:9,fill:"var(--panel2)",stroke:"var(--line)"},grp);txt(grp,12,y+4,String(k+1),{"text-anchor":"middle","font-size":9,fill:"var(--muted)"});
+    items.push(grp);
+  });
+  seqState[name]={i:-1,items,timer:null};
+}
+function seqGo(name,i){
+  const st=seqState[name],S=SEQS[name];st.i=Math.max(-1,Math.min(S.steps.length-1,i));
+  st.items.forEach((g,k)=>{g.setAttribute("opacity",k<=st.i?(k===st.i?1:.55):0);g.querySelectorAll("line,path").forEach(p=>{p.setAttribute("stroke",k===st.i?"var(--accent)":"var(--muted)");p.setAttribute("stroke-width",k===st.i?2.4:1.5);p.setAttribute("marker-end",`url(#${k===st.i?"m":"m2"}-${name})`);});g.querySelectorAll("text").forEach(t=>{if(t.getAttribute("font-size")==="11"){t.setAttribute("fill",k===st.i?"var(--ink)":"var(--muted)");t.setAttribute("font-weight",k===st.i?700:400);}});});
+  const ex=$("#seq-"+name+"-explain");
+  if(st.i<0){ex.innerHTML=`<span class="step">Ready</span><div>Press Play or Next to step through ${S.steps.length} steps.</div>`;}
+  else{const s=S.steps[st.i];ex.innerHTML=`<span class="step">Step ${st.i+1} of ${S.steps.length} · ${S.lanes[s[0]]} → ${S.lanes[s[1]]}</span><div><b>${s[2]}.</b> ${s[3]}</div>`;}
+  $("#seq-"+name+"-pos").textContent=`${st.i+1}/${S.steps.length}`;
+}
+Object.keys(SEQS).forEach(n=>{drawSeq(n);seqGo(n,-1);});
+$$("[data-seq]").forEach(b=>b.addEventListener("click",()=>{
+  const n=b.dataset.seq,a=b.dataset.act,st=seqState[n],playBtn=document.querySelector(`[data-seq="${n}"][data-act="play"]`);
+  const stop=()=>{if(st.timer){clearInterval(st.timer);st.timer=null;playBtn.textContent="▶ Play";}};
+  if(a==="play"){if(st.timer){stop();return;}if(st.i>=SEQS[n].steps.length-1)seqGo(n,-1);playBtn.textContent="⏸ Pause";seqGo(n,st.i+1);st.timer=setInterval(()=>{if(st.i>=SEQS[n].steps.length-1){stop();return;}seqGo(n,st.i+1);},2800);}
+  else{stop();if(a==="next")seqGo(n,st.i+1);if(a==="prev")seqGo(n,st.i-1);if(a==="reset")seqGo(n,-1);}
+}));
+
+/* ---------------- probe simulator ---------------- */
+const ps={used:0,missing:[],q:1};
+function psLimit(){const d=+$("#psDiff").value;return $("#psMini").checked?Math.min(d,1):d;}
+function psLog(s){const l=$("#psLog");l.textContent+="\n"+s;l.scrollTop=l.scrollHeight;}
+function psRender(){$("#psUsed").textContent=ps.used;$("#psLimit").textContent=psLimit();$("#psMissing").textContent=JSON.stringify(ps.missing);}
+function psNext(why){psLog(`→ MOVE ON (why: ${why}). Next question q${ps.q+1} asked; probes reset.`);ps.q++;ps.used=0;ps.missing=[];psRender();}
+$$("[data-ps]").forEach(b=>b.addEventListener("click",()=>{
+  const a=b.dataset.ps,lim=psLimit();
+  if(a==="fail"){psLog("decide() raised → ProbeDecision(action='move_on'); trace error recorded");return psNext("model_chose_move_on (fallback)");}
+  if(a==="move_on"){psLog("model: {action:'move_on'}");return psNext("model_chose_move_on");}
+  psLog(`model: {action:'probe', missing:['${a}']}`);
+  if(ps.used>=lim){psLog(`needs_decision=false: probes_used ${ps.used} ≥ limit ${lim}; decision ignored`);return psNext("probe_limit_reached");}
+  if(ps.used>0&&ps.missing.includes(a)){psLog(`'${a}' was already probed on this question and is still missing`);return psNext("same_gap_not_filled");}
+  ps.used++;ps.missing.push(a);psLog(`→ PROBE #${ps.used} on q${ps.q} targeting ${a} (why: model_chose_probe)`);
+  if(ps.used>=lim)psLog(`  (limit reached: the next answer gets no decide() call)`);psRender();
+}));
+$("#psReset").addEventListener("click",()=>psNext("manual"));
+$("#psDiff").addEventListener("change",psRender);$("#psMini").addEventListener("change",psRender);psRender();
+
+/* ---------------- hire signal calc ---------------- */
+const HC=[["ownership",1.5,3.2],["impact",1.2,3.0],["collaboration",1.0,2.8],["communication",0.8,3.4]];
+const hs=$("#hsSliders");
+HC.forEach((c,i)=>{const r=document.createElement("div");r.className="slider-row";r.innerHTML=`<span>${c[0]}</span><input type="range" min="1" max="4" step="0.1" value="${c[2]}" data-hc="${i}"><b id="hcv${i}">${c[2]}</b><span class="small">w=${c[1]}</span>`;hs.appendChild(r);});
+const SIG=[["Strong Hire",3.5,"var(--good)"],["Hire",3.0,"#16a34a"],["Lean Hire",2.6,"var(--warn)"],["Lean No Hire",2.0,"var(--bad)"],["No Hire",-1,"#b91c1c"]];
+function band(a){return SIG.findIndex(s=>a>=s[1]);}
+function badge(i){return `<span class="badge" style="background:${SIG[i][2]}">${SIG[i][0]}</span>`;}
+function hcCalc(){
+  const v=HC.map((c,i)=>+document.querySelector(`[data-hc="${i}"]`).value);v.forEach((x,i)=>$("#hcv"+i).textContent=x.toFixed(1));
+  const tw=HC.reduce((s,c)=>s+c[1],0),avg=HC.reduce((s,c,i)=>s+c[1]*v[i],0)/tw;
+  let b=band(avg),sg=b;const pts=v.map(x=>Math.max(1,Math.min(4,Math.floor(x+0.5))));const rules=[];
+  if(sg===0&&Math.min(...pts)<3){sg=1;rules.push("Strong Hire needs every competency at 3 or more, so the signal is Hire.");}
+  if(Math.min(...pts)===1&&sg<3){sg=3;rules.push("A competency scored 1, so the signal is capped at Lean No Hire.");}
+  $("#hsAvg").textContent=avg.toFixed(3);$("#hsBand").innerHTML=badge(b);$("#hsSignal").innerHTML=badge(sg);
+  $("#hsRules").innerHTML=(rules.length?"<b>Rules applied:</b> "+rules.join(" "):"No hard rule applied.")+`<br>Rubric points shown on the debrief: ${pts.join(", ")}`;
+}
+$$("[data-hc]").forEach(s=>s.addEventListener("input",hcCalc));hcCalc();
+
+/* ---------------- window demo ---------------- */
+function winDraw(){
+  const n=+$("#winN").value,w=$("#winSmall").checked?6:16,box=$("#winDemo");box.innerHTML="";
+  const b=document.createElement("div");b.className="t in";b.style.width="64px";b.textContent="BRIEF";box.appendChild(b);
+  for(let i=0;i<n;i++){const d=document.createElement("div");const isI=i%2===0;d.className="t "+(isI?"i":"c")+(i>=n-w?" in":"");d.textContent=(isI?"I":"C")+(i+1);box.appendChild(d);}
+  $("#winInfo").textContent=`${Math.min(n,w)} of ${n} turns in the prompt · window=${w}`;
+}
+$("#winN").addEventListener("input",winDraw);$("#winSmall").addEventListener("change",winDraw);winDraw();
+
+/* ---------------- guard animation ---------------- */
+const GD={
+ clean:{path:[0,1,4,6],act:["none"],ex:"Attempt 1 passes every rule unchanged → spoken. Trace: <code>guard{attempt:1, action:\"none\", rules:[]}</code>."},
+ fix:{path:[0,1,4,6],act:["fixed"],ex:"\"Great answer! What was the latency before the change?\" → the <b>feedback</b> clause is removed → \"What was the latency before the change?\". Usable, so it is spoken. Trace: <code>action:\"fixed\", rules:[\"feedback\"]</code>."},
+ retry:{path:[0,1,2,3,4,6],act:["retry","none"],ex:"\"The candidate didn't give a number, so I should probe.\" → the <b>meta</b> sentence is removed → nothing usable is left → call #2 with <code>turn_retry</code> → clean → spoken. Two say traces: <code>action:\"retry\"</code>, then <code>action:\"none\"</code>."},
+ fallback:{path:[0,1,2,3,5,6],act:["retry","fallback"],ex:"Both attempts are rejected (or the retry call errors) → <code>fallback_line(move)</code>: a fixed sentence for the move, for example a generic follow-up asking for a concrete example, never model text. Trace: <code>action:\"fallback\"</code>."}
+};
+const GX=[80,270,465,655,835,835,990],GY=[82,82,82,82,37,127,82];
+let gdTimer=null;
+$("#gdRun").addEventListener("click",()=>{
+  const sc=GD[$("#gdSel").value],d=$("#gdDot");if(gdTimer)clearInterval(gdTimer);
+  for(let i=0;i<7;i++)$("#gd"+i).classList.remove("hl");
+  d.style.transition="none";d.setAttribute("cx",GX[0]);d.setAttribute("cy",GY[0]);d.setAttribute("opacity",1);
+  let k=0;$("#gd0").classList.add("hl");
+  setTimeout(()=>{d.style.transition="cx .7s ease, cy .7s ease";},30);
+  gdTimer=setInterval(()=>{k++;if(k>=sc.path.length){clearInterval(gdTimer);$("#gdExplain").innerHTML=sc.ex;return;}const n=sc.path[k];d.setAttribute("cx",GX[n]);d.setAttribute("cy",GY[n]);$("#gd"+n).classList.add("hl");},850);
+  $("#gdExplain").innerHTML="<span class='step'>running…</span>";
+});
+
+/* ---------------- trace animation ---------------- */
+$("#trPlay").addEventListener("click",()=>{
+  const g=$("#trPackets");g.innerHTML="";
+  const recs=[["check","var(--accent2)"],["decide","var(--violet)"],["say#1 retry","var(--warn)"],["say#2 spoken","var(--accent)"]];
+  recs.forEach((r,i)=>{
+    const c=el("circle",{r:9,fill:r[1],cx:95,cy:100,opacity:0},g);
+    const t=el("text",{x:95,y:80,"font-size":10,"text-anchor":"middle",fill:r[1],opacity:0},g);t.textContent=r[0];
+    const an=(attr,vals,dur,begin)=>{const a=el("animate",{attributeName:attr,values:vals,dur:dur+"s",begin:begin+"s",fill:"freeze"},c);return a;};
+    const delay=i*0.9;
+    [c,t].forEach(node=>{
+      const a1=el("animate",{attributeName:"opacity",values:"0;1;1;0",keyTimes:"0;0.1;0.85;1",dur:"3.2s",begin:"indefinite",fill:"freeze"},node);
+      const a2=el("animate",{attributeName:node.tagName==="circle"?"cx":"x",values:"95;335;585;825",dur:"3.2s",begin:"indefinite",fill:"freeze"},node);
+      setTimeout(()=>{a1.beginElement();a2.beginElement();},delay*1000);
+    });
+  });
+  $("#trLabel").textContent="check → decide → say (attempt 1, guard: retry) → say (attempt 2, spoken): 4 rows in interviewer_traces";
+});
+})();
+</script>
+</body>
+</html>
