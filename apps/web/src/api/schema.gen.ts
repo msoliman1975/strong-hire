@@ -404,6 +404,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/roles/{job_target_id}/resume-comparison": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Comparison
+         * @description RC-8: the role's latest comparison. 404 when none was started.
+         */
+        get: operations["get_comparison_roles__job_target_id__resume_comparison_get"];
+        put?: never;
+        /**
+         * Start Comparison
+         * @description RC-1, RC-2: compare the user's resumes for this role. Reuses unchanged analyses.
+         */
+        post: operations["start_comparison_roles__job_target_id__resume_comparison_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resume-comparisons/{comparison_id}/use": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Use Resume
+         * @description RC-6: the role uses this resume from now on. Nothing switches without this call.
+         */
+        post: operations["use_resume_resume_comparisons__comparison_id__use_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resume-comparisons/{comparison_id}/hints/{key}/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Hint Line
+         * @description RC-4: copy the other resume's line into the focus resume, unchanged. No model call; the
+         *     resume check runs again on its next read.
+         */
+        post: operations["add_hint_line_resume_comparisons__comparison_id__hints__key__add_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resume-comparisons/{comparison_id}/hints/{key}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Hint
+         * @description RC-4: hide the hint. It stays hidden for this comparison.
+         */
+        post: operations["dismiss_hint_resume_comparisons__comparison_id__hints__key__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/debrief": {
         parameters: {
             query?: never;
@@ -5131,7 +5216,7 @@ export interface components {
             /** Company Name */
             company_name: string | null;
             /** @enum {string} */
-            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen";
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen" | "role_play";
             /** Question */
             question: string;
             /** Competencies */
@@ -5617,11 +5702,106 @@ export interface components {
             triage: components["schemas"]["TriageInfo"];
         };
         /**
+         * ComparedResume
+         * @description One compared resume: its rule-based must-have count (RC-2) and, once ready, its score.
+         */
+        ComparedResume: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /**
+             * Resume Name
+             * @description None when the resume was deleted.
+             */
+            resume_name: string | null;
+            /** Is Main */
+            is_main: boolean;
+            /** Deleted */
+            deleted: boolean;
+            /**
+             * Gap Analysis Id
+             * Format: uuid
+             */
+            gap_analysis_id: string;
+            /** @description The status of the analysis this resume is ranked by. */
+            status: components["schemas"]["GapStatus"];
+            /**
+             * Error
+             * @description A plain reason when status is failed.
+             */
+            error: string | null;
+            /**
+             * Reused
+             * @description RC-2: an earlier analysis was reused; no model call.
+             */
+            reused: boolean;
+            /**
+             * Match Score
+             * @description GA-1. None until ready.
+             */
+            match_score: number | null;
+            /**
+             * Must Haves Total
+             * @description RC-2: the job's must-have skills.
+             */
+            must_haves_total: number;
+            /**
+             * Must Haves Shown
+             * @description RC-2: must-haves the resume mentions (IN-12 rule, no model).
+             */
+            must_haves_shown: number;
+            /**
+             * Must Haves Missing
+             * @description RC-2: must-haves the resume never shows.
+             */
+            must_haves_missing: string[];
+            /**
+             * High Gaps
+             * @description High-severity gaps. None until ready.
+             */
+            high_gaps: number | null;
+            /**
+             * Rank
+             * @description RC-3: 1 is the best fit. None until ready.
+             */
+            rank: number | null;
+            /**
+             * Stale
+             * @description RC-8: the job or this resume changed since its analysis was made.
+             */
+            stale: boolean;
+        };
+        /**
+         * ComparisonGap
+         * @description One gap of the focus resume (RC-4, RC-5).
+         */
+        ComparisonGap: {
+            /**
+             * Key
+             * @description Stable id of this hint inside the comparison.
+             */
+            key: string;
+            /** Summary */
+            summary: string;
+            severity: components["schemas"]["Severity"];
+            /** Related Requirement */
+            related_requirement: string | null;
+            /** @description RC-4: another resume covers this gap. None: no resume does (RC-5). */
+            source: components["schemas"]["HintSource"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "added" | "dismissed";
+        };
+        /**
          * Competency
          * @description Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.
          * @enum {string}
          */
-        Competency: "ownership" | "impact" | "collaboration" | "conflict_handling" | "learning_from_failure" | "communication" | "role_fit" | "depth_of_experience" | "judgment" | "motivation" | "team_fit" | "scope_at_level" | "technical_depth" | "accuracy" | "reasoning" | "trade_offs" | "clarity_of_explanation" | "problem_framing" | "structure" | "user_and_business_sense" | "estimation_logic" | "prioritization" | "recommendation" | "logistics_and_expectations";
+        Competency: "ownership" | "impact" | "collaboration" | "conflict_handling" | "learning_from_failure" | "communication" | "role_fit" | "depth_of_experience" | "judgment" | "motivation" | "team_fit" | "scope_at_level" | "technical_depth" | "accuracy" | "reasoning" | "trade_offs" | "clarity_of_explanation" | "problem_framing" | "structure" | "user_and_business_sense" | "estimation_logic" | "prioritization" | "recommendation" | "logistics_and_expectations" | "discovery" | "objection_handling" | "value_articulation" | "closing";
         /** CompetencyMatch */
         CompetencyMatch: {
             competency: components["schemas"]["Competency"];
@@ -6128,6 +6308,8 @@ export interface components {
              * @description Plain reason when the session failed before it started.
              */
             failure_reason?: string | null;
+            /** @description RP-9: the buyer Strova played; role-play sessions only. */
+            buyer?: components["schemas"]["SessionBuyer"] | null;
         };
         /**
          * DeliveryMetrics
@@ -6214,6 +6396,24 @@ export interface components {
          * @enum {string}
          */
         DocumentKind: "job_posting" | "job_list" | "resume" | "cover_letter" | "company_page" | "article" | "error_page" | "other";
+        /**
+         * DraftBeat
+         * @description One beat of a role-play as the planner writes it (RP-4). The worker turns it into a
+         *     BriefQuestion: `opening` is what the buyer says to open the beat, `goal` stays hidden.
+         */
+        DraftBeat: {
+            /** Id */
+            id: string;
+            /** Opening */
+            opening: string;
+            /**
+             * Goal
+             * @description What the candidate should do.
+             */
+            goal: string;
+            /** Competencies */
+            competencies: components["schemas"]["Competency"][];
+        };
         /**
          * DraftQuestion
          * @description One question as the planner model writes it. The worker turns it into a BriefQuestion;
@@ -6523,7 +6723,7 @@ export interface components {
              */
             id: string;
             /** @enum {string} */
-            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen";
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen" | "role_play";
             /** Question */
             question: string;
             hints: components["schemas"]["QuestionHints"];
@@ -6597,6 +6797,40 @@ export interface components {
             started_at?: string | null;
             /** At */
             at?: string | null;
+        };
+        /**
+         * HintSource
+         * @description RC-4: the other resume that covers a gap, and its line.
+         */
+        HintSource: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /** Resume Name */
+            resume_name: string;
+            /**
+             * Line
+             * @description The line of that resume, unchanged.
+             */
+            line: string;
+            /**
+             * Place
+             * @description Where the line goes: the resume's skills, or an achievement of a role.
+             * @enum {string}
+             */
+            place: "skills" | "achievement";
+            /**
+             * Company
+             * @description For an achievement: the company of its role.
+             */
+            company: string | null;
+            /**
+             * Can Add
+             * @description The line can be copied: a skill the resume lacks, or an achievement at a company the resume also lists.
+             */
+            can_add: boolean;
         };
         /**
          * HireSignal
@@ -6803,7 +7037,7 @@ export interface components {
          *     COMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.
          * @enum {string}
          */
-        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom" | "recruiter_screen";
+        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom" | "recruiter_screen" | "role_play";
         /** InterviewWithReadiness */
         InterviewWithReadiness: {
             interview: components["schemas"]["InterviewOut"];
@@ -6854,7 +7088,7 @@ export interface components {
             target_values?: string[];
             /**
              * Questions
-             * @description 6 to 10; a mini interview has 3.
+             * @description 6 to 10; a mini interview has 3. Role-play: 2 to 4 beats, a mini has 1.
              */
             questions: components["schemas"]["BriefQuestion"][];
             /** Probe Areas */
@@ -6862,9 +7096,14 @@ export interface components {
             persona: components["schemas"]["PersonaBrief"];
             /**
              * Max Probes Per Question
-             * @description IV-3.
+             * @description IV-3: at most 3. Role-play: the buyer's replies per beat, at most 8 (RP-6).
              */
             max_probes_per_question: number;
+            /**
+             * @description RP-3: the hidden buyer brief, for Role-play sessions only. Never shown to the candidate before the debrief.
+             * @default null
+             */
+            role_play: components["schemas"]["RolePlayBrief"] | null;
             /**
              * Company Summary
              * @description AP-2: a short company summary from an auto-generated profile, shown to the interviewer labeled auto-generated. None for curated profiles and generic mode.
@@ -8360,7 +8599,7 @@ export interface components {
          * @description IV-3 follow-up rules: what an answer lacks, so the interviewer probes.
          * @enum {string}
          */
-        ProbeTrigger: "own_role" | "measurable_result" | "concrete_example" | "tradeoff_reasoning" | "off_topic";
+        ProbeTrigger: "own_role" | "measurable_result" | "concrete_example" | "tradeoff_reasoning" | "off_topic" | "needs_discovery" | "objection_unresolved" | "no_value_link" | "no_next_step";
         /** ProfileDiff */
         ProfileDiff: {
             /**
@@ -9005,6 +9244,101 @@ export interface components {
             resume: components["schemas"]["ResumeOut"];
             job: components["schemas"]["JobOut"] | null;
         };
+        /**
+         * ResumeComparisonEntry
+         * @description One resume of a resume comparison and the gap analysis it is ranked by (RC-2).
+         */
+        ResumeComparisonEntry: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /**
+             * Gap Analysis Id
+             * Format: uuid
+             */
+            gap_analysis_id: string;
+            /**
+             * Reused
+             * @description True when an analysis of the same job and resume already existed, so this comparison made no model call for it.
+             */
+            reused: boolean;
+        };
+        /**
+         * ResumeComparisonOut
+         * @description The latest resume comparison of a role. Poll while status is "running".
+         */
+        ResumeComparisonOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Status
+             * @description running while any analysis runs; failed when every analysis failed.
+             * @enum {string}
+             */
+            status: "running" | "ready" | "failed";
+            /**
+             * Resumes
+             * @description Ranked resumes first (rank 1 first), then the others.
+             */
+            resumes: components["schemas"]["ComparedResume"][];
+            /**
+             * Recommended Resume Id
+             * @description RC-3. None until ready.
+             */
+            recommended_resume_id: string | null;
+            /**
+             * Reason
+             * @description RC-3: why it fits best, built in code.
+             */
+            reason: string | null;
+            /**
+             * Focus Resume Id
+             * @description The resume whose gaps are listed: the chosen one, else the recommended one.
+             */
+            focus_resume_id: string | null;
+            /**
+             * Gaps
+             * @description RC-4, RC-5: gaps of the focus resume.
+             */
+            gaps: components["schemas"]["ComparisonGap"][];
+            /**
+             * Role Resume Id
+             * @description The resume the role uses now (its interviews, else its analysis).
+             */
+            role_resume_id: string | null;
+            /**
+             * Chosen Resume Id
+             * @description RC-6: picked with Use this one.
+             */
+            chosen_resume_id: string | null;
+            /**
+             * New Runs
+             * @description RC-7: analyses this comparison started.
+             */
+            new_runs: number;
+            /**
+             * Out Of Date
+             * @description RC-8: compare again to update it.
+             */
+            out_of_date: boolean;
+            /** Out Of Date Reason */
+            out_of_date_reason: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** ResumeIssue */
         ResumeIssue: {
             /** Key */
@@ -9190,7 +9524,7 @@ export interface components {
          *     `strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`.
          * @enum {string}
          */
-        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other" | "infra_security" | "data_analytics" | "eng_management" | "finance" | "consulting_strategy" | "project_program";
+        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other" | "infra_security" | "data_analytics" | "eng_management" | "finance" | "consulting_strategy" | "project_program" | "sales" | "customer_success";
         /** RoleModel */
         RoleModel: {
             /** Role */
@@ -9219,6 +9553,93 @@ export interface components {
             /** Interviews */
             interviews: components["schemas"]["InterviewWithReadiness"][];
         };
+        /**
+         * RolePlayBrief
+         * @description RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer
+         *     reads it to judge discovery and closing. Never shown to the candidate before the debrief.
+         */
+        RolePlayBrief: {
+            scenario: components["schemas"]["RolePlayScenario"];
+            /** Persona Name */
+            persona_name: string;
+            /** Persona Title */
+            persona_title: string;
+            /**
+             * Company Summary
+             * @description The buyer's company.
+             */
+            company_summary: string;
+            /**
+             * Product
+             * @description What the candidate sells.
+             */
+            product: string;
+            /**
+             * Product Illustrative
+             * @description D-9: true when the posting named no product and the planner described one.
+             * @default false
+             */
+            product_illustrative: boolean;
+            /**
+             * Situation
+             * @description Why this call is happening.
+             */
+            situation: string;
+            /**
+             * Hidden Pains
+             * @description Said only when good discovery earns them.
+             */
+            hidden_pains: string[];
+            /** Budget */
+            budget: string;
+            /** Decision Process */
+            decision_process: string;
+            /** Objections */
+            objections: components["schemas"]["RolePlayObjection"][];
+            /**
+             * Curveball
+             * @description Tough only (D-8).
+             */
+            curveball?: string | null;
+            /**
+             * Success Condition
+             * @description What earns the next step, e.g. a booked demo.
+             */
+            success_condition: string;
+        };
+        /**
+         * RolePlayDraft
+         * @description What the planner model returns for a role-play brief (RP-4). Code adds the scenario, the
+         *     persona, probe limits and the time plan.
+         */
+        RolePlayDraft: {
+            buyer: components["schemas"]["RolePlayBrief"];
+            /** Beats */
+            beats: components["schemas"]["DraftBeat"][];
+        };
+        /**
+         * RolePlayObjection
+         * @description One objection the buyer raises in a role-play (RP-3).
+         */
+        RolePlayObjection: {
+            /**
+             * Text
+             * @description What the buyer says.
+             */
+            text: string;
+            /**
+             * When
+             * @description When to raise it, e.g. "after the price".
+             */
+            when: string;
+        };
+        /**
+         * RolePlayScenario
+         * @description RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a
+         *     customer success call with an existing, unhappy customer.
+         * @enum {string}
+         */
+        RolePlayScenario: "cold_call" | "discovery_call" | "demo_objections" | "negotiation_close" | "escalation_call";
         /** RoleSummary */
         RoleSummary: {
             /**
@@ -9500,6 +9921,23 @@ export interface components {
             at: string | null;
         };
         /**
+         * SessionBuyer
+         * @description RP-8, RP-9: who Strova plays in a role-play. The hidden part (`reveal`) is sent only once
+         *     the session has ended, for the debrief; never while the call can still run.
+         */
+        SessionBuyer: {
+            /** Name */
+            name: string;
+            /** Title */
+            title: string;
+            /** Company Summary */
+            company_summary: string;
+            /** Product */
+            product: string;
+            /** @description The full buyer brief, after the session ended (RP-9). */
+            reveal?: components["schemas"]["RolePlayBrief"] | null;
+        };
+        /**
          * SessionChannel
          * @description PL-7. How the candidate and the interviewer talk. Text runs the same controller and
          *     interviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it.
@@ -9528,6 +9966,8 @@ export interface components {
              * @default as_company
              */
             tone: components["schemas"]["Tone"];
+            /** @description RP-4, D-5: the call to simulate; required for Role-play only. */
+            role_play?: components["schemas"]["RolePlayScenario"] | null;
         };
         /** SessionFeedbackIn */
         SessionFeedbackIn: {
@@ -9588,6 +10028,8 @@ export interface components {
              * @description Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise.
              */
             failure_reason?: string | null;
+            /** @description RP-8: the buyer Strova plays; role-play sessions only. */
+            buyer?: components["schemas"]["SessionBuyer"] | null;
         };
         /** SessionReplay */
         SessionReplay: {
@@ -11171,6 +11613,14 @@ export interface components {
              */
             has_billing_account: boolean;
         };
+        /** UseResumeIn */
+        UseResumeIn: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+        };
         /** UsedAchievement */
         UsedAchievement: {
             /** Achievement */
@@ -12164,6 +12614,272 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    get_comparison_roles__job_target_id__resume_comparison_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    start_comparison_roles__job_target_id__resume_comparison_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    use_resume_resume_comparisons__comparison_id__use_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comparison_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UseResumeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    add_hint_line_resume_comparisons__comparison_id__hints__key__add_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comparison_id: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    dismiss_hint_resume_comparisons__comparison_id__hints__key__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comparison_id: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -4461,6 +4461,678 @@
         "project_program"
       ],
       "levels": []
+    },
+    {
+      "id": "sales-lost-big-deal",
+      "interview_type": "behavioral",
+      "question": "Tell me about a deal you lost that you expected to win. What happened?",
+      "hints": {
+        "looking_for": [
+          "Whether you own the loss instead of blaming the buyer",
+          "What you changed afterwards"
+        ],
+        "strong_signals": [
+          "Names the moment the deal turned",
+          "Shows a concrete change in how you sell now"
+        ],
+        "watch_outs": [
+          "Blaming price or the product only",
+          "No lesson you still use"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-missed-quota",
+      "interview_type": "behavioral",
+      "question": "Tell me about a quarter when you were behind your number. What did you do?",
+      "hints": {
+        "looking_for": [
+          "How you react under quota pressure",
+          "Whether you plan, not just push harder"
+        ],
+        "strong_signals": [
+          "Gives the gap in numbers and the plan to close it",
+          "Says what worked and what did not"
+        ],
+        "watch_outs": [
+          "Vague effort with no plan",
+          "Discounting as the only lever"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-biggest-win",
+      "interview_type": "behavioral",
+      "question": "Walk me through the deal you are proudest of.",
+      "hints": {
+        "looking_for": [
+          "What you personally did to win it",
+          "How you managed a complex buying process"
+        ],
+        "strong_signals": [
+          "Clear numbers: size, cycle length, stakeholders",
+          "Shows your own moves, not the team's"
+        ],
+        "watch_outs": [
+          "Only the outcome, not how you got there",
+          "Credit for work others did"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-internal-conflict",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with a colleague in product, legal or finance to get a deal done.",
+      "hints": {
+        "looking_for": [
+          "How you work across teams under deal pressure",
+          "Whether you respect other teams' limits"
+        ],
+        "strong_signals": [
+          "Finds a solution both sides accept",
+          "Keeps the customer's interest in view"
+        ],
+        "watch_outs": [
+          "Going around the other team",
+          "Promising the customer something not agreed"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "collaboration"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-handoff",
+      "interview_type": "behavioral",
+      "question": "Describe how you worked with a sales engineer, customer success manager or partner to close or keep an account.",
+      "hints": {
+        "looking_for": [
+          "Whether you share credit and context",
+          "How you plan the handoff"
+        ],
+        "strong_signals": [
+          "Clear roles and a shared plan",
+          "Shows the account was better for it"
+        ],
+        "watch_outs": [
+          "Treating others as support staff",
+          "Dropping the customer after signature"
+        ]
+      },
+      "competencies": [
+        "collaboration",
+        "communication"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-explain-to-exec",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to explain a complex product to a senior executive with little time.",
+      "hints": {
+        "looking_for": [
+          "Whether you lead with the buyer's business, not features",
+          "How you adapt to the audience"
+        ],
+        "strong_signals": [
+          "Gets to the point in a sentence or two",
+          "Ties the product to a number the executive cares about"
+        ],
+        "watch_outs": [
+          "A feature tour",
+          "Jargon the executive would not use"
+        ]
+      },
+      "competencies": [
+        "communication",
+        "impact"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-said-no-to-deal",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you walked away from a deal or told a prospect you were not the right fit.",
+      "hints": {
+        "looking_for": [
+          "Whether you qualify honestly",
+          "How you protect your pipeline and reputation"
+        ],
+        "strong_signals": [
+          "Explains the signals that it was a bad fit",
+          "Shows the long-term result of saying no"
+        ],
+        "watch_outs": [
+          "Never having walked away",
+          "Walking away without trying to qualify"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "communication"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-why-sales",
+      "interview_type": "hiring_manager",
+      "question": "Why sales, and why this kind of sale (deal size, buyer, cycle) in particular?",
+      "hints": {
+        "looking_for": [
+          "Whether you chose this motion on purpose",
+          "What keeps you going after a hard quarter"
+        ],
+        "strong_signals": [
+          "Names the parts of the job you enjoy and the hard parts",
+          "Links it to the role in the posting"
+        ],
+        "watch_outs": [
+          "Only money as the reason",
+          "A generic answer that fits any job"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-pipeline-build",
+      "interview_type": "hiring_manager",
+      "question": "How do you build pipeline when inbound leads dry up?",
+      "hints": {
+        "looking_for": [
+          "Whether you own your own pipeline",
+          "How you pick accounts and channels"
+        ],
+        "strong_signals": [
+          "Concrete activity numbers and conversion rates",
+          "A clear way to choose target accounts"
+        ],
+        "watch_outs": [
+          "Waiting for marketing",
+          "Volume with no targeting"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "judgment"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-forecast",
+      "interview_type": "hiring_manager",
+      "question": "How do you decide which deals go in your commit forecast?",
+      "hints": {
+        "looking_for": [
+          "Whether you forecast on evidence, not hope",
+          "How you qualify a deal"
+        ],
+        "strong_signals": [
+          "Names a method (for example MEDDICC or similar) and the evidence behind each stage",
+          "Talks about forecast accuracy in past quarters"
+        ],
+        "watch_outs": [
+          "Gut feel only",
+          "Every deal is a commit"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "depth_of_experience"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-quota-history",
+      "interview_type": "hiring_manager",
+      "question": "Talk me through your quota attainment over the last few years and what drove it.",
+      "hints": {
+        "looking_for": [
+          "Whether your results are real and repeatable",
+          "How you explain a weak year"
+        ],
+        "strong_signals": [
+          "Numbers by year with context (quota size, territory)",
+          "Honest about a miss and what changed"
+        ],
+        "watch_outs": [
+          "Only the best year",
+          "Numbers that do not add up"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "role_fit"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-discount-pressure",
+      "interview_type": "hiring_manager",
+      "question": "A prospect says a competitor is 30 percent cheaper and asks you to match. How do you handle it?",
+      "hints": {
+        "looking_for": [
+          "Whether you defend value before price",
+          "How you use your approval process"
+        ],
+        "strong_signals": [
+          "Asks what the comparison includes before reacting",
+          "Trades any discount for something in return"
+        ],
+        "watch_outs": [
+          "Matching the price at once",
+          "Badmouthing the competitor"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "scope_at_level"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-account-plan",
+      "interview_type": "hiring_manager",
+      "question": "How would you plan your first 90 days in this territory?",
+      "hints": {
+        "looking_for": [
+          "Whether you plan before you dial",
+          "How quickly you can ramp"
+        ],
+        "strong_signals": [
+          "Learns the product, the customers and the pipeline in order",
+          "Sets measurable goals for each month"
+        ],
+        "watch_outs": [
+          "No plan beyond working hard",
+          "Ignoring existing accounts"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "role_fit"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-coaching-reps",
+      "interview_type": "hiring_manager",
+      "question": "How do you coach a rep whose activity is high but whose deals keep stalling?",
+      "hints": {
+        "looking_for": [
+          "Whether you diagnose before you coach",
+          "How you use call reviews and deal reviews"
+        ],
+        "strong_signals": [
+          "Finds the stage where deals stall and why",
+          "Gives a specific practice plan and checks it"
+        ],
+        "watch_outs": [
+          "Telling the rep to try harder",
+          "Taking over the deals"
+        ]
+      },
+      "competencies": [
+        "team_fit",
+        "judgment"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "sales-tools-stack",
+      "interview_type": "hiring_manager",
+      "question": "Which sales tools and data do you rely on every week, and how do they change what you do?",
+      "hints": {
+        "looking_for": [
+          "Whether you use data to choose your next action",
+          "How you keep the CRM accurate"
+        ],
+        "strong_signals": [
+          "Names tools and one decision each one drives",
+          "Keeps notes that others can use"
+        ],
+        "watch_outs": [
+          "Tools listed with no purpose",
+          "Treating the CRM as admin to avoid"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "team_fit"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sales-team-fit-culture",
+      "interview_type": "hiring_manager",
+      "question": "What kind of sales team do you do your best work on, and what do you bring to it?",
+      "hints": {
+        "looking_for": [
+          "Whether you fit how this team works",
+          "What you give back to peers"
+        ],
+        "strong_signals": [
+          "Specific examples of sharing what works",
+          "Honest about the style you need from a manager"
+        ],
+        "watch_outs": [
+          "Lone wolf with no interest in the team",
+          "Answers that fit every team"
+        ]
+      },
+      "competencies": [
+        "team_fit",
+        "motivation"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rp-cold-call-ops-director",
+      "interview_type": "role_play",
+      "question": "Cold call: you reach an operations director at a 200-person logistics firm who did not ask for your call. You have about two minutes to earn a 20-minute meeting.",
+      "hints": {
+        "looking_for": [
+          "A reason to keep listening in the first 20 seconds",
+          "Whether you ask before you pitch"
+        ],
+        "strong_signals": [
+          "Names a problem companies like theirs have, then asks a question",
+          "Asks for a specific meeting time"
+        ],
+        "watch_outs": [
+          "A long product introduction",
+          "Hanging up without a next step"
+        ]
+      },
+      "competencies": [
+        "discovery",
+        "closing"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": [
+        "new_grad",
+        "mid"
+      ]
+    },
+    {
+      "id": "rp-cold-call-gatekeeper",
+      "interview_type": "role_play",
+      "question": "Cold call: an executive assistant answers and says the VP does not take sales calls. Get the right next step without lying or pushing past them.",
+      "hints": {
+        "looking_for": [
+          "Whether you treat the assistant as a person who can help",
+          "How you handle an early brush-off"
+        ],
+        "strong_signals": [
+          "Asks who owns the problem and how they prefer to be contacted",
+          "Leaves a short, specific reason to call back"
+        ],
+        "watch_outs": [
+          "Pretending to know the VP",
+          "Arguing with the assistant"
+        ]
+      },
+      "competencies": [
+        "objection_handling",
+        "communication"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": [
+        "new_grad",
+        "mid"
+      ]
+    },
+    {
+      "id": "rp-discovery-hidden-pain",
+      "interview_type": "role_play",
+      "question": "Discovery call: a head of finance agreed to talk after a webinar but says things are 'mostly fine'. The real pain is a month-end close that takes two weeks. Find it.",
+      "hints": {
+        "looking_for": [
+          "Open questions about the current process",
+          "Whether you dig past the first answer"
+        ],
+        "strong_signals": [
+          "Asks how long, who, and what it costs",
+          "Repeats the pain back in the buyer's words"
+        ],
+        "watch_outs": [
+          "Pitching after the first question",
+          "Leading questions that put words in their mouth"
+        ]
+      },
+      "competencies": [
+        "discovery",
+        "communication"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rp-discovery-decision-process",
+      "interview_type": "role_play",
+      "question": "Discovery call: an IT manager loves the idea but you do not know who signs, the budget, or the timeline. Qualify the deal without turning it into an interrogation.",
+      "hints": {
+        "looking_for": [
+          "Whether you learn budget, authority and timeline",
+          "How natural your questions sound"
+        ],
+        "strong_signals": [
+          "Finds out who else decides and what they care about",
+          "Agrees on the next meeting with the right people"
+        ],
+        "watch_outs": [
+          "Skipping qualification because the buyer is friendly",
+          "A checklist read out loud"
+        ]
+      },
+      "competencies": [
+        "discovery",
+        "closing"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rp-demo-we-tried-this",
+      "interview_type": "role_play",
+      "question": "Demo: halfway through, the buyer says 'We tried a tool like this two years ago and nobody used it.' Handle it and keep the demo on track.",
+      "hints": {
+        "looking_for": [
+          "Whether you explore the objection before answering",
+          "How you link the product to the earlier failure"
+        ],
+        "strong_signals": [
+          "Asks what went wrong last time",
+          "Shows how adoption would work this time, tied to their pain"
+        ],
+        "watch_outs": [
+          "Dismissing the past failure",
+          "Talking faster through more features"
+        ]
+      },
+      "competencies": [
+        "objection_handling",
+        "value_articulation"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": [
+        "mid",
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "rp-demo-feature-gap",
+      "interview_type": "role_play",
+      "question": "Demo: the buyer asks for a feature your product does not have and says it is a must-have. Respond honestly and keep the deal alive.",
+      "hints": {
+        "looking_for": [
+          "Honesty about what the product does",
+          "Whether you find the need behind the feature"
+        ],
+        "strong_signals": [
+          "Asks what the feature would let them do",
+          "Offers a real alternative or path, not a promise"
+        ],
+        "watch_outs": [
+          "Saying the feature is coming soon without knowing",
+          "Ignoring the question"
+        ]
+      },
+      "competencies": [
+        "objection_handling",
+        "value_articulation"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": [
+        "mid",
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "rp-negotiation-price-pushback",
+      "interview_type": "role_play",
+      "question": "Negotiation: the buyer is ready to sign but asks for 25 percent off by Friday 'or we go with the other vendor'. Protect the price and close.",
+      "hints": {
+        "looking_for": [
+          "Whether you hold value before you discount",
+          "How you trade instead of give"
+        ],
+        "strong_signals": [
+          "Tests whether the deadline and the competitor are real",
+          "Asks for something in return for any concession"
+        ],
+        "watch_outs": [
+          "Giving the discount at once",
+          "Getting defensive or threatening"
+        ]
+      },
+      "competencies": [
+        "objection_handling",
+        "closing"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "rp-negotiation-stalled-deal",
+      "interview_type": "role_play",
+      "question": "Close: a champion who was excited a month ago now says 'we need to wait until next quarter'. Find out what changed and agree on a real next step.",
+      "hints": {
+        "looking_for": [
+          "Whether you uncover the real reason for the delay",
+          "Whether you leave with a concrete commitment"
+        ],
+        "strong_signals": [
+          "Asks what changed and who else is involved now",
+          "Agrees a dated next step with the right people"
+        ],
+        "watch_outs": [
+          "Accepting 'next quarter' with no follow-up",
+          "Pressure that damages the relationship"
+        ]
+      },
+      "competencies": [
+        "discovery",
+        "closing"
+      ],
+      "role_families": [
+        "sales"
+      ],
+      "levels": [
+        "mid",
+        "senior",
+        "staff_principal"
+      ]
     }
   ]
 }

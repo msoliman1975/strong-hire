@@ -33,7 +33,8 @@ def test_rf9_generic_mode_suggests_the_familys_loop(family: RoleFamily) -> None:
     items = suggested(generic_profile(), target(family)).items
     usual = [i.interview_type for i in items if i.usual]
     assert usual == list(family_info(family).generic_loop)
-    assert len(items) == 5
+    # The five general types, plus role-play where the family's loop has it (RP-2).
+    assert len(items) == 5 + (InterviewType.ROLE_PLAY in family_info(family).generic_loop)
 
 
 def test_rf9_consulting_leads_with_a_case_and_finance_has_no_engineers() -> None:

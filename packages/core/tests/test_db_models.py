@@ -51,6 +51,7 @@ SPEC_TABLES = {
     "target_interviews",  # RH-1
     "role_story_fits",  # ST-5: the stored story fit per role
     "suggestions",  # SG-1
+    "resume_comparisons",  # RC-8: resume comparison per role
 }
 
 

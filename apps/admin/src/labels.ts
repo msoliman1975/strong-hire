@@ -9,6 +9,7 @@ export const interviewTypeLabel: Record<InterviewType, string> = {
   case: "Case",
   custom: "Custom",
   recruiter_screen: "Recruiter screen",
+  role_play: "Role-play",
 };
 
 export const difficultyLabel: Record<Difficulty, string> = {
@@ -74,5 +75,7 @@ export const roleFamilyLabel: Record<RoleFamily, string> = {
   finance: "Finance",
   consulting_strategy: "Consulting and strategy",
   project_program: "Project and program management",
+  sales: "Sales",
+  customer_success: "Customer success",
   other: "Other",
 };

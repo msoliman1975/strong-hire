@@ -1,0 +1,257 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation",
+        "logistics_and_expectations",
+        "discovery",
+        "objection_handling",
+        "value_articulation",
+        "closing"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "DraftBeat": {
+      "additionalProperties": false,
+      "description": "One beat of a role-play as the planner writes it (RP-4). The worker turns it into a\nBriefQuestion: `opening` is what the buyer says to open the beat, `goal` stays hidden.",
+      "properties": {
+        "competencies": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "goal": {
+          "description": "What the candidate should do.",
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Goal",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "opening": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Opening",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "opening",
+        "goal",
+        "competencies"
+      ],
+      "title": "DraftBeat",
+      "type": "object"
+    },
+    "RolePlayBrief": {
+      "additionalProperties": false,
+      "description": "RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer\nreads it to judge discovery and closing. Never shown to the candidate before the debrief.",
+      "properties": {
+        "budget": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Budget",
+          "type": "string"
+        },
+        "company_summary": {
+          "description": "The buyer's company.",
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Company Summary",
+          "type": "string"
+        },
+        "curveball": {
+          "anyOf": [
+            {
+              "maxLength": 240,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tough only (D-8).",
+          "title": "Curveball"
+        },
+        "decision_process": {
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Decision Process",
+          "type": "string"
+        },
+        "hidden_pains": {
+          "description": "Said only when good discovery earns them.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Hidden Pains",
+          "type": "array"
+        },
+        "objections": {
+          "items": {
+            "$ref": "#/$defs/RolePlayObjection"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Objections",
+          "type": "array"
+        },
+        "persona_name": {
+          "maxLength": 60,
+          "minLength": 1,
+          "title": "Persona Name",
+          "type": "string"
+        },
+        "persona_title": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Persona Title",
+          "type": "string"
+        },
+        "product": {
+          "description": "What the candidate sells.",
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Product",
+          "type": "string"
+        },
+        "product_illustrative": {
+          "default": false,
+          "description": "D-9: true when the posting named no product and the planner described one.",
+          "title": "Product Illustrative",
+          "type": "boolean"
+        },
+        "scenario": {
+          "$ref": "#/$defs/RolePlayScenario"
+        },
+        "situation": {
+          "description": "Why this call is happening.",
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Situation",
+          "type": "string"
+        },
+        "success_condition": {
+          "description": "What earns the next step, e.g. a booked demo.",
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Success Condition",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scenario",
+        "persona_name",
+        "persona_title",
+        "company_summary",
+        "product",
+        "situation",
+        "hidden_pains",
+        "budget",
+        "decision_process",
+        "objections",
+        "success_condition"
+      ],
+      "title": "RolePlayBrief",
+      "type": "object"
+    },
+    "RolePlayObjection": {
+      "additionalProperties": false,
+      "description": "One objection the buyer raises in a role-play (RP-3).",
+      "properties": {
+        "text": {
+          "description": "What the buyer says.",
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "when": {
+          "description": "When to raise it, e.g. \"after the price\".",
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "When",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "when"
+      ],
+      "title": "RolePlayObjection",
+      "type": "object"
+    },
+    "RolePlayScenario": {
+      "description": "RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a\ncustomer success call with an existing, unhappy customer.",
+      "enum": [
+        "cold_call",
+        "discovery_call",
+        "demo_objections",
+        "negotiation_close",
+        "escalation_call"
+      ],
+      "title": "RolePlayScenario",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/role_play_draft.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What the planner model returns for a role-play brief (RP-4). Code adds the scenario, the\npersona, probe limits and the time plan.",
+  "properties": {
+    "beats": {
+      "items": {
+        "$ref": "#/$defs/DraftBeat"
+      },
+      "maxItems": 4,
+      "minItems": 1,
+      "title": "Beats",
+      "type": "array"
+    },
+    "buyer": {
+      "$ref": "#/$defs/RolePlayBrief"
+    }
+  },
+  "required": [
+    "buyer",
+    "beats"
+  ],
+  "title": "RolePlayDraft",
+  "type": "object"
+}

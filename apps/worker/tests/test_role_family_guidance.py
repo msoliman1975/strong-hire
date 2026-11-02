@@ -76,12 +76,17 @@ def test_d7_every_family_has_a_guidance_prompt_that_renders(family: RoleFamily) 
 def test_rf3_job_posting_prompt_lists_every_family_and_family_level_titles() -> None:
     """RF-3: all twelve values, the boundary rules and the family level mappings."""
     prompt = load_prompt(Role.EXTRACTOR, "job_posting")
-    assert prompt.version == 2
+    assert prompt.version == 4  # CS-6 added customer_success
     text = prompt.text
     for family in RoleFamily:
         assert f"  {family.value}:" in text, family.value
     assert "A tech lead with no direct reports is swe." in text
-    for words in ("engagement\n    manager is senior", "vice\n    president is senior"):
+    for words in (
+        "engagement\n    manager is senior",
+        "vice\n    president is senior",
+        "an SDR or BDR is new_grad",
+        "an associate customer success manager is new_grad",
+    ):
         assert words in text
 
 
@@ -141,7 +146,7 @@ async def test_rf6_scorer_input_has_the_family_guidance() -> None:
     assert rubric_input.startswith("Interview type:")
     assert "Role family: consulting_strategy" in rubric_input
     assert family_guidance(RoleFamily.CONSULTING_STRATEGY) in rubric_input
-    assert backend.calls[0][0][1].prompt_ref == "scorer/rubric_input.v3"
+    assert backend.calls[0][0][1].prompt_ref == "scorer/rubric_input.v4"
 
 
 # --- RF-7: generic mode is not a tech-industry bar --------------------------------------------

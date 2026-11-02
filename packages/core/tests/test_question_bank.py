@@ -112,10 +112,13 @@ def test_qb5_loader_reports_a_bad_file(tmp_path: Path) -> None:
 
 def test_qb2_every_checked_in_question_has_hints() -> None:
     """QB-2, QB-5: every company sample question and general question shows key hints, and the
-    general set covers every interview type."""
+    general set covers every standard type, plus the role-play scenario cards (RP-12)."""
     for path in sorted((REPO / "profiles").glob("*.json")):
         profile = parse_profile(json.loads(path.read_text(encoding="utf-8")))
         missing = [q.question for q in profile.sample_questions if q.hints is None]
         assert not missing, f"{path.name}: no hints for {missing}"
     bank = load_general_bank(REPO / "questions" / "general.json")
-    assert {q.interview_type for q in bank.questions} == set(STANDARD_INTERVIEW_TYPES)
+    assert {q.interview_type for q in bank.questions} == {
+        *STANDARD_INTERVIEW_TYPES,
+        InterviewType.ROLE_PLAY,
+    }

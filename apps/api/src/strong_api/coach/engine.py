@@ -42,6 +42,7 @@ from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import Message, ModelGateway, Role, usage_context
 from strong_core.prompts import load_prompt
 from strong_core.schemas import (
+    STORY_SKILLS,
     AnswerCheck,
     AnswerConduct,
     CoachReply,
@@ -312,7 +313,7 @@ def turn_messages(
     target = ", ".join(skill_label(Competency(s)) for s in story.skills) or "none chosen"
     return [
         load_prompt(Role.COACH, "turn").message(
-            "system", style=style, skills=", ".join(c.value for c in Competency)
+            "system", style=style, skills=", ".join(c.value for c in STORY_SKILLS)
         ),
         load_prompt(Role.COACH, "turn_input").message(
             "user",

@@ -68,7 +68,7 @@ function session(changes: Partial<SessionRecord> = {}): SessionRecord {
     id: "s1",
     job_target_id: "j1",
     resume_id: null,
-    config: { interview_type: "behavioral", difficulty: "realistic", mode: "coach", duration_min: 30, level: "senior", custom: null, tone: "as_company" },
+    config: { interview_type: "behavioral", difficulty: "realistic", mode: "coach", duration_min: 30, level: "senior", custom: null, tone: "as_company", role_play: null },
     channel: "voice",
     status: "created",
     brief_ready: true,
@@ -76,6 +76,7 @@ function session(changes: Partial<SessionRecord> = {}): SessionRecord {
     ended_at: null,
     minutes_billed: 0,
     failure_reason: null,
+    buyer: null,
     ...changes,
   };
 }
@@ -419,7 +420,7 @@ describe("plan re-check at the start (BL-2, CU-11)", () => {
   });
 
   it("BL-2: a 403 upgrade_required on 'Try again' after a failed plan opens the paywall too", async () => {
-    const { user } = renderLive(session({ status: "failed", brief_ready: false, failure_reason: null }));
+    const { user } = renderLive(session({ status: "failed", brief_ready: false, failure_reason: null, buyer: null }));
     server.use(
       http.post("*/api/sessions", () =>
         HttpResponse.json(

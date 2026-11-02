@@ -66,7 +66,14 @@ from strong_api.custom.limits import CustomSettings, get_custom_settings
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.plan.interviews import interview_for_session
-from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
+from strong_api.scoring.router import (
+    _brief,
+    _buyer,
+    _config,
+    _owned_session,
+    _owned_target,
+    start_scoring,
+)
 from strong_api.sessions.failure import brief_is_stale, failure_reason
 from strong_api.sessions.schemas import (
     CoachRequest,
@@ -91,6 +98,7 @@ from strong_core.db.turns import next_turn_seq
 from strong_core.gateway import Role, get_gateway, usage_context
 from strong_core.schemas import (
     CustomSessionSpec,
+    GapPurpose,
     GapStatus,
     InterviewType,
     JobPosting,
@@ -133,6 +141,7 @@ def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecor
         ended_at=session.ended_at,
         minutes_billed=session.minutes_billed or 0,
         failure_reason=failure_reason(session),
+        buyer=_buyer(session),
     )
 
 
@@ -162,6 +171,7 @@ async def _session_resume(
         GapRow.job_target_id == job_target_id,
         GapRow.org_id == me.org_id,
         GapRow.status == GapStatus.READY,
+        GapRow.purpose == GapPurpose.ROLE,  # RC-7
     )
     if resume_id is not None:
         query = query.where(GapRow.resume_id == resume_id)

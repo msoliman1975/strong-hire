@@ -25,7 +25,9 @@
         "eng_management",
         "finance",
         "consulting_strategy",
-        "project_program"
+        "project_program",
+        "sales",
+        "customer_success"
       ],
       "title": "RoleFamily",
       "type": "string"

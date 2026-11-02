@@ -114,7 +114,11 @@
         "estimation_logic",
         "prioritization",
         "recommendation",
-        "logistics_and_expectations"
+        "logistics_and_expectations",
+        "discovery",
+        "objection_handling",
+        "value_articulation",
+        "closing"
       ],
       "title": "Competency",
       "type": "string"
@@ -268,7 +272,8 @@
         "technical_qa",
         "case",
         "custom",
-        "recruiter_screen"
+        "recruiter_screen",
+        "role_play"
       ],
       "title": "InterviewType",
       "type": "string"
@@ -377,9 +382,164 @@
         "eng_management",
         "finance",
         "consulting_strategy",
-        "project_program"
+        "project_program",
+        "sales",
+        "customer_success"
       ],
       "title": "RoleFamily",
+      "type": "string"
+    },
+    "RolePlayBrief": {
+      "additionalProperties": false,
+      "description": "RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer\nreads it to judge discovery and closing. Never shown to the candidate before the debrief.",
+      "properties": {
+        "budget": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Budget",
+          "type": "string"
+        },
+        "company_summary": {
+          "description": "The buyer's company.",
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Company Summary",
+          "type": "string"
+        },
+        "curveball": {
+          "anyOf": [
+            {
+              "maxLength": 240,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tough only (D-8).",
+          "title": "Curveball"
+        },
+        "decision_process": {
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Decision Process",
+          "type": "string"
+        },
+        "hidden_pains": {
+          "description": "Said only when good discovery earns them.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Hidden Pains",
+          "type": "array"
+        },
+        "objections": {
+          "items": {
+            "$ref": "#/$defs/RolePlayObjection"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Objections",
+          "type": "array"
+        },
+        "persona_name": {
+          "maxLength": 60,
+          "minLength": 1,
+          "title": "Persona Name",
+          "type": "string"
+        },
+        "persona_title": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Persona Title",
+          "type": "string"
+        },
+        "product": {
+          "description": "What the candidate sells.",
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Product",
+          "type": "string"
+        },
+        "product_illustrative": {
+          "default": false,
+          "description": "D-9: true when the posting named no product and the planner described one.",
+          "title": "Product Illustrative",
+          "type": "boolean"
+        },
+        "scenario": {
+          "$ref": "#/$defs/RolePlayScenario"
+        },
+        "situation": {
+          "description": "Why this call is happening.",
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Situation",
+          "type": "string"
+        },
+        "success_condition": {
+          "description": "What earns the next step, e.g. a booked demo.",
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Success Condition",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scenario",
+        "persona_name",
+        "persona_title",
+        "company_summary",
+        "product",
+        "situation",
+        "hidden_pains",
+        "budget",
+        "decision_process",
+        "objections",
+        "success_condition"
+      ],
+      "title": "RolePlayBrief",
+      "type": "object"
+    },
+    "RolePlayObjection": {
+      "additionalProperties": false,
+      "description": "One objection the buyer raises in a role-play (RP-3).",
+      "properties": {
+        "text": {
+          "description": "What the buyer says.",
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "when": {
+          "description": "When to raise it, e.g. \"after the price\".",
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "When",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "when"
+      ],
+      "title": "RolePlayObjection",
+      "type": "object"
+    },
+    "RolePlayScenario": {
+      "description": "RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a\ncustomer success call with an existing, unhappy customer.",
+      "enum": [
+        "cold_call",
+        "discovery_call",
+        "demo_objections",
+        "negotiation_close",
+        "escalation_call"
+      ],
+      "title": "RolePlayScenario",
       "type": "string"
     },
     "SessionConfig": {
@@ -419,6 +579,18 @@
         },
         "mode": {
           "$ref": "#/$defs/Mode"
+        },
+        "role_play": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RolePlayScenario"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "RP-4, D-5: the call to simulate; required for Role-play only."
         },
         "tone": {
           "$ref": "#/$defs/Tone",
@@ -504,8 +676,8 @@
       "type": "boolean"
     },
     "max_probes_per_question": {
-      "description": "IV-3.",
-      "maximum": 3,
+      "description": "IV-3: at most 3. Role-play: the buyer's replies per beat, at most 8 (RP-6).",
+      "maximum": 8,
       "minimum": 0,
       "title": "Max Probes Per Question",
       "type": "integer"
@@ -540,12 +712,12 @@
       "type": "boolean"
     },
     "questions": {
-      "description": "6 to 10; a mini interview has 3.",
+      "description": "6 to 10; a mini interview has 3. Role-play: 2 to 4 beats, a mini has 1.",
       "items": {
         "$ref": "#/$defs/BriefQuestion"
       },
       "maxItems": 10,
-      "minItems": 3,
+      "minItems": 1,
       "title": "Questions",
       "type": "array"
     },
@@ -553,6 +725,18 @@
       "$ref": "#/$defs/RoleFamily",
       "default": "other",
       "description": "RF-5: the job's role family, set from the posting, never by the model. Picks the family guidance for the interviewer and the scorer. Briefs stored before RF-5 read as other."
+    },
+    "role_play": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RolePlayBrief"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "RP-3: the hidden buyer brief, for Role-play sessions only. Never shown to the candidate before the debrief."
     },
     "seniority_bar": {
       "anyOf": [

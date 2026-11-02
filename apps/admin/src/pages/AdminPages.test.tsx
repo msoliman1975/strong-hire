@@ -44,6 +44,7 @@ function seed({ consent = false, signedInAs = "admin@example.com" as string | nu
       level: "senior",
       custom: null,
       tone: "as_company",
+      role_play: null,
     },
     channel: "voice",
     brief_ready: true,
@@ -52,6 +53,7 @@ function seed({ consent = false, signedInAs = "admin@example.com" as string | nu
     ended_at: "2026-10-07T09:09:30Z",
     minutes_billed: 10,
     failure_reason: null,
+    buyer: null,
   };
   mockStore.db.sessions.push(session);
   if (signedInAs) mockSignIn(mockStore, signedInAs);

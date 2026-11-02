@@ -8,6 +8,7 @@ import type {
   Mode,
   Phase,
   RoleFamily,
+  RolePlayScenario,
   Severity,
 } from "./api/types";
 
@@ -18,6 +19,7 @@ export const interviewTypeLabel: Record<InterviewType, string> = {
   case: "Case",
   custom: "Custom",
   recruiter_screen: "Recruiter screen",
+  role_play: "Role-play",
 };
 
 export const interviewTypeHint: Record<InterviewType, string> = {
@@ -27,7 +29,35 @@ export const interviewTypeHint: Record<InterviewType, string> = {
   case: "Product sense, estimation or system thinking.",
   custom: "Mix question types, pick focus topics and add your own questions.",
   recruiter_screen: "Why this role, your background, and pay and timing.",
+  role_play: "A mock sales or customer call: Strova plays the buyer or customer and you lead.",
 };
+
+/** RP-4, D-5, CS-1: the calls a role-play simulates: four sales calls and the escalation call. */
+export const rolePlayScenarioLabel: Record<RolePlayScenario, string> = {
+  cold_call: "Cold call",
+  discovery_call: "Discovery call",
+  demo_objections: "Demo and objections",
+  negotiation_close: "Negotiation and close",
+  escalation_call: "Escalation call",
+};
+
+export const rolePlayScenarioHint: Record<RolePlayScenario, string> = {
+  cold_call: "The buyer did not expect your call. Earn a few minutes, then a meeting.",
+  discovery_call: "A booked first call. Uncover the buyer's problems and agree a next step.",
+  demo_objections: "Show how the product fixes the buyer's problems and handle pushback.",
+  negotiation_close: "The buyer likes it. Handle price pushback and get a commitment.",
+  escalation_call: "An upset customer and a renewal at risk. Calm the call, find the cause, agree a plan.",
+};
+
+/** D-5: the default call for a level. */
+export function defaultRolePlayScenario(level: Level | null | undefined): RolePlayScenario {
+  if (level === "new_grad") return "cold_call";
+  if (level === "senior" || level === "staff_principal") return "demo_objections";
+  return "discovery_call";
+}
+
+/** D-11: the interview types still labeled Beta (fewer than 5 gold transcripts). */
+export const betaInterviewTypes: ReadonlySet<InterviewType> = new Set<InterviewType>(["role_play"]);
 
 export const difficultyLabel: Record<Difficulty, string> = {
   friendly: "Friendly",
@@ -80,6 +110,8 @@ export const roleFamilyLabel: Record<RoleFamily, string> = {
   finance: "Finance",
   consulting_strategy: "Consulting and strategy",
   project_program: "Project and program management",
+  sales: "Sales",
+  customer_success: "Customer success",
   other: "Other",
 };
 
@@ -94,6 +126,8 @@ export const betaRoleFamilies: ReadonlySet<RoleFamily> = new Set<RoleFamily>([
   "finance",
   "consulting_strategy",
   "project_program",
+  "sales",
+  "customer_success",
 ]);
 
 export const severityLabel: Record<Severity, string> = { low: "Low", medium: "Medium", high: "High" };

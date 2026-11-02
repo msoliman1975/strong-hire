@@ -34,6 +34,9 @@ class RoleFamily(StrEnum):
     FINANCE = "finance"
     CONSULTING_STRATEGY = "consulting_strategy"
     PROJECT_PROGRAM = "project_program"
+    # Wave 2 (docs/role-play-spec.md D-10).
+    SALES = "sales"
+    CUSTOMER_SUCCESS = "customer_success"
 
 
 class InterviewType(StrEnum):
@@ -50,6 +53,7 @@ class InterviewType(StrEnum):
     CASE = "case"
     CUSTOM = "custom"
     RECRUITER_SCREEN = "recruiter_screen"
+    ROLE_PLAY = "role_play"  # RP-1: Strova plays the buyer in a mock sales call
 
 
 STANDARD_INTERVIEW_TYPES: tuple[InterviewType, ...] = (
@@ -75,6 +79,17 @@ class QuestionRefusal(StrEnum):
     NOT_A_QUESTION = "not_a_question"
     INAPPROPRIATE = "inappropriate"  # abuse, harassment, threats, hate or sexual content (IV-12)
     INSTRUCTIONS = "instructions"  # text that tries to instruct the interviewer
+
+
+class RolePlayScenario(StrEnum):
+    """RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a
+    customer success call with an existing, unhappy customer."""
+
+    COLD_CALL = "cold_call"
+    DISCOVERY_CALL = "discovery_call"
+    DEMO_OBJECTIONS = "demo_objections"
+    NEGOTIATION_CLOSE = "negotiation_close"
+    ESCALATION_CALL = "escalation_call"
 
 
 class Difficulty(StrEnum):
@@ -165,10 +180,15 @@ class Competency(StrEnum):
     RECOMMENDATION = "recommendation"
     # Recruiter screen (RS-1); it also scores motivation, role fit and communication
     LOGISTICS_AND_EXPECTATIONS = "logistics_and_expectations"
+    # Role-play (RP-1, D-6); it also scores communication
+    DISCOVERY = "discovery"
+    OBJECTION_HANDLING = "objection_handling"
+    VALUE_ARTICULATION = "value_articulation"
+    CLOSING = "closing"
 
 
-# The four standard types and Recruiter screen. Custom sessions take the union over their
-# categories.
+# The four standard types, Recruiter screen and Role-play. Custom sessions take the union over
+# their categories.
 COMPETENCIES_BY_TYPE: dict[InterviewType, tuple[Competency, ...]] = {
     InterviewType.BEHAVIORAL: (
         Competency.OWNERSHIP,
@@ -207,7 +227,29 @@ COMPETENCIES_BY_TYPE: dict[InterviewType, tuple[Competency, ...]] = {
         Competency.COMMUNICATION,
         Competency.LOGISTICS_AND_EXPECTATIONS,
     ),
+    InterviewType.ROLE_PLAY: (
+        Competency.DISCOVERY,
+        Competency.OBJECTION_HANDLING,
+        Competency.VALUE_ARTICULATION,
+        Competency.CLOSING,
+        Competency.COMMUNICATION,
+    ),
 }
+
+
+ROLE_PLAY_ONLY_COMPETENCIES: tuple[Competency, ...] = (
+    Competency.DISCOVERY,
+    Competency.OBJECTION_HANDLING,
+    Competency.VALUE_ARTICULATION,
+    Competency.CLOSING,
+)
+"""RP-1, D-6: scored only in a role-play, on how the candidate runs the call."""
+
+STORY_SKILLS: tuple[Competency, ...] = tuple(
+    c for c in Competency if c not in ROLE_PLAY_ONLY_COMPETENCIES
+)
+"""The skills a career story can show (ST-1). A role-play competency describes how someone runs a
+live call, not a past situation, so stories and the coach never use them."""
 
 
 class Severity(StrEnum):
@@ -329,6 +371,18 @@ class GapStatus(StrEnum):
     FAILED = "failed"
 
 
+class GapPurpose(StrEnum):
+    """Why a gap analysis row exists (RC-7).
+
+    A role row is the role's own analysis: the latest one is what the role page, the plan and
+    the interviewer brief use. A comparison row was made by a resume comparison (RC-2) for a
+    resume the user has not picked; it never becomes the role's analysis by itself.
+    """
+
+    ROLE = "role"
+    COMPARISON = "comparison"
+
+
 class Confidence(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
@@ -381,6 +435,11 @@ class ProbeTrigger(StrEnum):
     CONCRETE_EXAMPLE = "concrete_example"
     TRADEOFF_REASONING = "tradeoff_reasoning"
     OFF_TOPIC = "off_topic"
+    # Role-play (RP-6, D-7): why the buyer keeps a beat going
+    NEEDS_DISCOVERY = "needs_discovery"
+    OBJECTION_UNRESOLVED = "objection_unresolved"
+    NO_VALUE_LINK = "no_value_link"
+    NO_NEXT_STEP = "no_next_step"
 
 
 class AnswerConduct(StrEnum):

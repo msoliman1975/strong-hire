@@ -4,7 +4,8 @@
  * optional interview date,
  * must-have skills), 3 the interviews Strova suggests (TG-3) against the main resume. "Create the
  * role" saves the role with its interviews (RH-1) and opens the role page; the gap analysis runs
- * in the background as before.
+ * in the background as before. With 2 or more resumes, "Compare my resumes" ranks them for this
+ * job (RC-1); Use this one picks the resume the role is created with (RC-6).
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
@@ -21,6 +22,7 @@ import "../../components/ux/ux.css";
 import { interviewTypeLabel, levelLabel, roleFamilyLabel } from "../../labels";
 import { countWords, fmt, JD_MAX_WORDS, JD_WARN_WORDS } from "../../limits";
 import { planApi } from "../plan/api";
+import { ResumeComparison } from "./ResumeComparison";
 import { rolePath } from "./shared";
 
 type Step = 1 | 2 | 3;
@@ -326,6 +328,7 @@ function InterviewsStep({ jobId, posting, date, onBack }: { jobId: string; posti
   const main = live.find((r) => r.is_main) ?? live[0];
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [chooseResume, setChooseResume] = useState(false);
+  const [compare, setCompare] = useState(false);
   const [kept, setKept] = useState<Set<Kind> | null>(null);
   const chosen = live.find((r) => r.id === resumeId) ?? main;
   const keep = kept ?? new Set(suggested.data?.items.filter((i) => i.usual).map((i) => i.interview_type) ?? []);
@@ -389,9 +392,14 @@ function InterviewsStep({ jobId, posting, date, onBack }: { jobId: string; posti
           Measured against: <strong>{chosen ? `${chosen.name ?? "Resume"}${chosen.is_main ? " (main)" : ""}` : "no resume yet"}</strong>
         </span>
         {live.length > 1 && (
-          <button type="button" className="sx-link" onClick={() => setChooseResume((v) => !v)}>
-            Use another resume
-          </button>
+          <span className="sx-row">
+            <button type="button" className="sx-link" onClick={() => setChooseResume((v) => !v)}>
+              Use another resume
+            </button>
+            <button type="button" className="sx-link" onClick={() => setCompare((v) => !v)} aria-expanded={compare}>
+              Compare my resumes
+            </button>
+          </span>
         )}
         {live.length <= 1 && <Link to="/resumes">Use another resume</Link>}
       </div>
@@ -407,6 +415,20 @@ function InterviewsStep({ jobId, posting, date, onBack }: { jobId: string; posti
             ))}
           </select>
         </div>
+      )}
+      {compare && (
+        <section className="sx-card tight" aria-label="Which resume fits this role best">
+          <h3>Which resume fits {posting.title} best?</h3>
+          <ResumeComparison
+            jobId={jobId}
+            pickedId={chosen?.id ?? null}
+            onUse={(id) => setResumeId(id)}
+            // RC-2: compare against the posting as checked on step 2.
+            beforeStart={async () => {
+              await jobTargetsApi.update(jobId, { posting });
+            }}
+          />
+        </section>
       )}
       {create.isError && <ErrorNotice error={create.error} />}
       <div className="sx-row">

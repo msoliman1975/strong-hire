@@ -151,7 +151,7 @@ describe("target roles", () => {
     await user.paste("Senior engineer, payments. ".repeat(10));
     await user.click(screen.getByRole("button", { name: "Read the posting" }));
     const category = await screen.findByRole("combobox", { name: "Job category" }, { timeout: 4000 });
-    expect(within(category).getAllByRole("option")).toHaveLength(12);
+    expect(within(category).getAllByRole("option")).toHaveLength(14);
     await user.selectOptions(category, "Consulting and strategy");
     await user.click(screen.getByRole("button", { name: "Looks right" }));
     // Network steps get the same headroom as "Read the posting" above, for slow CI runners.
@@ -297,6 +297,31 @@ describe("rehearsals", () => {
     expect(within(length).getByRole("button", { name: "10 min" })).toHaveAttribute("aria-pressed", "true");
     await user.click(within(mode).getByRole("button", { name: "Practice" }));
     expect(screen.getByRole("region", { name: "Next take" })).toHaveTextContent("Practice, 10 minutes");
+  });
+
+  it("RP-4, RP-8, D-11: a role-play take picks the call, defaulting by level, and is labeled Beta", async () => {
+    const { interviews } = await roleWithInterviews("role_play");
+    const user = renderApp(`/interviews/${interviews[0].id}`);
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent("Beta");
+    await user.click(await screen.findByRole("button", { name: "Change settings" }));
+    const call = within(screen.getByTestId("take-settings")).getByRole("group", { name: "Call" });
+    // The profile's target level is senior, so the default call is demo and objections.
+    expect(within(call).getByRole("button", { name: "Demo and objections" })).toHaveAttribute("aria-pressed", "true");
+    await user.click(within(call).getByRole("button", { name: "Cold call" }));
+    expect(screen.getByRole("region", { name: "Next take" })).toHaveTextContent("Cold call, Realistic");
+    await user.click(within(screen.getByRole("region", { name: "Next take" })).getByRole("button", { name: "Start the first take" }));
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/sessions\/.+\/live$/), { timeout: 4000 });
+    const config = (mockStore.db.sessions.at(-1) as SessionRecord).config;
+    expect(config.interview_type).toBe("role_play");
+    expect(config.role_play).toBe("cold_call");
+  });
+
+  it("RP-4: other takes send no call", async () => {
+    const { interviews } = await roleWithInterviews("behavioral");
+    const user = renderApp(`/interviews/${interviews[0].id}`);
+    expect(await screen.findByRole("heading", { level: 1 })).not.toHaveTextContent("Beta");
+    await user.click(await screen.findByRole("button", { name: "Change settings" }));
+    expect(within(screen.getByTestId("take-settings")).queryByRole("group", { name: "Call" })).toBeNull();
   });
 
   it("RH-5: the mode labels are Realistic and Practice; a Practice take is stored as coach", async () => {

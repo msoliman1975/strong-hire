@@ -53,6 +53,7 @@ from strong_core.schemas import (
     Competency,
     CustomQuestion,
     GapAnalysis,
+    GapPurpose,
     GapStatus,
     InterviewType,
     JobPosting,
@@ -147,6 +148,7 @@ async def focus_suggestions(
         GapRow.org_id == me.org_id,
         GapRow.status == GapStatus.READY,
         GapRow.breakdown_json.is_not(None),
+        GapRow.purpose == GapPurpose.ROLE,  # RC-7
     )
     if resume_id is not None:
         query = query.where(GapRow.resume_id == resume_id)

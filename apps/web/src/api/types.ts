@@ -100,6 +100,7 @@ export type Turn = DeepRequired<S["Turn"]>;
 export type Phase = S["Phase"];
 export type Level = S["Level"];
 export type RoleFamily = S["RoleFamily"];
+export type RolePlayScenario = S["RolePlayScenario"];
 export type InterviewType = S["InterviewType"];
 export type Difficulty = S["Difficulty"];
 export type Mode = S["Mode"];
@@ -126,7 +127,7 @@ export type VoiceJoin = S["VoiceJoin"];
 export type SubscriptionStatus = S["SubscriptionStatus"];
 
 // Custom interview (docs/custom-interview-spec.md, CU-1 to CU-11).
-export type StandardType = Exclude<InterviewType, "custom" | "recruiter_screen">;
+export type StandardType = Exclude<InterviewType, "custom" | "recruiter_screen" | "role_play">;
 export type CustomSessionSpec = DeepRequired<S["CustomSessionSpec"]>;
 export type CustomCategory = DeepRequired<S["CustomCategory"]>;
 export type CustomQuestion = DeepRequired<S["CustomQuestion"]>;
@@ -153,3 +154,8 @@ export type SuggestionAcceptOut = DeepRequired<S["AcceptOut"]>;
 export type PersonalPlan = DeepRequired<S["PersonalPlan"]>;
 export type PlanItem = PersonalPlan["plan"]["items"][number];
 export type PlanGroup = PersonalPlan["groups"][number];
+
+// Resume comparison (RC-1 to RC-8).
+export type ResumeComparisonOut = DeepRequired<S["ResumeComparisonOut"]>;
+export type ComparedResume = DeepRequired<S["ComparedResume"]>;
+export type ComparisonGap = DeepRequired<S["ComparisonGap"]>;

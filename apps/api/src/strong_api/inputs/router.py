@@ -86,6 +86,7 @@ from strong_core.library import (
 from strong_core.schemas import (
     ACCEPTED_ISSUES_MAX,
     AcceptedIssue,
+    GapPurpose,
     GapStatus,
     JobPosting,
     Resume,
@@ -320,7 +321,9 @@ async def list_job_targets(
         )
         sessions = {jt: (n, last) for jt, n, last in rows}
         for gap in await db.scalars(
-            select(GapRow).where(GapRow.job_target_id.in_(ids)).order_by(GapRow.created_at.desc())
+            select(GapRow)
+            .where(GapRow.job_target_id.in_(ids), GapRow.purpose == GapPurpose.ROLE)  # RC-7
+            .order_by(GapRow.created_at.desc())
         ):
             gaps.setdefault(gap.job_target_id, []).append(gap)
     out = []

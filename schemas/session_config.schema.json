@@ -26,7 +26,11 @@
         "estimation_logic",
         "prioritization",
         "recommendation",
-        "logistics_and_expectations"
+        "logistics_and_expectations",
+        "discovery",
+        "objection_handling",
+        "value_articulation",
+        "closing"
       ],
       "title": "Competency",
       "type": "string"
@@ -180,7 +184,8 @@
         "technical_qa",
         "case",
         "custom",
-        "recruiter_screen"
+        "recruiter_screen",
+        "role_play"
       ],
       "title": "InterviewType",
       "type": "string"
@@ -203,6 +208,18 @@
         "realistic"
       ],
       "title": "Mode",
+      "type": "string"
+    },
+    "RolePlayScenario": {
+      "description": "RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a\ncustomer success call with an existing, unhappy customer.",
+      "enum": [
+        "cold_call",
+        "discovery_call",
+        "demo_objections",
+        "negotiation_close",
+        "escalation_call"
+      ],
+      "title": "RolePlayScenario",
       "type": "string"
     },
     "Tone": {
@@ -255,6 +272,18 @@
     },
     "mode": {
       "$ref": "#/$defs/Mode"
+    },
+    "role_play": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RolePlayScenario"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "RP-4, D-5: the call to simulate; required for Role-play only."
     },
     "tone": {
       "$ref": "#/$defs/Tone",

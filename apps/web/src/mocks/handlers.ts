@@ -894,7 +894,11 @@ export function sessionHandlers(store: MockStore) {
         id: newId(),
         job_target_id: body.job_target_id,
         resume_id: body.resume_id ?? readyCv,
-        config: { ...body.config, custom: withCustomDefaults(body.config.custom) },
+        config: {
+          ...body.config,
+          custom: withCustomDefaults(body.config.custom),
+          role_play: body.config.role_play ?? null,
+        },
         channel: body.channel ?? "voice",
         brief_ready: true,
         status: "created",
@@ -902,6 +906,7 @@ export function sessionHandlers(store: MockStore) {
         ended_at: null,
         minutes_billed: 0,
         failure_reason: null,
+        buyer: null,
       };
       db().sessions.push(session);
       store.save();
@@ -1069,6 +1074,7 @@ export function scoringHandlers(store: MockStore) {
           ended_at: s.ended_at,
           minutes_billed: s.minutes_billed,
           failure_reason: s.failure_reason ?? null,
+          buyer: s.buyer ?? null,
         },
         status: ready
           ? "ready"

@@ -1210,6 +1210,297 @@
         }
       }
     },
+    "/roles/{job_target_id}/resume-comparison": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Start Comparison",
+        "description": "RC-1, RC-2: compare the user's resumes for this role. Reuses unchanged analyses.",
+        "operationId": "start_comparison_roles__job_target_id__resume_comparison_post",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Get Comparison",
+        "description": "RC-8: the role's latest comparison. 404 when none was started.",
+        "operationId": "get_comparison_roles__job_target_id__resume_comparison_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resume-comparisons/{comparison_id}/use": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Use Resume",
+        "description": "RC-6: the role uses this resume from now on. Nothing switches without this call.",
+        "operationId": "use_resume_resume_comparisons__comparison_id__use_post",
+        "parameters": [
+          {
+            "name": "comparison_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Comparison Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseResumeIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resume-comparisons/{comparison_id}/hints/{key}/add": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Add Hint Line",
+        "description": "RC-4: copy the other resume's line into the focus resume, unchanged. No model call; the\nresume check runs again on its next read.",
+        "operationId": "add_hint_line_resume_comparisons__comparison_id__hints__key__add_post",
+        "parameters": [
+          {
+            "name": "comparison_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Comparison Id"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resume-comparisons/{comparison_id}/hints/{key}/dismiss": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Dismiss Hint",
+        "description": "RC-4: hide the hint. It stays hidden for this comparison.",
+        "operationId": "dismiss_hint_resume_comparisons__comparison_id__hints__key__dismiss_post",
+        "parameters": [
+          {
+            "name": "comparison_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Comparison Id"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sessions/{session_id}/debrief": {
       "get": {
         "tags": [
@@ -13837,7 +14128,8 @@
               "hiring_manager",
               "technical_qa",
               "case",
-              "recruiter_screen"
+              "recruiter_screen",
+              "role_play"
             ]
           },
           "question": {
@@ -14939,6 +15231,198 @@
         ],
         "title": "CompanyRequestGroup"
       },
+      "ComparedResume": {
+        "properties": {
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "resume_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Name",
+            "description": "None when the resume was deleted."
+          },
+          "is_main": {
+            "type": "boolean",
+            "title": "Is Main"
+          },
+          "deleted": {
+            "type": "boolean",
+            "title": "Deleted"
+          },
+          "gap_analysis_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Gap Analysis Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GapStatus",
+            "description": "The status of the analysis this resume is ranked by."
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "A plain reason when status is failed."
+          },
+          "reused": {
+            "type": "boolean",
+            "title": "Reused",
+            "description": "RC-2: an earlier analysis was reused; no model call."
+          },
+          "match_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Score",
+            "description": "GA-1. None until ready."
+          },
+          "must_haves_total": {
+            "type": "integer",
+            "title": "Must Haves Total",
+            "description": "RC-2: the job's must-have skills."
+          },
+          "must_haves_shown": {
+            "type": "integer",
+            "title": "Must Haves Shown",
+            "description": "RC-2: must-haves the resume mentions (IN-12 rule, no model)."
+          },
+          "must_haves_missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Must Haves Missing",
+            "description": "RC-2: must-haves the resume never shows."
+          },
+          "high_gaps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "High Gaps",
+            "description": "High-severity gaps. None until ready."
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank",
+            "description": "RC-3: 1 is the best fit. None until ready."
+          },
+          "stale": {
+            "type": "boolean",
+            "title": "Stale",
+            "description": "RC-8: the job or this resume changed since its analysis was made."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume_id",
+          "resume_name",
+          "is_main",
+          "deleted",
+          "gap_analysis_id",
+          "status",
+          "error",
+          "reused",
+          "match_score",
+          "must_haves_total",
+          "must_haves_shown",
+          "must_haves_missing",
+          "high_gaps",
+          "rank",
+          "stale"
+        ],
+        "title": "ComparedResume",
+        "description": "One compared resume: its rule-based must-have count (RC-2) and, once ready, its score."
+      },
+      "ComparisonGap": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "Stable id of this hint inside the comparison."
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "related_requirement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Related Requirement"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HintSource"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RC-4: another resume covers this gap. None: no resume does (RC-5)."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "added",
+              "dismissed"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "summary",
+          "severity",
+          "related_requirement",
+          "source",
+          "status"
+        ],
+        "title": "ComparisonGap",
+        "description": "One gap of the focus resume (RC-4, RC-5)."
+      },
       "Competency": {
         "type": "string",
         "enum": [
@@ -14965,7 +15449,11 @@
           "estimation_logic",
           "prioritization",
           "recommendation",
-          "logistics_and_expectations"
+          "logistics_and_expectations",
+          "discovery",
+          "objection_handling",
+          "value_articulation",
+          "closing"
         ],
         "title": "Competency",
         "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE."
@@ -16158,6 +16646,17 @@
             ],
             "title": "Failure Reason",
             "description": "Plain reason when the session failed before it started."
+          },
+          "buyer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionBuyer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-9: the buyer Strova played; role-play sessions only."
           }
         },
         "additionalProperties": false,
@@ -16372,6 +16871,47 @@
         ],
         "title": "DocumentKind",
         "type": "string"
+      },
+      "DraftBeat": {
+        "additionalProperties": false,
+        "description": "One beat of a role-play as the planner writes it (RP-4). The worker turns it into a\nBriefQuestion: `opening` is what the buyer says to open the beat, `goal` stays hidden.",
+        "properties": {
+          "id": {
+            "pattern": "^[a-z0-9_-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "opening": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Opening",
+            "type": "string"
+          },
+          "goal": {
+            "description": "What the candidate should do.",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Goal",
+            "type": "string"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Competencies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "opening",
+          "goal",
+          "competencies"
+        ],
+        "title": "DraftBeat",
+        "type": "object"
       },
       "DraftQuestion": {
         "additionalProperties": false,
@@ -17142,7 +17682,8 @@
               "hiring_manager",
               "technical_qa",
               "case",
-              "recruiter_screen"
+              "recruiter_screen",
+              "role_play"
             ],
             "type": "string"
           },
@@ -17342,6 +17883,61 @@
           "instance"
         ],
         "title": "Heartbeat"
+      },
+      "HintSource": {
+        "properties": {
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "resume_name": {
+            "type": "string",
+            "title": "Resume Name"
+          },
+          "line": {
+            "type": "string",
+            "title": "Line",
+            "description": "The line of that resume, unchanged."
+          },
+          "place": {
+            "type": "string",
+            "enum": [
+              "skills",
+              "achievement"
+            ],
+            "title": "Place",
+            "description": "Where the line goes: the resume's skills, or an achievement of a role."
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company",
+            "description": "For an achievement: the company of its role."
+          },
+          "can_add": {
+            "type": "boolean",
+            "title": "Can Add",
+            "description": "The line can be copied: a skill the resume lacks, or an achievement at a company the resume also lists."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume_id",
+          "resume_name",
+          "line",
+          "place",
+          "company",
+          "can_add"
+        ],
+        "title": "HintSource",
+        "description": "RC-4: the other resume that covers a gap, and its line."
       },
       "HireSignal": {
         "type": "string",
@@ -17766,7 +18362,8 @@
           "technical_qa",
           "case",
           "custom",
-          "recruiter_screen"
+          "recruiter_screen",
+          "role_play"
         ],
         "title": "InterviewType",
         "description": "The four v1 interview types (IV-2), plus Custom (CU-1) and Recruiter screen (RS-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool."
@@ -17876,12 +18473,12 @@
             "type": "array"
           },
           "questions": {
-            "description": "6 to 10; a mini interview has 3.",
+            "description": "6 to 10; a mini interview has 3. Role-play: 2 to 4 beats, a mini has 1.",
             "items": {
               "$ref": "#/components/schemas/BriefQuestion"
             },
             "maxItems": 10,
-            "minItems": 3,
+            "minItems": 1,
             "title": "Questions",
             "type": "array"
           },
@@ -17896,11 +18493,23 @@
             "$ref": "#/components/schemas/PersonaBrief"
           },
           "max_probes_per_question": {
-            "description": "IV-3.",
-            "maximum": 3,
+            "description": "IV-3: at most 3. Role-play: the buyer's replies per beat, at most 8 (RP-6).",
+            "maximum": 8,
             "minimum": 0,
             "title": "Max Probes Per Question",
             "type": "integer"
+          },
+          "role_play": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolePlayBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "RP-3: the hidden buyer brief, for Role-play sessions only. Never shown to the candidate before the debrief."
           },
           "company_summary": {
             "anyOf": [
@@ -21711,7 +22320,11 @@
           "measurable_result",
           "concrete_example",
           "tradeoff_reasoning",
-          "off_topic"
+          "off_topic",
+          "needs_discovery",
+          "objection_unresolved",
+          "no_value_link",
+          "no_next_step"
         ],
         "title": "ProbeTrigger",
         "type": "string"
@@ -23369,6 +23982,183 @@
         ],
         "title": "ResumeAccepted"
       },
+      "ResumeComparisonEntry": {
+        "additionalProperties": false,
+        "description": "One resume of a resume comparison and the gap analysis it is ranked by (RC-2).",
+        "properties": {
+          "resume_id": {
+            "format": "uuid",
+            "title": "Resume Id",
+            "type": "string"
+          },
+          "gap_analysis_id": {
+            "format": "uuid",
+            "title": "Gap Analysis Id",
+            "type": "string"
+          },
+          "reused": {
+            "description": "True when an analysis of the same job and resume already existed, so this comparison made no model call for it.",
+            "title": "Reused",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "resume_id",
+          "gap_analysis_id",
+          "reused"
+        ],
+        "title": "ResumeComparisonEntry",
+        "type": "object"
+      },
+      "ResumeComparisonOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "ready",
+              "failed"
+            ],
+            "title": "Status",
+            "description": "running while any analysis runs; failed when every analysis failed."
+          },
+          "resumes": {
+            "items": {
+              "$ref": "#/components/schemas/ComparedResume"
+            },
+            "type": "array",
+            "title": "Resumes",
+            "description": "Ranked resumes first (rank 1 first), then the others."
+          },
+          "recommended_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Resume Id",
+            "description": "RC-3. None until ready."
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "RC-3: why it fits best, built in code."
+          },
+          "focus_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focus Resume Id",
+            "description": "The resume whose gaps are listed: the chosen one, else the recommended one."
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/ComparisonGap"
+            },
+            "type": "array",
+            "title": "Gaps",
+            "description": "RC-4, RC-5: gaps of the focus resume."
+          },
+          "role_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Resume Id",
+            "description": "The resume the role uses now (its interviews, else its analysis)."
+          },
+          "chosen_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chosen Resume Id",
+            "description": "RC-6: picked with Use this one."
+          },
+          "new_runs": {
+            "type": "integer",
+            "title": "New Runs",
+            "description": "RC-7: analyses this comparison started."
+          },
+          "out_of_date": {
+            "type": "boolean",
+            "title": "Out Of Date",
+            "description": "RC-8: compare again to update it."
+          },
+          "out_of_date_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Out Of Date Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "job_target_id",
+          "status",
+          "resumes",
+          "recommended_resume_id",
+          "reason",
+          "focus_resume_id",
+          "gaps",
+          "role_resume_id",
+          "chosen_resume_id",
+          "new_runs",
+          "out_of_date",
+          "out_of_date_reason",
+          "created_at"
+        ],
+        "title": "ResumeComparisonOut",
+        "description": "The latest resume comparison of a role. Poll while status is \"running\"."
+      },
       "ResumeIssue": {
         "properties": {
           "key": {
@@ -23823,7 +24613,9 @@
           "eng_management",
           "finance",
           "consulting_strategy",
-          "project_program"
+          "project_program",
+          "sales",
+          "customer_success"
         ],
         "title": "RoleFamily",
         "description": "Role families (RF-1, `docs/role-families-spec.md`). Per-family facts live in\n`strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`."
@@ -23890,6 +24682,182 @@
         ],
         "title": "RoleOut",
         "description": "TG-1: a role with one readiness per interview."
+      },
+      "RolePlayBrief": {
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/RolePlayScenario"
+          },
+          "persona_name": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Persona Name"
+          },
+          "persona_title": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Persona Title"
+          },
+          "company_summary": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Company Summary",
+            "description": "The buyer's company."
+          },
+          "product": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Product",
+            "description": "What the candidate sells."
+          },
+          "product_illustrative": {
+            "type": "boolean",
+            "title": "Product Illustrative",
+            "description": "D-9: true when the posting named no product and the planner described one.",
+            "default": false
+          },
+          "situation": {
+            "type": "string",
+            "maxLength": 400,
+            "minLength": 1,
+            "title": "Situation",
+            "description": "Why this call is happening."
+          },
+          "hidden_pains": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Hidden Pains",
+            "description": "Said only when good discovery earns them."
+          },
+          "budget": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Budget"
+          },
+          "decision_process": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Decision Process"
+          },
+          "objections": {
+            "items": {
+              "$ref": "#/components/schemas/RolePlayObjection"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Objections"
+          },
+          "curveball": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Curveball",
+            "description": "Tough only (D-8)."
+          },
+          "success_condition": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Success Condition",
+            "description": "What earns the next step, e.g. a booked demo."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenario",
+          "persona_name",
+          "persona_title",
+          "company_summary",
+          "product",
+          "situation",
+          "hidden_pains",
+          "budget",
+          "decision_process",
+          "objections",
+          "success_condition"
+        ],
+        "title": "RolePlayBrief",
+        "description": "RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer\nreads it to judge discovery and closing. Never shown to the candidate before the debrief."
+      },
+      "RolePlayDraft": {
+        "additionalProperties": false,
+        "description": "What the planner model returns for a role-play brief (RP-4). Code adds the scenario, the\npersona, probe limits and the time plan.",
+        "properties": {
+          "buyer": {
+            "$ref": "#/components/schemas/RolePlayBrief"
+          },
+          "beats": {
+            "items": {
+              "$ref": "#/components/schemas/DraftBeat"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Beats",
+            "type": "array"
+          }
+        },
+        "required": [
+          "buyer",
+          "beats"
+        ],
+        "title": "RolePlayDraft",
+        "type": "object"
+      },
+      "RolePlayObjection": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Text",
+            "description": "What the buyer says."
+          },
+          "when": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "When",
+            "description": "When to raise it, e.g. \"after the price\"."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "when"
+        ],
+        "title": "RolePlayObjection",
+        "description": "One objection the buyer raises in a role-play (RP-3)."
+      },
+      "RolePlayScenario": {
+        "type": "string",
+        "enum": [
+          "cold_call",
+          "discovery_call",
+          "demo_objections",
+          "negotiation_close",
+          "escalation_call"
+        ],
+        "title": "RolePlayScenario",
+        "description": "RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a\ncustomer success call with an existing, unhappy customer."
       },
       "RoleSummary": {
         "properties": {
@@ -24515,6 +25483,46 @@
         ],
         "title": "ServiceProfile"
       },
+      "SessionBuyer": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company_summary": {
+            "type": "string",
+            "title": "Company Summary"
+          },
+          "product": {
+            "type": "string",
+            "title": "Product"
+          },
+          "reveal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolePlayBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The full buyer brief, after the session ended (RP-9)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "title",
+          "company_summary",
+          "product"
+        ],
+        "title": "SessionBuyer",
+        "description": "RP-8, RP-9: who Strova plays in a role-play. The hidden part (`reveal`) is sent only once\nthe session has ended, for the debrief; never while the call can still run."
+      },
       "SessionChannel": {
         "type": "string",
         "enum": [
@@ -24563,6 +25571,17 @@
             "$ref": "#/components/schemas/Tone",
             "description": "TN-1: the interviewer's tone. as_company uses the profile persona's tone.",
             "default": "as_company"
+          },
+          "role_play": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolePlayScenario"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-4, D-5: the call to simulate; required for Role-play only."
           }
         },
         "additionalProperties": false,
@@ -24716,6 +25735,17 @@
             ],
             "title": "Failure Reason",
             "description": "Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise."
+          },
+          "buyer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionBuyer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-8: the buyer Strova plays; role-play sessions only."
           }
         },
         "type": "object",
@@ -28513,6 +29543,21 @@
         ],
         "title": "UsageOut",
         "description": "BL-1 usage meter and BL-2 free interview, as the API counts them."
+      },
+      "UseResumeIn": {
+        "properties": {
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "resume_id"
+        ],
+        "title": "UseResumeIn"
       },
       "UsedAchievement": {
         "properties": {
