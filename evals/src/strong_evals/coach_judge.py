@@ -39,9 +39,11 @@ _KIND_LINE = {
 
 
 class CoachRuleResult(Contract):
+    # The reason comes before the verdict, so the model writes its evidence first and the
+    # verdict follows from it (a run gave "failure is not supported" with a fail verdict).
     rule: str = Field(description="One of: " + ", ".join(RULES))
-    verdict: Verdict
-    reason: str = Field(description="Short; quote or point to the turn number.")
+    reason: str = Field(description="Short; quote or point to the turn number. Written first.")
+    verdict: Verdict = Field(description="The verdict the reason supports.")
 
 
 class CoachJudgeVerdict(Contract):
