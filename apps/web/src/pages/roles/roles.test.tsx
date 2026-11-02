@@ -194,21 +194,27 @@ describe("target roles", () => {
     expect(within(ivs).getAllByText("Start a take")).toHaveLength(2);
     expect(screen.getByRole("region", { name: "What they'll look for" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Your stories for this role" })).toBeInTheDocument();
-    const ctx = screen.getByRole("region", { name: "Know anything about this interview?" });
-    expect(within(ctx).getByRole("button", { name: "Add what you know" })).toBeInTheDocument();
+    // The role's actions are at the top: the job posting, what you know, and remove.
+    const actions = screen.getByRole("group", { name: "Role actions" });
+    // Archive, not delete: the role has a gap report (once it has loaded).
+    await waitFor(() =>
+      expect(within(actions).getAllByRole("button").map((b) => b.textContent)).toEqual(["Job posting", "Add what you know", "Archive role"]),
+    );
     const look = screen.getByRole("region", { name: "What they'll look for" });
     expect(within(look).getByRole("link", { name: "See the full gap report" })).toHaveAttribute("href", `/jobs/${job.id}/gap-report`);
   });
 
-  it("LB-2: a role nothing uses can be deleted from its page, after a confirm", async () => {
+  it("LB-2: a role nothing uses can be deleted from its actions, after a confirm", async () => {
     const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
     const job = await jobTargetsApi.get(created.id);
     const user = renderApp(`/roles/${job.id}`);
-    const card = await screen.findByRole("region", { name: "Remove this role" });
-    expect(card).toHaveTextContent("Nothing uses this role yet");
-    await user.click(within(card).getByRole("button", { name: "Delete role" }));
-    expect(within(card).getByText(/can't be undone/)).toBeInTheDocument();
-    await user.click(within(card).getByRole("button", { name: "Delete role" }));
+    const actions = await screen.findByRole("group", { name: "Role actions" });
+    await user.click(within(actions).getByRole("button", { name: "Delete role" }));
+    const confirm = screen.getByTestId("remove-role");
+    expect(confirm).toHaveAttribute("open");
+    expect(confirm).toHaveTextContent("Nothing uses this role yet");
+    expect(confirm).toHaveTextContent("can't be undone");
+    await user.click(within(confirm).getByRole("button", { name: "Delete role" }));
     await waitFor(() => expect(screen.getByTestId("where")).toHaveTextContent(/^\/roles$/));
     expect(mockStore.db.jobs.find((j) => j.id === job.id)?.deleted).toBe(true);
   });
@@ -216,25 +222,30 @@ describe("target roles", () => {
   it("LB-2: a role with a gap report is archived, not deleted", async () => {
     const { job } = await roleWithInterviews("behavioral");
     const user = renderApp(`/roles/${job.id}`);
-    const card = await screen.findByRole("region", { name: "Remove this role" });
-    await waitFor(() => expect(card).toHaveTextContent("can't be deleted"));
-    expect(within(card).queryByRole("button", { name: "Delete role" })).toBeNull();
-    await user.click(within(card).getByRole("button", { name: "Archive role" }));
+    const actions = await screen.findByRole("group", { name: "Role actions" });
+    await waitFor(() => expect(within(actions).getByRole("button", { name: "Archive role" })).toBeInTheDocument());
+    expect(within(actions).queryByRole("button", { name: "Delete role" })).toBeNull();
+    await user.click(within(actions).getByRole("button", { name: "Archive role" }));
+    const confirm = screen.getByTestId("remove-role");
+    expect(confirm).toHaveTextContent("can't be deleted");
+    await user.click(within(confirm).getByRole("button", { name: "Archive role" }));
     await waitFor(() => expect(screen.getByTestId("where")).toHaveTextContent(/^\/roles$/));
     expect(mockStore.db.jobs.find((j) => j.id === job.id)?.archived_at).toBeTruthy();
   });
 
-  it("TG-4: the role page shows the job posting Strova read, closed, with its responsibilities and skills", async () => {
+  it("TG-4: Job posting, at the top, opens what Strova read: responsibilities and skills", async () => {
     const { job } = await roleWithInterviews("behavioral");
-    const user = userEvent.setup();
-    renderApp(`/roles/${job.id}`);
-    const card = await screen.findByRole("group", { name: "The job posting" });
-    expect(card).not.toHaveAttribute("open");
-    expect(card).toHaveTextContent(/\d+ responsibilit(y|ies) · \d+ must-have skills/);
-    await user.click(within(card).getByRole("heading", { name: "The job posting" }));
-    expect(card).toHaveAttribute("open");
-    expect(within(card).getByRole("heading", { name: "What you'll do" })).toBeInTheDocument();
-    expect(within(card).getAllByRole("listitem").length).toBeGreaterThan(0);
+    const user = renderApp(`/roles/${job.id}`);
+    const actions = await screen.findByRole("group", { name: "Role actions" });
+    const dialog = screen.getByTestId("posting-dialog");
+    expect(dialog).not.toHaveAttribute("open");
+    await user.click(within(actions).getByRole("button", { name: "Job posting" }));
+    expect(dialog).toHaveAttribute("open");
+    expect(dialog).toHaveTextContent(/\d+ responsibilit(y|ies) · \d+ must-have skills/);
+    expect(within(dialog).getByRole("heading", { name: "What you'll do" })).toBeInTheDocument();
+    expect(within(dialog).getAllByRole("listitem").length).toBeGreaterThan(0);
+    await user.click(within(dialog).getByRole("button", { name: "Close" }));
+    expect(dialog).not.toHaveAttribute("open");
   });
 });
 

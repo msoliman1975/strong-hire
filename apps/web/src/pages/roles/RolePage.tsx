@@ -4,7 +4,7 @@
  * for this role (story fit, ST-5) and what you know about the interview (IN-4).
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { useJob, useJobs, useResumeIssues, useResumes } from "../../api/hooks";
@@ -42,82 +42,92 @@ function InterviewCard({ item, first }: { item: InterviewWithReadiness; first: b
   );
 }
 
-/** TG-4: what Strova read from the job posting: responsibilities and skills, closed by default. */
-export function PostingCard({ posting, sourceUrl }: { posting: JobPosting; sourceUrl: string | null }) {
+/** TG-4: what Strova read from the job posting, in a dialog opened from the page's actions. */
+export function PostingDialog({ posting, sourceUrl }: { posting: JobPosting; sourceUrl: string | null }) {
+  const dialog = useRef<HTMLDialogElement>(null);
   const n = posting.responsibilities.length;
   const meta = [posting.level_label, posting.team, posting.location].filter(Boolean).join(" · ");
+  const counts = `${n} ${n === 1 ? "responsibility" : "responsibilities"} · ${posting.must_have_skills.length} must-have skills`;
   return (
-    <details className="sx-card sx-fold" aria-labelledby="posting-heading" data-testid="posting-card">
-      <summary className="sx-stack" style={{ gap: 4 }}>
-        <div className="sx-between">
-          <h2 id="posting-heading">The job posting</h2>
-          <span className="sx-row sx-small sx-muted">
-            {n} {n === 1 ? "responsibility" : "responsibilities"} · {posting.must_have_skills.length} must-have skills
-            <span className="caret" aria-hidden="true">
-              ▾
-            </span>
-          </span>
-        </div>
-        {meta && <span className="sx-small sx-muted">{meta}</span>}
-      </summary>
-      {n > 0 ? (
-        <div className="sx-stack" style={{ gap: 6 }}>
-          <h3>What you'll do</h3>
-          <ul className="sx-small" style={{ margin: 0, paddingLeft: 18 }}>
-            {posting.responsibilities.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <p className="sx-notice warn sx-small">
-          Strova found no responsibilities in this posting. If the link showed only part of it, add the role again and paste
-          the job description instead.
-        </p>
-      )}
-      {posting.must_have_skills.length > 0 && (
-        <div className="sx-stack" style={{ gap: 6 }}>
-          <h3>Must-have skills</h3>
-          <div className="sx-chips">
-            {posting.must_have_skills.map((k) => (
-              <span key={k} className="sx-chip">
-                {k}
-              </span>
-            ))}
+    <>
+      <button type="button" className="sx-btn ghost sm" onClick={() => dialog.current?.showModal()}>
+        Job posting
+      </button>
+      <dialog ref={dialog} aria-labelledby="posting-heading" className="sx-dialog" data-testid="posting-dialog">
+        <div className="sx-card">
+          <div className="sx-stack" style={{ gap: 4 }}>
+            <h2 id="posting-heading">The job posting</h2>
+            <span className="sx-small sx-muted">{meta ? `${meta} · ${counts}` : counts}</span>
+          </div>
+          {n > 0 ? (
+            <div className="sx-stack" style={{ gap: 6 }}>
+              <h3>What you'll do</h3>
+              <ul className="sx-small" style={{ margin: 0, paddingLeft: 18 }}>
+                {posting.responsibilities.map((r) => (
+                  <li key={r}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="sx-notice warn sx-small">
+              Strova found no responsibilities in this posting. If the link showed only part of it, add the role again and
+              paste the job description instead.
+            </p>
+          )}
+          {posting.must_have_skills.length > 0 && (
+            <div className="sx-stack" style={{ gap: 6 }}>
+              <h3>Must-have skills</h3>
+              <div className="sx-chips">
+                {posting.must_have_skills.map((k) => (
+                  <span key={k} className="sx-chip">
+                    {k}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {posting.nice_to_have_skills.length > 0 && (
+            <div className="sx-stack" style={{ gap: 6 }}>
+              <h3>Nice to have</h3>
+              <div className="sx-chips">
+                {posting.nice_to_have_skills.map((k) => (
+                  <span key={k} className="sx-chip">
+                    {k}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="sx-between">
+            {sourceUrl ? (
+              <a className="sx-small" href={sourceUrl} target="_blank" rel="noreferrer">
+                Open the original posting
+              </a>
+            ) : (
+              <span />
+            )}
+            <button type="button" className="sx-btn sm" onClick={() => dialog.current?.close()}>
+              Close
+            </button>
           </div>
         </div>
-      )}
-      {posting.nice_to_have_skills.length > 0 && (
-        <div className="sx-stack" style={{ gap: 6 }}>
-          <h3>Nice to have</h3>
-          <div className="sx-chips">
-            {posting.nice_to_have_skills.map((k) => (
-              <span key={k} className="sx-chip">
-                {k}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      {sourceUrl && (
-        <a className="sx-small" href={sourceUrl} target="_blank" rel="noreferrer">
-          Open the original posting
-        </a>
-      )}
-    </details>
+      </dialog>
+    </>
   );
 }
 
 /**
- * LB-2 on the role page: a role nothing uses yet (no gap report, no takes) can be deleted; one
- * with a gap report or takes is archived instead, so its reports keep their role.
+ * LB-2 in the page's actions: a role nothing uses yet (no gap report, no takes) can be deleted,
+ * after a confirm; one with a gap report or takes is archived instead, so its reports keep their
+ * role. A 409 from the server (a report made since the page loaded) switches to archive.
  */
 export function RemoveRole({ jobId, inUse }: { jobId: string; inUse: boolean }) {
   const client = useQueryClient();
   const navigate = useNavigate();
-  const [confirming, setConfirming] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
   const [archiveOnly, setArchiveOnly] = useState(false);
   const done = () => {
+    dialog.current?.close();
     // Roles, rehearsals, the plan and Home all list this role.
     void client.invalidateQueries();
     navigate(rolesPath);
@@ -125,44 +135,44 @@ export function RemoveRole({ jobId, inUse }: { jobId: string; inUse: boolean }) 
   const remove = useMutation({
     mutationFn: () => jobTargetsApi.remove(jobId),
     onSuccess: done,
-    // The server is the judge: a report made since the page loaded turns delete into archive.
     onError: (err) => {
       if ((err as { status?: number }).status === 409) setArchiveOnly(true);
     },
   });
   const archive = useMutation({ mutationFn: () => jobTargetsApi.archive(jobId), onSuccess: done });
   const keep = inUse || archiveOnly;
+  const label = keep ? "Archive role" : "Delete role";
+  const error = archiveOnly ? archive.error : (remove.error ?? archive.error);
   return (
-    <section className="sx-card" aria-labelledby="remove-heading" data-testid="remove-role">
-      <h2 id="remove-heading">Remove this role</h2>
-      <p className="sx-small sx-muted">
-        {keep
-          ? "This role has a gap report or takes, so it can't be deleted. Archive it to hide it from your roles; its reports stay."
-          : "Nothing uses this role yet: no gap report and no takes. Deleting removes the job posting and its interviews."}
-      </p>
-      {(remove.error ?? archive.error) && !archiveOnly && <ErrorNotice error={remove.error ?? archive.error} />}
-      <div className="sx-row">
-        {keep ? (
-          <button type="button" className="sx-btn ghost sm" disabled={archive.isPending} onClick={() => archive.mutate()}>
-            Archive role
-          </button>
-        ) : confirming ? (
-          <>
-            <span className="sx-small">Delete this role? This can't be undone.</span>
-            <button type="button" className="sx-btn sm" disabled={remove.isPending} onClick={() => remove.mutate()}>
-              Delete role
+    <>
+      <button type="button" className="sx-btn quiet sm" onClick={() => dialog.current?.showModal()}>
+        {label}
+      </button>
+      <dialog ref={dialog} aria-labelledby="remove-heading" className="sx-dialog" data-testid="remove-role">
+        <div className="sx-card">
+          <h2 id="remove-heading">{keep ? "Archive this role?" : "Delete this role?"}</h2>
+          <p className="sx-small sx-muted">
+            {keep
+              ? "This role has a gap report or takes, so it can't be deleted. Archiving hides it from your roles; its reports stay."
+              : "Nothing uses this role yet: no gap report and no takes. Deleting removes the job posting and its interviews. This can't be undone."}
+          </p>
+          {error && <ErrorNotice error={error} />}
+          <div className="sx-row">
+            <button
+              type="button"
+              className="sx-btn sm"
+              disabled={remove.isPending || archive.isPending}
+              onClick={() => (keep ? archive.mutate() : remove.mutate())}
+            >
+              {label}
             </button>
-            <button type="button" className="sx-btn quiet sm" onClick={() => setConfirming(false)}>
+            <button type="button" className="sx-btn quiet sm" onClick={() => dialog.current?.close()}>
               Cancel
             </button>
-          </>
-        ) : (
-          <button type="button" className="sx-btn ghost sm" onClick={() => setConfirming(true)}>
-            Delete role
-          </button>
-        )}
-      </div>
-    </section>
+          </div>
+        </div>
+      </dialog>
+    </>
   );
 }
 
@@ -200,33 +210,49 @@ export function RolePage() {
 
   return (
     <div className="sx-page">
-      <div className="sx-stack" style={{ gap: 6 }}>
-        <Link className="sx-small" to={rolesPath}>
-          Target roles
-        </Link>
-        <div className="sx-eyebrow teal">Target role</div>
-        <h1>
-          {title}
-          {company ? ` · ${company}` : ""}
-        </h1>
-        <div className="sx-row sx-small sx-muted">
-          <span className={`sx-chip${chip.teal ? " t" : ""}`}>{chip.text}</span>
-          {posting && betaRoleFamilies.has(posting.role_family) && (
-            <span
-              className="sx-chip v"
-              title="Practice for this job category is new. Its questions and scoring are still being calibrated."
-            >
-              Beta: {roleFamilyLabel[posting.role_family]}
+      <div className="sx-between" style={{ alignItems: "flex-start" }}>
+        <div className="sx-stack" style={{ gap: 6 }}>
+          <Link className="sx-small" to={rolesPath}>
+            Target roles
+          </Link>
+          <div className="sx-eyebrow teal">Target role</div>
+          <h1>
+            {title}
+            {company ? ` · ${company}` : ""}
+          </h1>
+          <div className="sx-row sx-small sx-muted">
+            <span className={`sx-chip${chip.teal ? " t" : ""}`}>{chip.text}</span>
+            {posting && betaRoleFamilies.has(posting.role_family) && (
+              <span
+                className="sx-chip v"
+                title="Practice for this job category is new. Its questions and scoring are still being calibrated."
+              >
+                Beta: {roleFamilyLabel[posting.role_family]}
+              </span>
+            )}
+            {match !== null && match !== undefined && (
+              <span className="sx-mono" style={{ color: "var(--sh-ink)" }}>
+                Match {match}
+              </span>
+            )}
+            <span>
+              {resumeLabel(resumes.data, resumeId)} · <Link to="/resumes">change</Link>
             </span>
+          </div>
+          {hasContext && (
+            <p className="sx-small sx-muted" data-testid="role-context">
+              You know: {[job.data.stage, job.data.context.interviewer_role, job.data.context.concerns].filter(Boolean).join(" · ")}
+            </p>
           )}
-          {match !== null && match !== undefined && (
-            <span className="sx-mono" style={{ color: "var(--sh-ink)" }}>
-              Match {match}
-            </span>
-          )}
-          <span>
-            {resumeLabel(resumes.data, resumeId)} · <Link to="/resumes">change</Link>
-          </span>
+        </div>
+        {/* The role's actions sit at the top, where they are seen: posting, what you know, remove. */}
+        <div className="sx-row" role="group" aria-label="Role actions">
+          {posting && <PostingDialog posting={posting} sourceUrl={job.data.source_url} />}
+          <ContextDialog job={job.data} />
+          <RemoveRole
+            jobId={jobId}
+            inUse={Boolean(plan.data?.gap) || (interviews.data ?? []).some((i) => i.takes_count > 0)}
+          />
         </div>
       </div>
       <section className="sx-card" aria-labelledby="ivs-heading">
@@ -304,22 +330,6 @@ export function RolePage() {
           })}
         </section>
       </div>
-      {posting && <PostingCard posting={posting} sourceUrl={job.data.source_url} />}
-      <section className="sx-card dashed" aria-labelledby="ctx-card-heading">
-        <h2 id="ctx-card-heading">Know anything about this interview?</h2>
-        <p className="sx-small sx-muted">
-          {hasContext
-            ? [job.data.stage, job.data.context.interviewer_role, job.data.context.concerns].filter(Boolean).join(" · ")
-            : "The stage, the interviewer's role, recruiter notes, or what worries you. Optional, and Strova focuses on it."}
-        </p>
-        <div className="sx-row">
-          <ContextDialog job={job.data} />
-        </div>
-      </section>
-      <RemoveRole
-        jobId={jobId}
-        inUse={Boolean(plan.data?.gap) || (interviews.data ?? []).some((i) => i.takes_count > 0)}
-      />
     </div>
   );
 }
