@@ -9,7 +9,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 
 | ID | Title | Area | Priority | Status |
 | --- | --- | --- | --- | --- |
-| RMAP-1 | Filter Rehearsals by target role | web | Next | Idea |
+| RMAP-1 | Filter Rehearsals by target role | web | Next | Done |
 | RMAP-2 | One resume list on the Resumes page | web | Next | Done |
 | RMAP-3 | Clearer "Not checked yet" label on resumes | web | Next | Done |
 
@@ -31,6 +31,19 @@ on the role they're preparing for next.
   be filterable on the client from data the page already loads. Check before adding an API change.
 - Open questions: should the recommended next-take hero follow the filter? Should the filter be
   remembered between visits, or set from a role page link (for example `#rehearse?role=<id>`)?
+
+**Done (2026-11-02):** a **Target role** dropdown on Rehearsals with Strova, shown when the user has
+two or more roles: "All target roles (N)", then each role as "Company · Title (N)".
+
+- The recommended next take follows the filter. With a role picked, it is worked out with the API's
+  rule (`recommendNext`, the same as `recommend` in `strong_api/plan/interviews.py`). With All, it
+  is the API's `next_interview_id`. If every interview of the role is at the readiness goal, a
+  note says so.
+- The filter is in the URL (`/rehearsals?role=<id>`), so Back, reload and shared links keep it, and
+  a role page can link to it later. An unknown or archived role shows everything. No localStorage.
+- Client-side only, from the data the page already loads. No API change.
+- Also: when two roles share a company, their rows and the hero name the role title too, so
+  "Rubrik · Behavioral" no longer appears twice with nothing to tell the rows apart.
 
 ## RMAP-2: One resume list on the Resumes page
 

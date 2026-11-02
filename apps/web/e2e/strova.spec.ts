@@ -174,6 +174,36 @@ test("RMAP-2: Resumes is one list; each row opens its breakdown and has Rename a
   await expect(page).toHaveURL(/\/resumes\/[^/]+\/check$/);
 });
 
+test("RMAP-1: Rehearsals filters by target role and keeps the filter in the URL", async ({ page }) => {
+  await firstUse(page, "filter@example.com");
+  await addRole(page);
+  // A second role, from the Add a target role page.
+  await page.goto("/roles/new");
+  await page.getByRole("button", { name: "paste the text" }).click();
+  await page.getByLabel("Job posting text").fill(POSTING.replaceAll("Stripe", "Shopify"));
+  await page.getByRole("button", { name: "Read the posting" }).click();
+  await expect(page.getByLabel("Company")).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("button", { name: "Looks right" }).click();
+  await page.getByRole("button", { name: "Create the role" }).click();
+  await expect(page).toHaveURL(/\/roles\/[^/]+$/, { timeout: 15_000 });
+
+  await page.goto("/rehearsals");
+  const filter = page.getByRole("combobox", { name: "Target role" });
+  await expect(filter).toBeVisible();
+  const rows = page.getByTestId("rehearsal-list").getByRole("link");
+  const total = await rows.count();
+  await shot(page, "24-rehearsals-all");
+  const options = filter.getByRole("option");
+  await expect(options).toHaveCount(3);
+  const value = await options.nth(1).getAttribute("value");
+  await filter.selectOption(value ?? "");
+  await expect(page).toHaveURL(new RegExp(`\\?role=${value}$`));
+  await expect.poll(() => rows.count()).toBeLessThan(total);
+  await shot(page, "25-rehearsals-filtered");
+  await page.reload();
+  await expect(filter).toHaveValue(value ?? "");
+});
+
 test("rehearse: interview page, take, live room, debrief, apply a suggestion, undo", async ({ page }) => {
   await firstUse(page, "rehearse@example.com");
   await addRole(page);

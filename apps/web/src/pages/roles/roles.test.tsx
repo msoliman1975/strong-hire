@@ -21,8 +21,13 @@ const USER_ID = "00000000-0000-4000-8000-0000000000a1";
 const EMAIL = "ana@example.com";
 
 function Where() {
-  const { pathname } = useLocation();
-  return <span data-testid="where">{pathname}</span>;
+  const { pathname, search } = useLocation();
+  return (
+    <>
+      <span data-testid="where">{pathname}</span>
+      <span data-testid="where-search">{search}</span>
+    </>
+  );
 }
 
 beforeEach(() => {
@@ -260,6 +265,62 @@ describe("rehearsals", () => {
     for (const i of interviews) {
       expect(screen.getAllByRole("link").some((a) => a.getAttribute("href") === `/interviews/${i.id}`)).toBe(true);
     }
+  });
+
+  it("RMAP-1: the Target role filter narrows the list and the recommended take, and the URL keeps it", async () => {
+    const first = await roleWithInterviews("behavioral", "hiring_manager");
+    const second = await roleWithInterviews("technical_qa");
+    const user = renderApp("/rehearsals");
+    const filter = await screen.findByRole("combobox", { name: "Target role" });
+    const list = await screen.findByTestId("rehearsal-list");
+    const hrefs = () => within(list).getAllByRole("link").map((a) => a.getAttribute("href"));
+    expect(hrefs()).toHaveLength(3);
+    expect(within(filter).getAllByRole("option").map((o) => o.textContent)).toEqual([
+      "All target roles (3)",
+      expect.stringMatching(/\(1\)$/),
+      expect.stringMatching(/\(2\)$/),
+    ]);
+
+    await user.selectOptions(filter, second.job.id);
+    expect(hrefs()).toEqual([`/interviews/${second.interviews[0].id}`]);
+    const hero = screen.getByRole("region", { name: "Recommended next take" });
+    expect(within(hero).getByRole("link")).toHaveAttribute("href", `/interviews/${second.interviews[0].id}`);
+    expect(screen.getByTestId("where-search")).toHaveTextContent(`?role=${second.job.id}`);
+
+    await user.selectOptions(filter, first.job.id);
+    expect(hrefs()).toEqual(first.interviews.map((i) => `/interviews/${i.id}`));
+    expect(within(screen.getByRole("region", { name: "Recommended next take" })).getByRole("link")).toHaveAttribute(
+      "href",
+      `/interviews/${first.interviews[0].id}`,
+    );
+
+    await user.selectOptions(filter, "");
+    expect(hrefs()).toHaveLength(3);
+    expect(screen.getByTestId("where-search")).toBeEmptyDOMElement();
+    // Both roles are at the same company here, so each row names its role title too.
+    const titles = within(list)
+      .getAllByRole("link")
+      .map((a) => a.querySelector("strong")?.textContent ?? "");
+    for (const t of titles) expect(t).toMatch(/^.+ · .+ · .+$/);
+  });
+
+  it("RMAP-1: a link with ?role opens filtered; an unknown role shows everything; one role has no filter", async () => {
+    const first = await roleWithInterviews("behavioral", "hiring_manager");
+    const second = await roleWithInterviews("technical_qa");
+    renderApp(`/rehearsals?role=${first.job.id}`);
+    expect(await screen.findByRole("combobox", { name: "Target role" })).toHaveValue(first.job.id);
+    expect(within(screen.getByTestId("rehearsal-list")).getAllByRole("link")).toHaveLength(2);
+    cleanup();
+
+    renderApp("/rehearsals?role=gone");
+    expect(await screen.findByRole("combobox", { name: "Target role" })).toHaveValue("");
+    expect(within(await screen.findByTestId("rehearsal-list")).getAllByRole("link")).toHaveLength(3);
+    cleanup();
+
+    mockStore.db.jobs.find((j) => j.id === second.job.id)!.archived_at = "2026-11-01T10:00:00Z";
+    renderApp("/rehearsals");
+    expect(within(await screen.findByTestId("rehearsal-list")).getAllByRole("link")).toHaveLength(2);
+    expect(screen.queryByRole("combobox", { name: "Target role" })).not.toBeInTheDocument();
   });
 
   it("RH-3, RD-3: a new interview shows the first-take state; Start creates the take for this interview", async () => {
