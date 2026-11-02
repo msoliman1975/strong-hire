@@ -154,7 +154,7 @@ details[open] summary{margin-bottom:6px}
   <p class="lead">This guide covers every LLM-driven component in Strong Hire: what each agent does, how it is wired, what it remembers, which guardrails surround it, and how its actions and reasoning are traced and monitored. It was written from the code on <code>main</code>. File references point to the repo.</p>
 
   <div class="callout">
-    <b>The core idea in one sentence.</b> Strong Hire is not one free-roaming agent. It is a set of <b>role-based LLM workers</b> (extractor, planner, interviewer, scorer, coach). Each one is wrapped in deterministic code that decides the flow, checks every output, and keeps the state. <b>The code is in charge. The model only fills in what to say or how to judge.</b>
+    <b>The core idea in one sentence.</b> Strong Hire is not one free-roaming agent. It is a set of <b>role-based agents</b> (extractor, planner, interviewer, scorer, coach). Each one is wrapped in deterministic code that decides the flow, checks every output, and keeps the state. <b>The code is in charge. The model only fills in what to say or how to judge.</b><br><span class="small"><b>What "agent" means in this guide:</b> one gateway role plus the code loop around it (prompts, context, checks, retries, persistence). These are <i>workflow agents</i>, not autonomous ones: none of them picks its own tools or next step, and none calls another agent. Code and job chains decide the next action every time.</span>
   </div>
 
   <h3>System map</h3>
