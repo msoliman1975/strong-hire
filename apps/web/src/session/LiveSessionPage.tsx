@@ -20,7 +20,7 @@ import { useRoles } from "../api/roles";
 import { paywallReason, sessionsApi } from "../api/sessions";
 import type { Phase, SessionRecord } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
-import { difficultyLabel, interviewTypeLabel, modeLabels, phaseLabel } from "../labels";
+import { difficultyLabel, interviewTypeLabel, modeLabels, phaseLabel, rolePlayPart } from "../labels";
 import { useFeature } from "../theme/features";
 import { AnswerLengthBar } from "./AnswerLengthBar";
 import { SUGGESTED_ANSWER_SECONDS, useActivityTiming } from "./answerLength";
@@ -206,9 +206,10 @@ function LiveView({ session }: { session: SessionRecord }) {
   const preparing = prepLeft !== null;
   const inRoom = stage === "waiting" || stage === "live";
 
-  // RP-8: in a role-play the candidate leads the call and Strova plays the buyer.
+  // RP-8, CS D-7: in a role-play the candidate leads the call and Strova plays the buyer, or the
+  // customer in an escalation call.
   const buyerLine = session.buyer
-    ? `Role-play: you are the seller. Strova plays ${session.buyer.name}, ${session.buyer.title}.`
+    ? `Role-play: you are ${rolePlayPart(config.role_play)}. Strova plays ${session.buyer.name}, ${session.buyer.title}.`
     : null;
   const settings = (
     <>
