@@ -62,6 +62,7 @@ router = APIRouter(tags=["suggestions"])
 NOT_OPEN = "not_open"
 CANNOT_UNDO = "cannot_undo"
 CHANGED = "changed_since"
+STYLED = "styled_story"  # SC-14: a styled story's parts are rendered from its outline
 
 # What each place shows (ux-spec section 8, "Shown on").
 PLACE_KINDS: dict[Place, tuple[SuggestionKind, ...]] = {
@@ -112,6 +113,16 @@ def suggestion_out(row: SuggestionRow) -> Suggestion:
 
 def _conflict(code: str, message: str) -> HTTPException:
     return HTTPException(status.HTTP_409_CONFLICT, {"code": code, "message": message})
+
+
+def _parts_editable(story: StoryRow) -> None:
+    """SC-14: a part edit cannot be applied to a styled story, whose five parts are rendered
+    from its outline; the next outline save would undo it. Its sections are improved instead
+    (SC-11)."""
+    if story.outline_json is not None:
+        raise _conflict(
+            STYLED, "This story is organized in sections. Use Improve with Strova on a section."
+        )
 
 
 def _open_query(org_id: uuid.UUID, user_id: uuid.UUID) -> Select[SuggestionRow]:
@@ -265,6 +276,7 @@ async def accept_suggestion(
         case SuggestionKind.TUNE_STORY:
             edit = TuneStoryPayload.model_validate(row.payload).edit
             story = await _story(db, me, row.story_id)
+            _parts_editable(story)
             after = (body.after or edit.after).strip()
             before = getattr(story, edit.part.value)
             setattr(story, edit.part.value, after)
@@ -329,6 +341,8 @@ async def accept_suggestion(
         case SuggestionKind.REVIEW:
             review = ReviewPayload.model_validate(row.payload).review
             story = await _story(db, me, row.story_id)
+            if any(n.edit is not None for n in review.notes):
+                _parts_editable(story)
             chosen = set(body.parts) if body.parts is not None else None
             # ST-11: edits can be accepted one part at a time; earlier ones are kept for Undo.
             parts: dict[str, list[str | None]] = dict((row.undo or {}).get("parts", {}))
