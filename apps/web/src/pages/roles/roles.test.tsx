@@ -94,7 +94,7 @@ describe("target roles", () => {
     });
     await within(c).findAllByRole("meter");
     expect(within(c).getByText("No date yet")).toBeInTheDocument();
-    expect(c).toHaveTextContent("Main resume");
+    expect(c).toHaveTextContent("Default resume");
     expect(within(c).getAllByRole("meter")).toHaveLength(2);
     expect(within(c).getAllByText("Not started")).toHaveLength(2);
     expect(screen.getByRole("link", { name: "Add a target role" })).toHaveAttribute("href", "/roles/new");
@@ -138,7 +138,7 @@ describe("target roles", () => {
     const behavioral = await screen.findByRole("checkbox", { name: /Behavioral/ });
     expect(behavioral).toBeChecked();
     expect(screen.getByRole("checkbox", { name: /Recruiter screen/ })).not.toBeChecked();
-    expect(screen.getByText(/Measured against:/)).toHaveTextContent("(main)");
+    expect(screen.getByText(/Measured against:/)).toHaveTextContent("(default)");
     await user.click(screen.getByRole("checkbox", { name: /Hiring manager/ }));
     await user.click(screen.getByRole("button", { name: "Create the role" }));
     await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/[^/]+$/));
@@ -251,6 +251,67 @@ describe("target roles", () => {
     expect(within(dialog).getAllByRole("listitem").length).toBeGreaterThan(0);
     await user.click(within(dialog).getByRole("button", { name: "Close" }));
     expect(dialog).not.toHaveAttribute("open");
+  });
+});
+
+describe("a deleted resume (RMAP-5)", () => {
+  async function roleOnDeletedResume() {
+    const setup = await roleWithInterviews("behavioral", "hiring_manager");
+    const form = new FormData();
+    form.append("text", "Platform engineer, Kubernetes and Terraform. Ran the on-call rotation for 40 services.");
+    const { resume: other } = await resumesApi.upload(form);
+    await resumesApi.get(other.id);
+    await resumesApi.remove(setup.resumeId);
+    return { ...setup, otherId: other.id };
+  }
+
+  it("RMAP-5: the Resumes delete dialog names the roles that use the resume", async () => {
+    await roleWithInterviews("behavioral");
+    const user = renderApp("/resumes");
+    const list = await screen.findByRole("list", { name: "Your resumes" });
+    const row = await waitFor(() => {
+      const found = within(list).getAllByRole("listitem").find((li) => li.textContent?.includes("Used by"));
+      expect(found).toBeDefined();
+      return found as HTMLElement;
+    });
+    await user.click(within(row).getByRole("button", { name: /^Delete / }));
+    const note = within(row).getByTestId("delete-roles-note");
+    expect(note).toHaveTextContent(/uses this resume\. It keeps its takes and report, and asks you to pick another resume\./);
+  });
+
+  it("RMAP-5: a role on a deleted resume is flagged, and Use this resume moves its interviews", async () => {
+    const { job, interviews, otherId } = await roleOnDeletedResume();
+
+    renderApp("/roles");
+    expect(await screen.findByText("Pick a resume for this role")).toBeInTheDocument();
+    expect(screen.getByText(/Resume deleted/)).toBeInTheDocument();
+    cleanup();
+
+    renderApp(`/interviews/${interviews[0].id}`);
+    const gone = await screen.findByTestId("resume-gone");
+    expect(within(gone).getByRole("link", { name: "Pick a resume for this role" })).toHaveAttribute("href", `/roles/${job.id}`);
+    expect(screen.queryByRole("button", { name: /Start the first take|Retake/ })).not.toBeInTheDocument();
+    cleanup();
+
+    const user = renderApp(`/roles/${job.id}`);
+    const card = await screen.findByTestId("pick-resume");
+    expect(within(card).getByRole("combobox", { name: "Resume for this role" })).toHaveValue(otherId);
+    await user.click(within(card).getByRole("button", { name: "Use this resume" }));
+    await waitFor(() => expect(screen.queryByTestId("pick-resume")).not.toBeInTheDocument());
+
+    const live = (mockStore.db.interviews ?? []).filter((i) => i.job_target_id === job.id && !i.archived_at);
+    expect(live.map((i) => i.resume_id)).toEqual([otherId, otherId]);
+    expect(live.map((i) => i.interview_type).sort()).toEqual(["behavioral", "hiring_manager"]);
+    const old = (mockStore.db.interviews ?? []).filter((i) => interviews.some((o) => o.id === i.id));
+    expect(old.every((i) => i.archived_at)).toBe(true);
+  });
+
+  it("RMAP-5: with no resume left, the role offers Add a resume", async () => {
+    const { job, resumeId } = await roleWithInterviews("behavioral");
+    await resumesApi.remove(resumeId);
+    renderApp(`/roles/${job.id}`);
+    const card = await screen.findByTestId("pick-resume");
+    expect(within(card).getByRole("link", { name: "Add a resume" })).toBeInTheDocument();
   });
 });
 

@@ -24,8 +24,9 @@ import { usePlan } from "../plan/api";
 import { storyPath, useRoleStoryFit } from "../plan/StoryFitTable";
 import { resumePath } from "../resumes/ResumesListPage";
 import { ContextDialog } from "./ContextDialog";
+import { PickResume } from "./PickResume";
 import { comparisonSummary, ResumeComparison } from "./ResumeComparison";
-import { dateChip, interviewPath, resumeLabel, rolesPath, takesMeta, typeName } from "./shared";
+import { dateChip, interviewPath, resumeGone, resumeLabel, rolesPath, takesMeta, typeName } from "./shared";
 
 function InterviewCard({ item, first }: { item: InterviewWithReadiness; first: boolean }) {
   const score = item.readiness.score;
@@ -307,6 +308,9 @@ export function RolePage() {
           />
         </div>
       </div>
+      {resumes.data && resumeGone(resumes.data, resumeId) && (
+        <PickResume jobId={jobId} interviews={interviews.data ?? []} resumes={resumes.data} />
+      )}
       {liveResumes.length > 1 && <CompareResumes jobId={jobId} resumeId={resumeId} />}
       <section className="sx-card" aria-labelledby="ivs-heading">
         <div className="sx-between">

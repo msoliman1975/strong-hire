@@ -1,7 +1,7 @@
 /**
  * RM-1 (mockup #cvs): "{First name}'s Resumes". One list, one row per resume, the main one marked.
  * Each row has its roles, open issues, story ideas, date added and check state (IN-12), and every
- * action: Open, Open breakdown, Make main (RM-2), and Rename or Delete in the row's "More" menu (R1).
+ * action: Open, Open breakdown, Make default (RM-2; "default" in the UI, `is_main` in the API), and Rename or Delete in the row's "More" menu (R1).
  * RMAP-2: this replaces the second "Saved resumes" list that the page used to fold below.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -36,15 +36,31 @@ const andList = (items: string[]) =>
  */
 export function usedBy(roles: RoleOut[] | undefined, resumeId: string): string | null {
   if (!roles) return null;
+  const names = usingCompanies(roles, resumeId);
+  return names.length === 0 ? "Not used by a role" : `Used by ${andList(names)}`;
+}
+
+/** "Rubrik (2 roles)", "Sourcegraph": the roles whose interviews use this resume, by company. */
+function usingCompanies(roles: RoleOut[], resumeId: string): string[] {
   const counts = new Map<string, number>();
   for (const r of roles) {
     if (!r.interviews.some((i) => i.interview.resume_id === resumeId)) continue;
     const name = r.role.company_name ?? r.role.name ?? "a role";
     counts.set(name, (counts.get(name) ?? 0) + 1);
   }
-  if (counts.size === 0) return "Not used by a role";
-  const names = [...counts].map(([name, n]) => (n > 1 ? `${name} (${n} roles)` : name));
-  return `Used by ${andList(names)}`;
+  return [...counts].map(([name, n]) => (n > 1 ? `${name} (${n} roles)` : name));
+}
+
+/**
+ * RMAP-5: what the delete dialog says about the roles that use the resume. Delete is allowed; those
+ * roles keep their takes and report and ask for another resume.
+ */
+export function deleteRolesNote(roles: RoleOut[] | undefined, resumeId: string): string | null {
+  const names = roles ? usingCompanies(roles, resumeId) : [];
+  if (names.length === 0) return null;
+  const count = roles?.filter((r) => r.interviews.some((i) => i.interview.resume_id === resumeId)).length ?? 0;
+  const keep = count === 1 ? "It keeps its takes and report, and asks" : "They keep their takes and reports, and each asks";
+  return `${andList(names)} ${count === 1 ? "uses" : "use"} this resume. ${keep} you to pick another resume.`;
 }
 
 /**
@@ -165,7 +181,7 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
               <Link className="sx-plain" to={resumePath(resume.id)}>
                 {label}
               </Link>{" "}
-              {resume.is_main && <span className="sx-chip dark">Main</span>}
+              {resume.is_main && <span className="sx-chip dark">Default</span>}
             </strong>
             <span className="sx-small sx-muted">{facts.join(" · ")}</span>
             <span className="sx-small sx-muted">{dates.join(" · ")}</span>
@@ -178,7 +194,7 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
                 onClick={() => makeMain.mutate()}
                 disabled={makeMain.isPending}
               >
-                Make main
+                Make default
               </button>
             )}
             {ready && (
@@ -229,8 +245,13 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
           <h2 id={`delete-${resume.id}`}>Delete this resume?</h2>
           <p className="sx-small sx-muted">
             We delete {label} and its file. Your reports, interviews and progress are kept.
-            {resume.is_main && " Your newest other resume becomes your main resume."}
+            {resume.is_main && " Your newest other resume becomes your default resume."}
           </p>
+          {deleteRolesNote(roles, resume.id) && (
+            <p className="sx-notice warn sx-small" data-testid="delete-roles-note">
+              {deleteRolesNote(roles, resume.id)}
+            </p>
+          )}
           {remove.isError && <ErrorNotice error={remove.error} title="The delete did not work" />}
           <div className="sx-row">
             <button type="button" className="sx-btn sm" disabled={remove.isPending} onClick={() => remove.mutate()}>
@@ -275,7 +296,7 @@ export function ResumesListPage() {
         )}
       </div>
       <p className="sx-muted">
-        Your main resume feeds your story ideas and is used for new target roles. Use other resumes for roles where you
+        Your default resume feeds your story ideas and is used for new target roles. Use other resumes for roles where you
         sent a different version.
       </p>
       {resumes.data && (

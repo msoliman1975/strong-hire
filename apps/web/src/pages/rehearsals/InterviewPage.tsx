@@ -27,7 +27,7 @@ import {
   rolePlayScenarioLabel,
 } from "../../labels";
 import type { Tone } from "../plan/api";
-import { DEFAULT_TAKE_MINUTES, roleTitle, rolePath, typeName } from "../roles/shared";
+import { DEFAULT_TAKE_MINUTES, resumeGone, roleTitle, rolePath, typeName } from "../roles/shared";
 
 const MINI = DEFAULT_TAKE_MINUTES;
 const LENGTHS = [10, 30, 45] as const;
@@ -113,6 +113,8 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
   const [picked, setScenario] = useState<RolePlayScenario | null>(null);
   const scenario = picked ?? defaultRolePlayScenario(level, job.data?.posting?.role_family);
   const resume = resumes.data?.find((r) => r.id === detail.interview.resume_id);
+  // RMAP-5: the interview's resume was deleted. The role asks for another one before a new take.
+  const gone = resumeGone(resumes.data, detail.interview.resume_id);
 
   const start = useMutation({
     mutationFn: async () => {
@@ -176,7 +178,7 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
           )}
         </h1>
         <p className="sx-muted sx-small">
-          Role × Resume × Type: {company ?? detail.role.name ?? "Role"} · {detail.resume_name ?? resume?.name ?? "Resume"} · {name}
+          Role × Resume × Type: {company ?? detail.role.name ?? "Role"} · {gone ? "Resume deleted" : (detail.resume_name ?? resume?.name ?? "Resume")} · {name}
         </p>
       </div>
       <div className="sx-grid2">
@@ -229,16 +231,27 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
         </div>
         <div className="big">{setup}</div>
         <div className="sub">{actingAs}.</div>
-        <div className="sx-row">
-          <button type="button" className="sx-btn" onClick={() => start.mutate()} disabled={start.isPending}>
-            {start.isPending ? "Getting the take ready…" : detail.takes.length === 0 ? "Start the first take" : "Retake"}
-          </button>
-          <button type="button" className="sx-btn ghost" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-            {open ? "Hide settings" : "Change settings"}
-          </button>
-        </div>
+        {gone ? (
+          <div className="sx-stack" style={{ gap: 8 }} data-testid="resume-gone">
+            <div className="sub">The resume for this interview was deleted. Pick another resume for the role to take it again.</div>
+            <div className="sx-row">
+              <Link className="sx-btn" to={rolePath(detail.role.id)}>
+                Pick a resume for this role
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="sx-row">
+            <button type="button" className="sx-btn" onClick={() => start.mutate()} disabled={start.isPending}>
+              {start.isPending ? "Getting the take ready…" : detail.takes.length === 0 ? "Start the first take" : "Retake"}
+            </button>
+            <button type="button" className="sx-btn ghost" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+              {open ? "Hide settings" : "Change settings"}
+            </button>
+          </div>
+        )}
         {start.isError && paywallReason(start.error, false) === null && <ErrorNotice error={start.error} />}
-        {open && (
+        {open && !gone && (
           <div className="sx-drawer" data-testid="take-settings">
             {rolePlay && (
               <div className="sx-stack" style={{ gap: 6 }}>

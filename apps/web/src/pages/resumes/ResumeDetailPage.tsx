@@ -72,10 +72,10 @@ export function ResumeDetailPage() {
           <h1>{record.data.name ?? "Resume"}</h1>
           <div className="sx-row sx-small sx-muted">
             {record.data.is_main ? (
-              <span className="sx-chip dark">Main resume</span>
+              <span className="sx-chip dark">Default resume</span>
             ) : (
               <button type="button" className="sx-btn quiet sm" onClick={() => makeMain.mutate()} disabled={makeMain.isPending}>
-                Make this my main resume
+                Make this my default resume
               </button>
             )}
             {usedBy.length > 0 && (

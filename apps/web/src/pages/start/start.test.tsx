@@ -203,23 +203,23 @@ describe("first run", () => {
 });
 
 describe("resume pages", () => {
-  it("RM-1: the resumes page is titled with the first name and marks the main resume", async () => {
+  it("RM-1: the resumes page is titled with the first name and marks the default resume", async () => {
     const first = await addResume();
     const second = await addResume();
     if (mockStore.db.profiles[EMAIL]) mockStore.db.profiles[EMAIL].plan_style = "weekly";
     else mockStore.db.profiles[EMAIL] = { ...(await import("../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
     const user = renderApp("/resumes");
     expect(await screen.findByRole("heading", { level: 1, name: "Ana's Resumes" })).toBeInTheDocument();
-    const card = (await screen.findByText("Main")).closest(".sx-card") as HTMLElement;
+    const card = (await screen.findByText("Default")).closest(".sx-card") as HTMLElement;
     expect(within(card).getAllByRole("link", { name: /^Open (?!breakdown)/ })).toHaveLength(2);
     // RMAP-2: one list only, each row with its breakdown.
     expect(within(card).getAllByRole("link", { name: /^Open breakdown for / })).toHaveLength(2);
     expect(screen.queryByRole("list", { name: "Saved resumes" })).not.toBeInTheDocument();
-    const main = screen.getByText("Main");
+    const main = screen.getByText("Default");
     expect(main.closest(".sx-list-row")).toHaveTextContent(first.name ?? "");
     expect(await within(main.closest(".sx-list-row") as HTMLElement).findByText(/Not used by a role/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Make main" }));
-    await waitFor(() => expect(screen.getByText("Main").closest(".sx-list-row")).toHaveTextContent(second.name ?? ""));
+    await user.click(screen.getByRole("button", { name: "Make default" }));
+    await waitFor(() => expect(screen.getByText("Default").closest(".sx-list-row")).toHaveTextContent(second.name ?? ""));
   });
 
   it("RM-3: the resume page has breakdown and issues first, then Strova's story ideas, closed with their counts", async () => {
@@ -227,7 +227,7 @@ describe("resume pages", () => {
     mockStore.db.profiles[EMAIL] = { ...(await import("../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
     const user = renderApp(`/resumes/${resume.id}`);
     expect(await screen.findByRole("heading", { level: 1, name: resume.name ?? "" })).toBeInTheDocument();
-    expect(screen.getByText("Main resume")).toBeInTheDocument();
+    expect(screen.getByText("Default resume")).toBeInTheDocument();
     const ideas = await screen.findByRole("group", { name: "Story ideas from this resume" });
     const breakdown = screen.getByRole("region", { name: "Breakdown" });
     const issuesCard = screen.getByRole("region", { name: "Resume issues" });

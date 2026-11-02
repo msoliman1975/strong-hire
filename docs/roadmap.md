@@ -12,6 +12,8 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | RMAP-1 | Filter Rehearsals by target role | web | Next | Done |
 | RMAP-2 | One resume list on the Resumes page | web | Next | Done |
 | RMAP-3 | Clearer "Not checked yet" label on resumes | web | Next | Done |
+| RMAP-4 | Call it the "default" resume, not the "main" one | web | Now | Done |
+| RMAP-5 | Deleting a resume that a target role uses | web | Now | Done |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -122,4 +124,66 @@ gone from the v2 Resumes page. Open issues and **Open breakdown** already prompt
 to set `confirmed_at` is `PUT /resumes/{id}`, which also re-runs the story-idea skills job (a model
 call) and every gap analysis that used the resume. That is too much for a click-through. If a
 reviewed state is wanted later, add a light endpoint that only sets a `reviewed_at`.
+
+## RMAP-4: Call it the "default" resume, not the "main" one
+
+**Recorded:** 2026-11-02
+
+**What:** Every user-facing "main" becomes "default":
+
+- the **Default** chip on Resumes, Home and the resume comparison;
+- **Make default**;
+- **Default resume** on the resume page and the role cards;
+- "Measured against: … (default)" on Add a target role;
+- the delete dialog and the Resumes intro.
+
+**Why:** "Default" says what it does: new target roles use it unless the user picks another.
+
+**Done (2026-11-02):** copy only. The API keeps `is_main`, `POST /resumes/{id}/main` and the RM-2
+requirement wording, the same way the stored mode `coach` kept its name when the label became
+Practice. The terminology table in `docs/ux-strova/ux-spec.md` now says "default resume". A test in
+`nv2Terms.test.tsx` fails if a v2 screen says "main" again.
+
+## RMAP-5: Deleting a resume that a target role uses
+
+**Recorded:** 2026-11-02
+
+**Today:** Delete is allowed with no warning (`DELETE /resumes/{id}`, R1). The resume's text and file
+go. The roles that used it keep their interviews, takes and gap report, and the report shows the
+resume as deleted. The interviews still point at the deleted resume, so the role page has no resume
+name. New takes keep running on the old gap analysis, because `_session_resume` in
+`strong_api/sessions/router.py` does not check `deleted_at`. The only way to move a role to another
+resume is **Compare my resumes**, then **Use this one** (RC-6), which needs two or more resumes.
+
+**What:**
+
+1. The delete dialog says which roles use the resume ("Used by Rubrik (2 roles)") and what
+   happens to them.
+2. Choose one of:
+   - (a) offer to move those roles to the default resume first, with RC-6's move (archive the old
+     interviews, copy the analysis);
+   - (b) block the delete until no role uses it;
+   - (c) delete, then flag the roles ("Pick a resume for this role").
+3. Decide whether a take may start on an interview whose resume is deleted.
+
+**Decision (2026-11-02):** (c). Delete stays allowed. The roles flag it and ask for another resume.
+
+**Done (2026-11-02):** web only, with the existing endpoints:
+
+- **Delete dialog** (Resumes): names the roles that use the resume, for example "Rubrik (2 roles)
+  and Sourcegraph use this resume. They keep their takes and reports, and each asks you to pick
+  another resume."
+- **Target roles:** the card says "Resume deleted" with a **Pick a resume for this role** chip.
+- **Role page:** a **Pick a resume for this role** card, with the live resumes (default first) and
+  **Use this resume**. That button:
+  - starts the role's analysis with that resume (`reuse_ready`, so a ready analysis is reused;
+    otherwise one run counts against GA-4);
+  - keeps the same interview types (and Custom setup) on the new resume;
+  - archives the old interviews with their takes (RH-1).
+  It is the same end state as RC-6. With no resume left, the card offers **Add a resume**.
+- **Interview page:** "Resume deleted" in the Role × Resume × Type line. In place of Start, a link
+  to the role says "Pick a resume for this role".
+
+**Not done:** the API still lets a take start on an interview whose resume is deleted. Only the UI
+stops it. If that matters, `interview_for_session` can return 409 for a deleted resume.
 

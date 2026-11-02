@@ -8,7 +8,7 @@ import { useJobs, useResumes } from "../../api/hooks";
 import { useRoles } from "../../api/roles";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
-import { addRolePath, dateChip, ReadinessRow, resumeLabel, rolePath, roleTitle } from "./shared";
+import { addRolePath, dateChip, ReadinessRow, resumeGone, resumeLabel, rolePath, roleTitle } from "./shared";
 
 export function RolesPage() {
   const roles = useRoles();
@@ -48,6 +48,11 @@ export function RolesPage() {
                 {resumeLabel(resumes.data, interviews[0]?.interview.resume_id)}
                 {match !== null && match !== undefined ? ` · match ${match}` : ""}
               </span>
+              {resumeGone(resumes.data, interviews[0]?.interview.resume_id) && (
+                <span className="sx-chip warn" style={{ alignSelf: "flex-start" }}>
+                  Pick a resume for this role
+                </span>
+              )}
               <div className="sx-stack" style={{ gap: 8 }}>
                 {interviews.length === 0 && <span className="sx-small sx-muted">No interviews kept yet.</span>}
                 {interviews.map((i) => (

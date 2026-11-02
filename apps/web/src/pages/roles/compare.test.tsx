@@ -202,6 +202,6 @@ describe("resume comparison", () => {
     renderApp(`/roles/${created.id}`);
     expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText(`${other.name} ·`, { exact: false })).toBeInTheDocument());
-    expect(screen.queryByText(/Main resume ·/)).toBeNull();
+    expect(screen.queryByText(/Default resume ·/)).toBeNull();
   });
 });

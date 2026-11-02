@@ -38,8 +38,8 @@ work in between.
 
 | Thing | What it is | UI word (use exactly) |
 | --- | --- | --- |
-| Resume | The user's CV, parsed. One is the **main resume**. Required before any rehearsal | "resume" everywhere. Never "CV" in user-facing copy |
-| Target role | A real job posting the user is aiming at. The resume is chosen once per role (main resume by default) | "Target role" |
+| Resume | The user's CV, parsed. One is the **default resume** (`is_main` in the API). Required before any rehearsal | "resume" everywhere. Never "CV" in user-facing copy. "Default resume", never "main resume" (RMAP-4) |
+| Target role | A real job posting the user is aiming at. The resume is chosen once per role (the default resume unless the user picks another) | "Target role" |
 | Interview | Target role × Resume × Interview type, for example "Stripe · Behavioral". Has a readiness score | "interview" means one of these. The real-world event is "your interview" / "onsite" |
 | Take | One run of an interview with Strova. Retake any time | "take", "Start the take", "Retake" |
 | Story | The user's own story, five parts (context, stakes, your action, result, reflection), shared across roles, with a note per role | "story", "Career Stories" |
@@ -210,18 +210,18 @@ role plans require a resume; a role added without one waits for it.
    the PR-2 advice, one line why, primary **Start the take** (or the step's action) and a ghost
    link to the related role.
 3. **Your plan** card (section 7), weekly or checklist.
-4. **Four summary cards**, same size, each opens its page: {First name}'s Resumes (main resume
-   name with "Main" chip, issues open, story ideas), Target roles (count, each with days left or
+4. **Four summary cards**, same size, each opens its page: {First name}'s Resumes (default resume
+   name with "Default" chip, issues open, story ideas), Target roles (count, each with days left or
    "no date"), Rehearsals with Strova (count, best readiness, not started count), Career Stories
    with Strova (count, Proven · Ready · Draft, suggestions from Strova). No suggestion lists on
    Home: suggestions live on their pages.
 
 ### 6.3 Resumes
 
-- **{First name}'s Resumes** (`#cvs`): list of resumes, the main one marked "Main", each with roles
+- **{First name}'s Resumes** (`#cvs`): list of resumes, the default one marked "Default", each with roles
   using it, issues open, story ideas. Primary **Add a resume**. The user can set another resume as
   main.
-- **Resume page** (`#cv`): name, Main chip, roles using it, Upload a new version. Sections:
+- **Resume page** (`#cv`): name, Default chip, roles using it, Upload a new version. Sections:
   **Story ideas from this resume** (each idea with likely skills and what it still needs, **Craft
   with Strova** and **Not a story**; an achievement already used by a story links to it),
   **Breakdown** with Edit, **Resume issues** with fix and accept actions, and **Strova suggests ·
@@ -235,7 +235,7 @@ role plans require a resume; a role added without one waits for it.
   IN-1, IN-6). 2 Check the role (company, title, level, optional interview date, must-have
   skills; profile notice when curated). 3 **Interviews Strova suggests** from the company's usual
   rounds (profile loop; standard loop in generic mode), as checkboxes the user keeps or removes,
-  plus "Measured against: {main resume} · Use another resume". Primary **Create the role**.
+  plus "Measured against: {default resume} · Use another resume". Primary **Create the role**.
 - **Role page** (`#role`): back link, title, date chip, match, resume with change link. **Interviews
   for this role** as cards (readiness score, goal 75, bar, takes and last signal, Retake or Start a
   take). **What they'll look for** (skills, where they'll probe from GA-2, must-haves the resume
@@ -309,7 +309,7 @@ One plan per user. It has three kinds of items, each with its own chip and colou
 | --- | --- | --- |
 | Rehearsals | teal "Rehearsal" | one per interview below its readiness goal of 75: "Stripe · Behavioral: readiness 75 or more" (now 58) |
 | Story completion | violet "Story" | one per tested skill with no Ready story ("Conflict handling: a Ready story"); one per started Draft ("Get X to Ready"); resume ideas not yet built |
-| Resume gaps and issues | amber "Resume" | one per open resume issue on the main resume |
+| Resume gaps and issues | amber "Resume" | one per open resume issue on the default resume |
 
 - **Before any target role** the plan has only Story and Resume items (rehearsal items appear when
   a role is added).

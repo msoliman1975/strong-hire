@@ -66,7 +66,7 @@ function ResumeRow({
             </span>
           )}
           <strong>{name(r)}</strong>
-          {r.is_main && <span className="sx-chip">Main</span>}
+          {r.is_main && <span className="sx-chip">Default</span>}
           {inUse && <span className="sx-chip t">In use</span>}
         </div>
         <span className="sx-small sx-muted">
