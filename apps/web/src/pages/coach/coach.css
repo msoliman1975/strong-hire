@@ -637,3 +637,17 @@
     flex-direction: column;
   }
 }
+
+/* SC-18: a formatted candidate reply is one bubble, paragraphs and lists inside it. */
+.coach-turn[data-speaker="candidate"] .md {
+  padding: 12px 16px;
+  background: var(--sh-ink);
+  color: var(--sh-room-text);
+  border-radius: var(--sh-radius) 4px var(--sh-radius) var(--sh-radius);
+}
+
+.coach-turn[data-speaker="candidate"] .md p {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+}
