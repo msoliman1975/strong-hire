@@ -153,3 +153,8 @@ export type SuggestionAcceptOut = DeepRequired<S["AcceptOut"]>;
 export type PersonalPlan = DeepRequired<S["PersonalPlan"]>;
 export type PlanItem = PersonalPlan["plan"]["items"][number];
 export type PlanGroup = PersonalPlan["groups"][number];
+
+// Resume comparison (RC-1 to RC-8).
+export type ResumeComparisonOut = DeepRequired<S["ResumeComparisonOut"]>;
+export type ComparedResume = DeepRequired<S["ComparedResume"]>;
+export type ComparisonGap = DeepRequired<S["ComparisonGap"]>;
