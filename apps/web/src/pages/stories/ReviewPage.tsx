@@ -6,6 +6,9 @@
  *
  * POST /stories/{id}/review queues the review; it arrives as the story's open `review`
  * suggestion, which this page polls for.
+ *
+ * A styled story (SC-1) shows its sections; its review is notes only, named by section (review
+ * v2), and each section is improved with Strova on the story page (SC-11).
  */
 import "../../components/ux/ux.css";
 import "./stories.css";
@@ -19,7 +22,9 @@ import type { Suggestion } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading, STORY_PART_LABEL } from "../../components/ui";
 import { newCoachPath } from "../coach/paths";
+import { SECTION_LABEL } from "../coach/outline";
 import { STORY_PARTS, storiesApi, storyKeys, useStory, type Story } from "./api";
+import { OutlineStory } from "./OutlineStory";
 import { storyPath } from "./paths";
 
 const POLL_MS = 1500;
@@ -73,15 +78,19 @@ export function ReviewPage() {
         </p>
       </div>
       <div className="sx-grid2 review-grid">
-        <section className="sx-card" aria-label="Story parts">
-          {STORY_PARTS.map((p) => (
+        <section className="sx-card" aria-label={s.outline ? "Story sections" : "Story parts"}>
+          {s.outline ? (
+            <OutlineStory story={s} outline={s.outline} readOnly />
+          ) : (
+          STORY_PARTS.map((p) => (
             <div key={p} className="sx-part" data-testid={`part-${p}`}>
               <span className="part-lbl" data-part={p}>
                 {s[p]?.trim() ? "●" : "○"} {STORY_PART_LABEL[p]}
               </span>
               {s[p]?.trim() ? <span>{s[p]}</span> : <span className="sx-muted">Not written yet</span>}
             </div>
-          ))}
+          ))
+          )}
           {!current && !analysing && (
             <div className="sx-row">
               <button type="button" className="sx-btn" disabled={ask.isPending} onClick={() => ask.mutate()}>
@@ -120,6 +129,19 @@ export function ReviewPage() {
   );
 }
 
+/** Review v2 names a styled story's notes by part; show the section the part belongs to. */
+function partSection(story: Story, part: (typeof STORY_PARTS)[number]): string {
+  const opening = story.outline?.style === "carl" ? "challenge" : "situation";
+  const by: Record<(typeof STORY_PARTS)[number], string> = {
+    context: SECTION_LABEL[opening],
+    stakes: story.outline?.style === "carl" ? SECTION_LABEL.challenge : `${SECTION_LABEL.situation} and ${SECTION_LABEL.task}`,
+    action: SECTION_LABEL.action,
+    result: SECTION_LABEL.result,
+    reflection: SECTION_LABEL.learning,
+  };
+  return by[part];
+}
+
 function ReviewResult({ suggestion, review, story }: { suggestion: Suggestion; review: Review; story: Story }) {
   const client = useQueryClient();
   const [applied, setApplied] = useState<string[]>([]);
@@ -142,7 +164,7 @@ function ReviewResult({ suggestion, review, story }: { suggestion: Suggestion; r
       <div className="sx-notice ok sx-small">{review.summary}</div>
       {accept.isError && <ErrorNotice error={accept.error} />}
       {review.notes.map((n) => {
-        const label = STORY_PART_LABEL[n.part];
+        const label = story.outline ? partSection(story, n.part) : STORY_PART_LABEL[n.part];
         if (n.edit) {
           if (applied.includes(n.part))
             return (
