@@ -11,6 +11,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | --- | --- | --- | --- | --- |
 | RMAP-1 | Filter Rehearsals by target role | web | Next | Idea |
 | RMAP-2 | One resume list on the Resumes page | web | Next | Done |
+| RMAP-3 | Clearer "Not checked yet" label on resumes | web | Next | Idea |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -71,4 +72,30 @@ as the breakdown, so the page shows one number. "Used by" names a company once, 
 count. "Not checked yet" was not a bug: it means the user has not confirmed the breakdown
 (`confirmed_at`), while the issues are always found. It is now on its own line, apart from the
 counts. The v1 Resumes page still uses `CvLibrary`, unchanged.
+
+## RMAP-3: Clearer "Not checked yet" label on resumes
+
+**Recorded:** 2026-11-02
+
+**What:** A resume shows "Not checked yet" next to its issue counts, for example "Not checked yet ·
+10 to fix". That reads as a contradiction: how can there be issues if it was never checked?
+
+The issues are always found automatically, with the rules in
+`apps/web/src/pages/onboarding/resumeChecks.ts`. "Checked Oct 28" only means the user saved the
+resume from the breakdown page: `confirmed_at` is set by `PUT /resumes/{id}`. A user who opens the
+breakdown and clicks **Continue** without editing still sees "Not checked yet".
+
+Change the wording so it says what the user has done, for example "Reviewed Oct 28" and "Not
+reviewed yet", or "Review the breakdown" as a link to it.
+
+**Why:** The label makes users think the issue counts are wrong or stale.
+
+**Notes:**
+
+- The label comes from `checkedLabel()` in `apps/web/src/pages/onboarding/resumeSummary.ts`. It is
+  shown on the Resumes page (RMAP-2), on the v1 "Saved CVs" list (`CvLibrary`), and in IN-12 tests.
+  Check the Home card and the breakdown page for the same words.
+- Decide too whether **Continue** on the breakdown should count as reviewed (set `confirmed_at`)
+  even with no edit. That is an API change in `apps/api/src/strong_api/inputs/router.py`.
+- Update the IN-12 tests that match "Checked Oct 28" and "Not checked yet".
 
