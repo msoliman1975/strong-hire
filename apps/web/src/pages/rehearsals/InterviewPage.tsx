@@ -15,6 +15,7 @@ import type { Difficulty, HireSignal, InterviewDetail, Level, Mode, RolePlayScen
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
+import { ReadinessRing } from "../../components/ux/ReadinessRing";
 import {
   betaInterviewTypes,
   competencyLabel,
@@ -184,37 +185,32 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
       <div className="sx-grid2">
         <section className="sx-card interviewer" aria-label="Readiness">
           <div className="sx-eyebrow teal">Readiness</div>
-          {score === null ? (
-            <>
-              <div className="sx-row" style={{ alignItems: "baseline" }}>
-                <span className="sx-score sx-muted">–</span>
-                <span className="sx-muted">goal {ready.goal}</span>
-              </div>
-              <div className="sx-bar">
-                <span style={{ width: "0%" }} />
-              </div>
-              <p className="sx-small sx-muted">Your readiness appears after your first Realistic take.</p>
-            </>
-          ) : (
-            <>
-              <div className="sx-row" style={{ alignItems: "baseline" }}>
-                <span className="sx-score">{score}</span>
-                <span className="sx-muted">of 100 · goal {ready.goal}</span>
-                {ready.change !== null && ready.change !== 0 && (
-                  <span className={`sx-chip ${ready.change > 0 ? "ok" : "warn"}`}>
-                    {ready.change > 0 ? "+" : ""}
-                    {ready.change} after your last take
-                  </span>
-                )}
-              </div>
-              <div className="sx-bar">
-                <span style={{ width: `${score}%` }} />
-              </div>
-              <p className="sx-small sx-muted">
-                A practice estimate from your Realistic takes. It is not a prediction of {company ?? "the company"}'s decision.
-              </p>
-            </>
-          )}
+          <div className="sx-row" style={{ gap: 18, alignItems: "center" }}>
+            <ReadinessRing score={score} goal={ready.goal} size={104} label={`${name} readiness`} />
+            <div className="sx-stack" style={{ gap: 6, flex: "1 1 180px", minWidth: 0 }}>
+              {score === null ? (
+                <>
+                  <span className="sx-muted">goal {ready.goal}</span>
+                  <p className="sx-small sx-muted">Your readiness appears after your first Realistic take.</p>
+                </>
+              ) : (
+                <>
+                  <div className="sx-row" style={{ alignItems: "baseline" }}>
+                    <span className="sx-muted">{score} of 100 · goal {ready.goal}</span>
+                    {ready.change !== null && ready.change !== 0 && (
+                      <span className={`sx-chip ${ready.change > 0 ? "ok" : "warn"}`}>
+                        {ready.change > 0 ? "+" : ""}
+                        {ready.change} after your last take
+                      </span>
+                    )}
+                  </div>
+                  <p className="sx-small sx-muted">
+                    A practice estimate from your Realistic takes. It is not a prediction of {company ?? "the company"}'s decision.
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
         </section>
         <section className="sx-card" aria-label="Skill coverage">
           <div className="sx-eyebrow plain">Skill coverage</div>

@@ -280,6 +280,7 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 | SV-8 | The marketing site has the "Meet Strova" section with the animated avatar and the approved copy. | P0 |
 | SV-9 | Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged. | P0 |
 | SV-10 | The Strong Hire logo is the Orbit: Strova's violet ring, open at the top right, with the candidate's green dot in the gap. The app, the site, the favicons, the app icon and Strova's emails use the same drawing. | P0 |
+| SV-11 | Readiness is drawn as Strova's ring: a teal arc that fills from the top toward a goal tick, green with no tick at or above the goal, an empty track with a dash before the first Realistic take. It is a meter with the score, goal and "goal reached" in its text, on the interview page, the role page, Rehearsals and Target roles. | P1 |
 
 **Onboarding**
 

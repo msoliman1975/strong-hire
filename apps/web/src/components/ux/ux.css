@@ -149,3 +149,13 @@ a.sx-card, a.sx-card:hover { color: inherit; text-decoration: none; }
 .sx-menu__list button { background: none; border: 0; text-align: left; font: inherit; font-size: 13.5px; color: var(--sh-ink); padding: 8px 10px; border-radius: 6px; cursor: pointer; }
 .sx-menu__list button:hover, .sx-menu__list button:focus-visible { background: var(--sh-sunken); }
 .sx-rows { list-style: none; margin: 0; padding: 0; }
+
+/* SV-11: the readiness ring. Teal below the goal, green at or above it, an empty track before the first take. */
+.sx-ring { flex: none; display: block; }
+.sx-ring-track { stroke: var(--sh-sunken); }
+.sx-ring-arc { stroke: var(--sh-teal); transition: stroke-dashoffset 600ms ease-out; }
+.sx-ring[data-state="reached"] .sx-ring-arc { stroke: var(--sh-ok); }
+.sx-ring-goal { stroke: var(--sh-ink-2); }
+.sx-ring-num { font-family: var(--sh-font-mono); font-size: 13px; font-weight: 600; fill: var(--sh-ink); }
+.sx-ring[data-state="empty"] .sx-ring-num { fill: var(--sh-muted); }
+@media (prefers-reduced-motion: reduce) { .sx-ring-arc { transition: none; } }
