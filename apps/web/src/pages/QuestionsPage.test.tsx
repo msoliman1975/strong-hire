@@ -142,6 +142,16 @@ describe("questions page", () => {
     expect((await screen.findAllByText("No questions match these filters.")).length).toBeGreaterThan(0);
   });
 
+  it("RP-12: with v2 on, Role-play scenario cards are a type with the call areas", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const user = renderAt("/questions");
+    await section(/^General questions/);
+    await user.selectOptions(screen.getByLabelText("Interview type"), "role_play");
+    expect(lastSearch).toContain("type=role_play");
+    const areas = within(screen.getByRole("group", { name: "Question area" }));
+    expect(areas.getAllByRole("checkbox")).toHaveLength(5);
+  });
+
   it("RS-1: with v2 off, Recruiter screen is not offered", async () => {
     renderAt("/questions");
     await section(/^General questions/);
