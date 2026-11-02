@@ -157,3 +157,50 @@ export function craftTurn(o: StoryOutline, section: StorySection | null, said: s
           : SECTION_OPENER[next];
   return { message: advanced || updates.length === 0 ? message : `Thank you. ${message}`, updates, skips, sectionDone: advanced, section: next };
 }
+
+/** As strong_api.stories.outline.has_content: any slot filled. */
+export function hasContent(o: StoryOutline): boolean {
+  return o.sections.some(
+    (s) =>
+      Object.values(s.slots ?? {}).some((v) => v.status === "filled") ||
+      s.metric?.status === "filled" ||
+      (s.steps ?? []).some((st) => Object.values(st).some((v) => v?.status === "filled")),
+  );
+}
+
+type Part = "context" | "stakes" | "action" | "result" | "reflection";
+const OPENING: StorySection[] = ["situation", "challenge"];
+const TASKS: StorySection[] = ["task", "challenge"];
+const LEGACY: Record<Exclude<Part, "action">, [StorySection[], string][]> = {
+  context: ["org", "role", "scale", "timeframe", "constraints", "stakeholders"].map((k) => [OPENING, k]),
+  stakes: [[OPENING, "problem"], [TASKS, "goal"], [TASKS, "success"]],
+  result: [[["result"], "metric"], [["result"], "impact"], [["result"], "evidence"]],
+  reflection: [[["learning"], "lesson"], [["learning"], "differently"], [["learning"], "since"]],
+};
+const sentence = (t: string) => (/[.!?…:]$/.test(t.trim()) ? t.trim() : `${t.trim()}.`);
+
+/** As strong_api.stories.outline.render_legacy (SC-14), without the Markdown details. */
+export function renderLegacy(o: StoryOutline): Record<Part, string | null> {
+  const text = (keys: StorySection[], key: string) => {
+    const s = o.sections.find((x) => keys.includes(x.section));
+    const slot = s ? slotOf(s, key) : EMPTY;
+    return slot.status === "filled" && slot.text ? sentence(slot.text) : null;
+  };
+  const out = {} as Record<Part, string | null>;
+  for (const [part, refs] of Object.entries(LEGACY) as [Exclude<Part, "action">, [StorySection[], string][]][]) {
+    out[part] = refs.map(([k, key]) => text(k, key)).filter(Boolean).join(" ") || null;
+  }
+  const steps = sec(o, "action").steps ?? [];
+  out.action =
+    steps
+      .map((st) => {
+        const did = st.did?.status === "filled" ? st.did.text : null;
+        const why = st.why?.status === "filled" ? st.why.text : null;
+        if (did && why) return `${did.replace(/[ .;,]+$/, "")}, because ${why.charAt(0).toLowerCase()}${why.slice(1)}`;
+        return did || why ? sentence((did ?? why) as string) : null;
+      })
+      .filter(Boolean)
+      .map((t) => sentence(t as string))
+      .join(" ") || null;
+  return out;
+}

@@ -25,7 +25,7 @@ import type {
   TakeRequest,
 } from "../pages/coach/api";
 import { STORY_PARTS, type Competency, type Story } from "../pages/stories/api";
-import { askOf, craftTurn, emptyOutline, nextSection, SECTION_OPENER, WRAP_LINE } from "./craftMock";
+import { askOf, craftTurn, emptyOutline, hasContent, nextSection, renderLegacy, SECTION_OPENER, WRAP_LINE } from "./craftMock";
 import type { MockStore } from "./db";
 import { mockStory, mockStoryLibrary } from "./storyHandlers";
 
@@ -221,6 +221,7 @@ export function coachHandlers(store?: MockStore) {
       if (!story) return HttpResponse.json({ detail: "The story was deleted; end the session." }, { status: 409 });
       if (story.outline) {
         const step = craftTurn(story.outline, entry.session.section ?? null, text);
+        Object.assign(story, renderLegacy(story.outline)); // SC-14: the five parts follow the outline
         story.updated_at = new Date().toISOString();
         entry.session = { ...entry.session, section: step.section };
         const said = addTurn(entry, "candidate", text);
@@ -282,7 +283,8 @@ export function coachHandlers(store?: MockStore) {
       if (entry.session.status === "active") {
         entry.session = { ...entry.session, status: "ended", ended_at: new Date().toISOString() };
         const story = findStory(entry.session.story_id);
-        if (story && story.source === "coach" && missing(story).length === STORY_PARTS.length) {
+        const empty = story?.outline ? !hasContent(story.outline) : missing(story).length === STORY_PARTS.length;
+        if (story && story.source === "coach" && empty) {
           const library = mockStoryLibrary();
           library.splice(library.indexOf(story), 1);
           entry.session = { ...entry.session, story_id: null };
