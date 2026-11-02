@@ -3,9 +3,12 @@
  * they'll look for (skills, where they'll probe, must-haves the resume never shows), your stories
  * for this role (story fit, ST-5) and what you know about the interview (IN-4).
  */
-import { Link, useParams } from "react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router";
 
 import { useJob, useJobs, useResumeIssues, useResumes } from "../../api/hooks";
+import { jobTargetsApi } from "../../api/inputs";
 import { useRoleInterviews, useRoles } from "../../api/roles";
 import type { InterviewWithReadiness, JobPosting } from "../../api/types";
 import { Strova } from "../../components/strova";
@@ -102,6 +105,64 @@ export function PostingCard({ posting, sourceUrl }: { posting: JobPosting; sourc
         </a>
       )}
     </details>
+  );
+}
+
+/**
+ * LB-2 on the role page: a role nothing uses yet (no gap report, no takes) can be deleted; one
+ * with a gap report or takes is archived instead, so its reports keep their role.
+ */
+export function RemoveRole({ jobId, inUse }: { jobId: string; inUse: boolean }) {
+  const client = useQueryClient();
+  const navigate = useNavigate();
+  const [confirming, setConfirming] = useState(false);
+  const [archiveOnly, setArchiveOnly] = useState(false);
+  const done = () => {
+    // Roles, rehearsals, the plan and Home all list this role.
+    void client.invalidateQueries();
+    navigate(rolesPath);
+  };
+  const remove = useMutation({
+    mutationFn: () => jobTargetsApi.remove(jobId),
+    onSuccess: done,
+    // The server is the judge: a report made since the page loaded turns delete into archive.
+    onError: (err) => {
+      if ((err as { status?: number }).status === 409) setArchiveOnly(true);
+    },
+  });
+  const archive = useMutation({ mutationFn: () => jobTargetsApi.archive(jobId), onSuccess: done });
+  const keep = inUse || archiveOnly;
+  return (
+    <section className="sx-card" aria-labelledby="remove-heading" data-testid="remove-role">
+      <h2 id="remove-heading">Remove this role</h2>
+      <p className="sx-small sx-muted">
+        {keep
+          ? "This role has a gap report or takes, so it can't be deleted. Archive it to hide it from your roles; its reports stay."
+          : "Nothing uses this role yet: no gap report and no takes. Deleting removes the job posting and its interviews."}
+      </p>
+      {(remove.error ?? archive.error) && !archiveOnly && <ErrorNotice error={remove.error ?? archive.error} />}
+      <div className="sx-row">
+        {keep ? (
+          <button type="button" className="sx-btn ghost sm" disabled={archive.isPending} onClick={() => archive.mutate()}>
+            Archive role
+          </button>
+        ) : confirming ? (
+          <>
+            <span className="sx-small">Delete this role? This can't be undone.</span>
+            <button type="button" className="sx-btn sm" disabled={remove.isPending} onClick={() => remove.mutate()}>
+              Delete role
+            </button>
+            <button type="button" className="sx-btn quiet sm" onClick={() => setConfirming(false)}>
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button type="button" className="sx-btn ghost sm" onClick={() => setConfirming(true)}>
+            Delete role
+          </button>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -255,6 +316,10 @@ export function RolePage() {
           <ContextDialog job={job.data} />
         </div>
       </section>
+      <RemoveRole
+        jobId={jobId}
+        inUse={Boolean(plan.data?.gap) || (interviews.data ?? []).some((i) => i.takes_count > 0)}
+      />
     </div>
   );
 }

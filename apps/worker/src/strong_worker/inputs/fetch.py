@@ -4,7 +4,9 @@ Order of attempts:
 1. LinkedIn, or a URL we may not fetch: ask the user to paste the text.
 2. Greenhouse, Lever, Ashby and Workday: the board's public JSON API, which also works for
    Workday pages that need JavaScript.
-3. Any other page: httpx, then trafilatura to keep the main content.
+3. Any other page: httpx, then the page's schema.org JobPosting (JSON-LD), which job sites such
+   as Built In fill with the full description while the page shows part of it; else
+   trafilatura to keep the main content. The longer text wins.
 4. A page with too little text after step 3 is probably rendered by scripts: render it with
    Playwright (when installed), then trafilatura again.
 5. Still too little text, or a blocked fetch (401, 403, 429 and similar): ask for a paste.
@@ -17,6 +19,7 @@ from __future__ import annotations
 import asyncio
 import html
 import ipaddress
+import json
 import logging
 import re
 import socket
@@ -41,7 +44,7 @@ USER_AGENT = "StrongHireBot/0.1 (+job posting import; contact support@stronghire
 BLOCKED_STATUSES = {401, 403, 407, 429, 451, 999}
 PASTE_ONLY_HOSTS = ("linkedin.com", "lnkd.in")
 
-Board = Literal["greenhouse", "lever", "ashby", "workday", "generic", "browser"]
+Board = Literal["greenhouse", "lever", "ashby", "workday", "jsonld", "generic", "browser"]
 PasteReason = Literal[
     "linkedin",
     "invalid_url",
@@ -250,7 +253,10 @@ class PostingFetcher:
         resp = await self._get(url, accept="text/html,application/xhtml+xml")
         if resp is None:
             raise _BlockedError("fetch_failed", "The page did not return a posting.")
+        structured = job_posting_from_json_ld(resp.text)
         text = extract_main_text(resp.text)
+        if structured and len(structured) >= max(MIN_TEXT_CHARS, len(text)):
+            return FetchResult(structured, board="jsonld")
         if len(text) >= MIN_TEXT_CHARS:
             return FetchResult(text, board="generic")
 
@@ -331,6 +337,64 @@ def html_to_text(fragment: str) -> str:
     text = lxml_html.fragment_fromstring(marked, create_parent="div").text_content()
     lines = [re.sub(r"[ \t\xa0]+", " ", line).strip() for line in text.splitlines()]
     return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+
+
+_JSON_LD = re.compile(
+    r"<script[^>]+type=[\"']application/ld\+json[\"'][^>]*>(.*?)</script>",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _json_ld_nodes(value: Any) -> list[dict[str, Any]]:
+    if isinstance(value, list):
+        return [n for v in value for n in _json_ld_nodes(v)]
+    if isinstance(value, dict):
+        return [value, *_json_ld_nodes(value.get("@graph"))]
+    return []
+
+
+def _is_job_posting(node: dict[str, Any]) -> bool:
+    kind = node.get("@type")
+    kinds = kind if isinstance(kind, list) else [kind]
+    return "JobPosting" in kinds
+
+
+def _place(location: Any) -> str | None:
+    """'Seattle, WA' from a schema.org jobLocation (a Place, or a list of them)."""
+    places = location if isinstance(location, list) else [location]
+    names = []
+    for place in places:
+        address = place.get("address") if isinstance(place, dict) else None
+        if isinstance(address, dict):
+            parts = [address.get("addressLocality"), address.get("addressRegion")]
+            name = ", ".join(str(p) for p in parts if p)
+            if name:
+                names.append(name)
+    return "; ".join(dict.fromkeys(names)) or None
+
+
+def job_posting_from_json_ld(page_html: str) -> str | None:
+    """The posting from the page's schema.org JobPosting (JSON-LD), or None when it has none."""
+    for block in _JSON_LD.findall(page_html):
+        try:
+            data = json.loads(block.strip())
+        except ValueError:
+            continue
+        for node in _json_ld_nodes(data):
+            if not _is_job_posting(node):
+                continue
+            body = html_to_text(html.unescape(str(node.get("description") or "")))
+            if not body:
+                continue
+            org = node.get("hiringOrganization")
+            return _compose(
+                title=node.get("title"),
+                company=org.get("name") if isinstance(org, dict) else org,
+                location=_place(node.get("jobLocation")),
+                team=None,
+                body=body,
+            )
+    return None
 
 
 def extract_main_text(page_html: str) -> str:

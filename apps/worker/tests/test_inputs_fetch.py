@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import json
 
 import httpx
 
@@ -256,3 +257,65 @@ async def test_in1_private_addresses_are_never_fetched() -> None:
 async def test_in1_rejects_non_http_urls() -> None:
     result = await make_fetcher({}).fetch("file:///etc/passwd")
     assert result.paste_reason == "invalid_url"
+
+
+async def test_in1_a_page_with_a_json_ld_job_posting_uses_its_full_description() -> None:
+    """IN-1: job sites such as Built In show part of the posting (skills, a summary) and put the
+    full description in a schema.org JobPosting. The importer reads that, not the visible bits."""
+    description = html.escape(
+        "<p>We are looking for a Staff Product Manager for databases.</p>"
+        "<h3>What you'll do</h3><ul>"
+        + "".join(f"<li>Own the roadmap for database product area {i}</li>" for i in range(12))
+        + "</ul><h3>What you bring</h3><ul><li>8+ years in product management</li></ul>"
+    )
+    ld = json.dumps(
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {"@type": "Organization", "name": "Built In"},
+                {
+                    "@type": "JobPosting",
+                    "title": "Staff Product Manager, Databases",
+                    "hiringOrganization": {"@type": "Organization", "name": "Acme Data"},
+                    "jobLocation": [
+                        {
+                            "@type": "Place",
+                            "address": {"addressLocality": "Seattle", "addressRegion": "WA"},
+                        }
+                    ],
+                    "description": description,
+                },
+            ],
+        }
+    )
+    page = (
+        "<html><head><title>Staff PM</title>"
+        f'<script type="application/ld+json">{ld}</script></head><body>'
+        "<article><h1>Staff Product Manager, Databases</h1><p>Top skills: SQL, Roadmaps, "
+        "Stakeholder management.</p><p>Acme Data builds managed databases for developers "
+        "around the world, and is hiring in Seattle.</p>"
+        + "<p>Benefits and perks.</p>" * 20
+        + "</article></body></html>"
+    )
+    fetcher = make_fetcher(
+        {"www.builtinseattle.com/job/staff-pm/1": httpx.Response(200, html=page)}
+    )
+    result = await fetcher.fetch("https://www.builtinseattle.com/job/staff-pm/1")
+    assert result.board == "jsonld"
+    assert result.text is not None
+    assert "Title: Staff Product Manager, Databases" in result.text
+    assert "Company: Acme Data" in result.text
+    assert "Location: Seattle, WA" in result.text
+    assert "- Own the roadmap for database product area 11" in result.text
+    assert "- 8+ years in product management" in result.text
+
+
+async def test_in1_a_short_json_ld_description_does_not_replace_a_full_page() -> None:
+    """IN-1: when the JSON-LD description is shorter than the page's own text, the page wins."""
+    ld = json.dumps({"@type": "JobPosting", "title": "Engineer", "description": "Short."})
+    page = posting_page().replace(
+        "<head>", f'<head><script type="application/ld+json">{ld}</script>'
+    )
+    fetcher = make_fetcher({"careers.example.org/j/7": httpx.Response(200, html=page)})
+    result = await fetcher.fetch("https://careers.example.org/j/7")
+    assert result.board == "generic"
