@@ -145,7 +145,7 @@ async def test_rf6_scorer_input_has_the_family_guidance() -> None:
     assert rubric_input.startswith("Interview type:")
     assert "Role family: consulting_strategy" in rubric_input
     assert family_guidance(RoleFamily.CONSULTING_STRATEGY) in rubric_input
-    assert backend.calls[0][0][1].prompt_ref == "scorer/rubric_input.v3"
+    assert backend.calls[0][0][1].prompt_ref == "scorer/rubric_input.v4"
 
 
 # --- RF-7: generic mode is not a tech-industry bar --------------------------------------------

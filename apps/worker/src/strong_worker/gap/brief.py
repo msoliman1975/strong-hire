@@ -79,12 +79,18 @@ from strong_core.schemas import (
     PhaseTime,
     QuestionSource,
     Resume,
+    RolePlayDraft,
     SessionConfig,
     Severity,
     Tone,
     session_competencies,
 )
-from strong_core.schemas.session import BRIEF_COMPANY_SUMMARY_MAX, FULL_MIN_COMPETENCIES
+from strong_core.schemas.session import (
+    BRIEF_COMPANY_SUMMARY_MAX,
+    FULL_MIN_COMPETENCIES,
+    ROLE_PLAY_MAX_TURNS,
+    ROLE_PLAY_MINI_MAX_TURNS,
+)
 from strong_worker.family import family_guidance
 from strong_worker.gap.text import posting_text, resume_text
 from strong_worker.quoting import quote_untrusted as _quote
@@ -96,6 +102,16 @@ PROMPT_INPUT = "interviewer_brief_input"
 PROMPT_CUSTOM = "interviewer_brief_custom"
 PROMPT_CUSTOM_INPUT = "interviewer_brief_custom_input"
 PROMPT_TONES = "interviewer_brief_tones"
+PROMPT_ROLE_PLAY = "interviewer_brief_role_play"
+PROMPT_ROLE_PLAY_INPUT = "interviewer_brief_role_play_input"
+ROLE_PLAY_BEATS_BY_DURATION = {10: 1, 30: 3, 45: 4}
+"""RP-4: beats per role-play; a mini has one."""
+ROLE_PLAY_TURNS_BY_DIFFICULTY = {
+    Difficulty.FRIENDLY: 6,
+    Difficulty.REALISTIC: ROLE_PLAY_MAX_TURNS,
+    Difficulty.TOUGH: ROLE_PLAY_MAX_TURNS,
+}
+"""RP-6: the buyer's replies per beat. A mini allows ROLE_PLAY_MINI_MAX_TURNS."""
 PROMPT_BY_TYPE = {InterviewType.RECRUITER_SCREEN: "interviewer_brief_recruiter_screen"}
 """RS-2: a type with its own brief prompt. The others use PROMPT. Chosen by type, never by model."""
 ATTEMPTS = 2
@@ -132,6 +148,10 @@ TONE_BY_DIFFICULTY = {
 }
 PUSHBACK_FRIENDLY = "Gentle. Asks for more detail but does not challenge the answer."
 PUSHBACK_TOUGH = "Challenges assumptions and asks why not the simpler option."
+DEFAULT_ROLE_PLAY_CURVEBALL = (
+    "Midway, the buyer says they just heard a competitor will offer the same thing for less, and "
+    "asks why they should not wait."
+)
 DEFAULT_CURVEBALL = (
     "Midway, change one key constraint of the candidate's last answer and ask how their "
     "decision changes."
@@ -475,6 +495,100 @@ def assemble(
     return _with_company_summary(brief, profile, auto_summary, flags), flags
 
 
+# --- role-play (RP-4) -------------------------------------------------------------------------
+
+
+def role_play_messages(
+    config: SessionConfig,
+    posting: JobPosting,
+    resume: Resume | None,
+    profile: ResolvedProfile,
+) -> list[Message]:
+    """RP-4: the planner prompt for a role-play's buyer brief and beats."""
+    assert config.role_play is not None
+    tough = config.difficulty == Difficulty.TOUGH and not config.is_mini
+    return [
+        load_prompt(Role.PLANNER, PROMPT_ROLE_PLAY).message("system"),
+        load_prompt(Role.PLANNER, PROMPT_ROLE_PLAY_INPUT).message(
+            "user",
+            beats=ROLE_PLAY_BEATS_BY_DURATION[config.duration_min],
+            scenario=config.role_play.value,
+            level=config.level.value,
+            seniority_bar=seniority_bar(config, posting, profile),
+            difficulty=config.difficulty.value,
+            mode=config.mode.value,
+            duration=config.duration_min,
+            company=profile.company_name if not profile.generic else posting.company_name,
+            family_guidance=family_guidance(posting.role_family),
+            curveball="Write one curveball." if tough else "Set curveball to null.",
+            job=posting_text(posting),
+            resume=resume_text(resume) if resume else "(no resume)",
+        ),
+    ]
+
+
+def assemble_role_play(
+    draft: RolePlayDraft,
+    config: SessionConfig,
+    posting: JobPosting,
+    profile: ResolvedProfile,
+    gap: GapAnalysis | None,
+    *,
+    auto_summary: str | None = None,
+) -> tuple[InterviewerBrief, list[str]]:
+    """RP-3, RP-4: build the role-play brief from the planner's draft, in code. The scenario,
+    the curveball rule, the beat count and the buyer's turn limit come from the session."""
+    assert config.role_play is not None
+    flags: list[str] = []
+    pool = COMPETENCIES_BY_TYPE[InterviewType.ROLE_PLAY]
+    wanted = ROLE_PLAY_BEATS_BY_DURATION[config.duration_min]
+    beats = draft.beats[:wanted]
+    if len(draft.beats) > wanted:
+        flags.append("dropped_beats")
+    if not config.is_mini and len(beats) < 2:
+        raise BriefError(f"the draft has {len(beats)} beats; 2 are needed")
+    questions = []
+    for i, b in enumerate(beats, start=1):
+        comps = [c for c in b.competencies if c in pool] or [Competency.DISCOVERY]
+        questions.append(
+            BriefQuestion(
+                id=b.id,
+                text=b.opening.strip(),
+                competencies=comps,
+                priority=i,
+                probe_hints=[b.goal],
+            )
+        )
+    tough = config.difficulty == Difficulty.TOUGH and not config.is_mini
+    curveball = ((draft.buyer.curveball or "").strip()[:MAX_TEXT] or None) if tough else None
+    if tough and curveball is None:
+        curveball = DEFAULT_ROLE_PLAY_CURVEBALL
+    buyer = draft.buyer.model_copy(update={"scenario": config.role_play, "curveball": curveball})
+    turns = ROLE_PLAY_TURNS_BY_DIFFICULTY[config.difficulty]
+    if config.is_mini:
+        turns = min(turns, ROLE_PLAY_MINI_MAX_TURNS)
+    brief = InterviewerBrief(
+        session=config,
+        company_name=None if profile.generic else profile.company_name,
+        generic_mode=profile.generic,
+        profile_version=profile.version,
+        role_family=posting.role_family,
+        target_competencies=target_competencies(config, profile, gap),
+        target_values=[],
+        questions=questions,
+        probe_areas=probe_areas(gap),
+        persona=persona(config, profile),
+        max_probes_per_question=turns,
+        curveball=curveball,
+        seniority_bar=seniority_bar(config, posting, profile),
+        pushback=tough,
+        coach_help=config.mode == Mode.COACH,
+        time_plan=time_plan(config.duration_min),
+        role_play=buyer,
+    )
+    return _with_company_summary(brief, profile, auto_summary, flags), flags
+
+
 def company_summary(profile: ResolvedProfile, auto_summary: str | None) -> str | None:
     """AP-2: the labeled auto-profile summary for a generic-mode brief, else None."""
     text = " ".join((auto_summary or "").split())
@@ -512,21 +626,34 @@ async def build_brief(
     """Ask the planner for questions, then build and check the brief in code. Retries once.
 
     `auto_summary` is an approved auto-profile's summary (AP-2); only generic mode uses it."""
-    messages = build_messages(config, posting, resume, profile, gap)
+    role_play = config.is_role_play
+    messages = (
+        role_play_messages(config, posting, resume, profile)
+        if role_play
+        else build_messages(config, posting, resume, profile, gap)
+    )
     errors: list[str] = []
     for attempt in range(1, ATTEMPTS + 1):
         try:
-            done = await gateway.complete(Role.PLANNER, messages, output_type=BriefDraft)
-            brief, flags = assemble(
-                done.output, config, posting, profile, gap, auto_summary=auto_summary
-            )
+            if role_play:
+                rp = await gateway.complete(Role.PLANNER, messages, output_type=RolePlayDraft)
+                done_refs, done_model = rp.prompt_refs, rp.model
+                brief, flags = assemble_role_play(
+                    rp.output, config, posting, profile, gap, auto_summary=auto_summary
+                )
+            else:
+                done = await gateway.complete(Role.PLANNER, messages, output_type=BriefDraft)
+                done_refs, done_model = done.prompt_refs, done.model
+                brief, flags = assemble(
+                    done.output, config, posting, profile, gap, auto_summary=auto_summary
+                )
         except Exception as exc:  # gateway, validation or a draft with too few questions
             errors.append(f"attempt {attempt}: {type(exc).__name__}: {exc}"[:300])
             log.warning("planner brief call failed (%s), attempt %d", type(exc).__name__, attempt)
             continue
         tone_ref = tone_line(config, profile)[1]
-        refs = [*done.prompt_refs, *([tone_ref] if tone_ref else [])]
-        version = f"{done.model} {' '.join(refs)}".strip()[:200]
+        refs = [*done_refs, *([tone_ref] if tone_ref else [])]
+        version = f"{done_model} {' '.join(refs)}".strip()[:200]
         return BuiltBrief(brief, version, brief_tokens(brief), flags)
     raise BriefError(f"Brief failed after {ATTEMPTS} attempts: " + " | ".join(errors))
 
