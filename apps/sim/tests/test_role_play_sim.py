@@ -22,7 +22,8 @@ def test_rp11_role_play_candidate_is_the_seller() -> None:
     rp = Scenario(id="rp", interview_type=InterviewType.ROLE_PLAY, role_play="discovery_call")
     seller = Candidate(rp, gateway(), CostMeter({}))
     assert seller.prompt_refs[0] == "candidate/persona_role_play"
-    assert "You are the seller" in seller.system.content
+    assert "you are the seller" in seller.system.content
+    assert "you are the customer success manager" in seller.system.content
     beh = Candidate(Scenario(id="beh"), gateway(), CostMeter({}))
     assert beh.prompt_refs[0] == "candidate/persona"
 

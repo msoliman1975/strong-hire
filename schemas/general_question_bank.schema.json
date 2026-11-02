@@ -177,7 +177,8 @@
         "finance",
         "consulting_strategy",
         "project_program",
-        "sales"
+        "sales",
+        "customer_success"
       ],
       "title": "RoleFamily",
       "type": "string"

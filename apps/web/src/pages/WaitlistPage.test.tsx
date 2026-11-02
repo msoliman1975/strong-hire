@@ -63,7 +63,7 @@ describe("waitlist (L04)", () => {
     const bodies = recordBodies("/api/public/waitlist");
     const user = renderAt("/waitlist");
     const field = await screen.findByLabelText("Your field (optional)");
-    expect(within(field).getAllByRole("option")).toHaveLength(14); // "Choose one" and 13 families
+    expect(within(field).getAllByRole("option")).toHaveLength(15); // "Choose one" and 14 families
     await user.type(screen.getByLabelText("Email"), "fin@example.com");
     await user.click(screen.getByLabelText("In the next two weeks"));
     await user.selectOptions(field, "Finance");

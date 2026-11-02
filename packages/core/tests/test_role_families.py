@@ -26,11 +26,12 @@ WAVE_1 = {
 }
 ORIGINAL = {"swe", "data_ml", "pm", "design", "tpm", "other"}
 WAVE_2 = {"sales"}
+WAVE_3 = {"customer_success"}
 
 
 def test_rf1_enum_keeps_original_values_and_adds_wave_1() -> None:
     """RF-1 / D-4: splits narrow a value's meaning; no value is renamed or removed."""
-    assert {f.value for f in RoleFamily} == ORIGINAL | WAVE_1 | WAVE_2
+    assert {f.value for f in RoleFamily} == ORIGINAL | WAVE_1 | WAVE_2 | WAVE_3
 
 
 def test_rf2_every_family_has_exactly_one_registry_entry() -> None:
@@ -186,6 +187,7 @@ def test_rf14_beta_families_are_the_wave_1_families_without_5_gold_transcripts()
         "consulting_strategy",
         "project_program",
         "sales",
+        "customer_success",
     }
     expected = {f for f in wave_1 if counts[f] < 5}
     text = (root / "apps/web/src/labels.ts").read_text(encoding="utf-8")
