@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from enum import StrEnum
 from typing import Annotated
 
@@ -93,3 +94,17 @@ class GapAssessment(Contract):
     gaps: list[Gap] = Field(default_factory=list)
     probe_areas: list[str] = Field(default_factory=list)
     session_plan: list[PlannedSession] = Field(min_length=1)
+
+
+# --- resume comparison (RC-1 to RC-8) -------------------------------------------------------
+
+
+class ResumeComparisonEntry(Contract):
+    """One resume of a resume comparison and the gap analysis it is ranked by (RC-2)."""
+
+    resume_id: uuid.UUID
+    gap_analysis_id: uuid.UUID
+    reused: bool = Field(
+        description="True when an analysis of the same job and resume already existed, so this "
+        "comparison made no model call for it."
+    )

@@ -52,6 +52,7 @@ from strong_core.schemas.enums import (
     Difficulty,
     EmailKind,
     ErrorGroupStatus,
+    GapPurpose,
     GapStatus,
     GrantKind,
     HireSignal,
@@ -145,6 +146,7 @@ USER_OWNED_TABLES = (
     "target_interviews",
     "suggestions",
     "role_story_fits",
+    "resume_comparisons",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -528,8 +530,61 @@ class GapAnalysis(Base):
     model_version: Mapped[str | None] = mapped_column(
         String(200), comment="Gateway alias + prompt ref"
     )
+    purpose: Mapped[GapPurpose] = mapped_column(
+        str_enum(GapPurpose, "gap_purpose"),
+        default=GapPurpose.ROLE,
+        server_default="role",
+        comment="RC-7: role is the role's own analysis; comparison was made by a resume "
+        "comparison and is never the role's latest analysis",
+    )
+    source_gap_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("gap_analyses.id", ondelete="SET NULL"),
+        comment="RC-6: the comparison row this role row was copied from. A copy made no model "
+        "call and does not count against the rate limit. NULL: computed by the worker",
+    )
     created_at: Mapped[datetime] = _created_at()
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ResumeComparison(Base):
+    """RC-1 to RC-8: one comparison of the user's resumes against one target role.
+
+    Each entry (schemas.ResumeComparisonEntry) points at the gap analysis a resume is ranked by:
+    a reused one when the job and the resume did not change, else a new comparison row. The
+    ranking, the recommendation and the gap hints are computed in code when the comparison is
+    read, so nothing here needs a model call.
+    """
+
+    __tablename__ = "resume_comparisons"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    # Job targets are soft deleted (R1), like gap_analyses.job_target_id.
+    job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"), index=True)
+    entries_json: Mapped[list[Any]] = mapped_column(
+        comment="schemas.ResumeComparisonEntry list, one per compared resume"
+    )
+    new_runs: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+        comment="RC-7: gap analyses this comparison started. A comparison with any counts as "
+        "one run against the rate limit; 0 means every pair was reused",
+    )
+    chosen_resume_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("resumes.id", ondelete="SET NULL"),
+        comment="RC-6: the resume the user picked with Use this one. NULL: not picked yet",
+    )
+    dismissed_json: Mapped[list[Any] | None] = mapped_column(
+        comment="RC-4: keys of the gap hints the user dismissed"
+    )
+    applied_json: Mapped[list[Any] | None] = mapped_column(
+        comment="RC-4: keys of the gap hints whose line the user added to the resume"
+    )
+    created_at: Mapped[datetime] = _created_at()
 
 
 class InterviewSession(Base):
