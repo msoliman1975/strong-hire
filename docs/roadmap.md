@@ -10,7 +10,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | ID | Title | Area | Priority | Status |
 | --- | --- | --- | --- | --- |
 | RMAP-1 | Filter Rehearsals by target role | web | Next | Idea |
-| RMAP-2 | One resume list on the Resumes page | web | Next | Idea |
+| RMAP-2 | One resume list on the Resumes page | web | Next | Done |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -63,3 +63,12 @@ one, and they say different things about the same resume.
   pages, so check those before changing it).
 - Keep RM-1 and RM-2 in `docs/ux-strova/ux-spec.md` true: titled with the first name, main resume
   marked, one main per user.
+
+**Done (2026-11-02):** one list, one row per resume. A row shows roles, issues (open, high,
+accepted) and story ideas, then the date added and the check state. Its actions are Make main,
+Open breakdown, Open, and Rename and Delete under **More**. Issue counts now come from the same rules
+as the breakdown, so the page shows one number. "Used by" names a company once, with its role
+count. "Not checked yet" was not a bug: it means the user has not confirmed the breakdown
+(`confirmed_at`), while the issues are always found. It is now on its own line, apart from the
+counts. The v1 Resumes page still uses `CvLibrary`, unchanged.
+

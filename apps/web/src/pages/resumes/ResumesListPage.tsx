@@ -1,74 +1,255 @@
 /**
- * RM-1 (mockup #cvs): "{First name}'s Resumes". Every resume, the main one marked, each with its
- * roles, open issues and story ideas. The user can make another resume main (RM-2).
+ * RM-1 (mockup #cvs): "{First name}'s Resumes". One list, one row per resume, the main one marked.
+ * Each row has its roles, open issues, story ideas, date added and check state (IN-12), and every
+ * action: Open, Open breakdown, Make main (RM-2), and Rename or Delete in the row's "More" menu (R1).
+ * RMAP-2: this replaces the second "Saved resumes" list that the page used to fold below.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router";
 
 import { resumesApi } from "../../api/inputs";
 import { rolesApi } from "../../api/roles";
-import { useAuth, useResumeIssues, useResumes, useStoryIdeas } from "../../api/hooks";
+import { useAuth, useResumes, useStoryIdeas } from "../../api/hooks";
 import type { ResumeOut, RoleOut } from "../../api/types";
 import { resumesLabel } from "../../components/Layout";
-import { CvLibrary } from "../../components/LibrarySection";
+import { NAME_MAX, useLibraryRefresh, validateName } from "../../components/LibrarySection";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
+import { formatDate } from "../../labels";
 import { MAX_RESUME_MB, MAX_RESUMES, RESUMES_FULL } from "../../limits";
+import { resumeCheckPath } from "../../paths";
+import { checkedLabel, issuesOpen, resumeIssueCounts } from "../onboarding/resumeSummary";
 import { START } from "../start/paths";
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export const resumePath = (id: string) => `/resumes/${id}`;
 
-/** "Stripe and Shopify": the companies of the roles whose interviews use this resume. */
-function usedBy(roles: RoleOut[] | undefined, resumeId: string): string | null {
+/** "a, b and c". */
+const andList = (items: string[]) =>
+  items.length === 1 ? items[0] : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`;
+
+/**
+ * "Used by Stripe and Shopify": the companies of the roles whose interviews use this resume. A
+ * company with two roles is named once, with its count: "Used by Rubrik (2 roles) and Sourcegraph".
+ */
+export function usedBy(roles: RoleOut[] | undefined, resumeId: string): string | null {
   if (!roles) return null;
-  const names = roles
-    .filter((r) => r.interviews.some((i) => i.interview.resume_id === resumeId))
-    .map((r) => r.role.company_name ?? r.role.name ?? "a role");
-  if (names.length === 0) return "Not used by a role";
-  const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
-  return `Used by ${list}`;
+  const counts = new Map<string, number>();
+  for (const r of roles) {
+    if (!r.interviews.some((i) => i.interview.resume_id === resumeId)) continue;
+    const name = r.role.company_name ?? r.role.name ?? "a role";
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  if (counts.size === 0) return "Not used by a role";
+  const names = [...counts].map(([name, n]) => (n > 1 ? `${name} (${n} roles)` : name));
+  return `Used by ${andList(names)}`;
+}
+
+/**
+ * "10 issues open · 2 high · 1 accepted", worked out with the same rules as the breakdown (IN-12),
+ * so the list and the breakdown always agree.
+ */
+function issueFacts(resume: ResumeOut): string | null {
+  const counts = resumeIssueCounts(resume);
+  if (!counts) return null;
+  return [
+    issuesOpen(counts.open),
+    counts.high > 0 ? `${counts.high} high` : null,
+    counts.accepted > 0 ? `${counts.accepted} accepted` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | undefined }) {
   const ready = resume.status === "extracted";
-  const issues = useResumeIssues(ready ? resume.id : null);
+  const label = resume.name ?? "Resume";
   const ideas = useStoryIdeas(ready ? resume.id : null);
   const queryClient = useQueryClient();
+  const refresh = useLibraryRefresh();
+  const menu = useRef<HTMLDetailsElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+
   const makeMain = useMutation({
     mutationFn: () => resumesApi.setMain(resume.id),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["resumes"] }),
   });
+  const rename = useMutation({
+    mutationFn: (name: string) => resumesApi.rename(resume.id, name),
+    onSuccess: () => {
+      setEditing(null);
+      refresh();
+    },
+  });
+  const remove = useMutation({
+    mutationFn: () => resumesApi.remove(resume.id),
+    onSuccess: () => {
+      dialog.current?.close?.();
+      dialog.current?.removeAttribute("open");
+      refresh();
+      // Roles show which resume they use.
+      void queryClient.invalidateQueries({ queryKey: ["roles"] });
+    },
+  });
+
+  const closeMenu = () => menu.current?.removeAttribute("open");
+  // The More menu closes on a click outside it and on Escape, like any menu.
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      if (menu.current && !menu.current.contains(e.target as Node)) closeMenu();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && menu.current?.open) {
+        closeMenu();
+        menu.current.querySelector("summary")?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+  const onRename = (e: FormEvent) => {
+    e.preventDefault();
+    if (editing === null) return;
+    const problem = validateName(editing);
+    setNameError(problem);
+    if (!problem) rename.mutate(editing.trim());
+  };
+
   const facts = !ready
     ? ["Still being read"]
-    : [
-        usedBy(roles, resume.id),
-        issues.data ? `${plural(issues.data.open.length, "issue")} open` : null,
-        ideas.data ? plural(ideas.data.ideas.length, "story idea") : null,
-      ].filter(Boolean);
+    : [usedBy(roles, resume.id), issueFacts(resume), ideas.data ? plural(ideas.data.ideas.length, "story idea") : null].filter(
+        Boolean,
+      );
+  const dates = [`Added ${formatDate(resume.uploaded_at)}`, ready ? checkedLabel(resume) : null].filter(Boolean);
+
   return (
-    <div className="sx-list-row">
-      <div className="sx-stack" style={{ gap: 2 }}>
-        <strong>
-          <Link className="sx-plain" to={resumePath(resume.id)}>
-            {resume.name ?? "Resume"}
-          </Link>{" "}
-          {resume.is_main && <span className="sx-chip dark">Main</span>}
-        </strong>
-        <span className="sx-small sx-muted">{facts.join(" · ")}</span>
-      </div>
-      <span className="sx-row">
-        {!resume.is_main && (
-          <button type="button" className="sx-btn quiet sm" onClick={() => makeMain.mutate()} disabled={makeMain.isPending}>
-            Make main
+    <li className="sx-list-row" data-testid="resume-row">
+      {editing !== null ? (
+        <form className="sx-row" onSubmit={onRename} noValidate aria-label={`Rename ${label}`} style={{ flex: 1 }}>
+          <label className="visually-hidden" htmlFor={`rename-${resume.id}`}>
+            New name
+          </label>
+          <input
+            id={`rename-${resume.id}`}
+            type="text"
+            value={editing}
+            maxLength={NAME_MAX + 20}
+            onChange={(e) => setEditing(e.target.value)}
+            autoFocus
+          />
+          <button type="submit" className="sx-btn sm" disabled={rename.isPending}>
+            Save name
           </button>
-        )}
-        <Link className="sx-small sx-plain" to={resumePath(resume.id)} aria-label={`Open ${resume.name ?? "resume"}`}>
-          Open
-        </Link>
-      </span>
-    </div>
+          <button type="button" className="sx-btn quiet sm" onClick={() => setEditing(null)}>
+            Cancel
+          </button>
+          {nameError && (
+            <p className="field-error" role="alert">
+              {nameError}
+            </p>
+          )}
+          {rename.isError && <ErrorNotice error={rename.error} />}
+        </form>
+      ) : (
+        <>
+          <div className="sx-stack" style={{ gap: 2, minWidth: 0 }}>
+            <strong>
+              <Link className="sx-plain" to={resumePath(resume.id)}>
+                {label}
+              </Link>{" "}
+              {resume.is_main && <span className="sx-chip dark">Main</span>}
+            </strong>
+            <span className="sx-small sx-muted">{facts.join(" · ")}</span>
+            <span className="sx-small sx-muted">{dates.join(" · ")}</span>
+          </div>
+          <span className="sx-row">
+            {!resume.is_main && (
+              <button
+                type="button"
+                className="sx-btn quiet sm"
+                onClick={() => makeMain.mutate()}
+                disabled={makeMain.isPending}
+              >
+                Make main
+              </button>
+            )}
+            {ready && (
+              <Link className="sx-btn ghost sm" to={resumeCheckPath(resume.id)} aria-label={`Open breakdown for ${label}`}>
+                Open breakdown
+              </Link>
+            )}
+            <Link className="sx-btn sm" to={resumePath(resume.id)} aria-label={`Open ${label}`}>
+              Open
+            </Link>
+            <details className="sx-menu" ref={menu}>
+              <summary className="sx-btn quiet sm" aria-label={`More actions for ${label}`}>
+                More ▾
+              </summary>
+              <div className="sx-menu__list" role="group" aria-label={`More actions for ${label}`}>
+                <button
+                  type="button"
+                  aria-label={`Rename ${label}`}
+                  onClick={() => {
+                    closeMenu();
+                    setNameError(null);
+                    setEditing(resume.name ?? "");
+                  }}
+                >
+                  Rename
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Delete ${label}`}
+                  onClick={() => {
+                    closeMenu();
+                    remove.reset();
+                    const d = dialog.current;
+                    if (d && typeof d.showModal === "function") d.showModal();
+                    else d?.setAttribute("open", "");
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </details>
+          </span>
+          {makeMain.isError && <ErrorNotice error={makeMain.error} />}
+        </>
+      )}
+      <dialog ref={dialog} aria-labelledby={`delete-${resume.id}`} className="sx-dialog">
+        <div className="sx-card">
+          <h2 id={`delete-${resume.id}`}>Delete this resume?</h2>
+          <p className="sx-small sx-muted">
+            We delete {label} and its file. Your reports, interviews and progress are kept.
+            {resume.is_main && " Your newest other resume becomes your main resume."}
+          </p>
+          {remove.isError && <ErrorNotice error={remove.error} title="The delete did not work" />}
+          <div className="sx-row">
+            <button type="button" className="sx-btn sm" disabled={remove.isPending} onClick={() => remove.mutate()}>
+              Delete
+            </button>
+            <button
+              type="button"
+              className="sx-btn quiet sm"
+              onClick={() => {
+                dialog.current?.close?.();
+                dialog.current?.removeAttribute("open");
+              }}
+            >
+              Keep it
+            </button>
+          </div>
+        </div>
+      </dialog>
+    </li>
   );
 }
 
@@ -78,10 +259,11 @@ export function ResumesListPage() {
   const roles = useQuery({ queryKey: ["roles"], queryFn: rolesApi.list });
   const live = (resumes.data ?? []).filter((r) => !r.deleted);
   const full = live.length >= MAX_RESUMES;
+  const title = resumesLabel(auth.data?.user?.full_name);
   return (
     <div className="sx-page">
       <div className="sx-between">
-        <h1>{resumesLabel(auth.data?.user?.full_name)}</h1>
+        <h1>{title}</h1>
         {full ? (
           <button type="button" className="sx-btn" disabled>
             Add a resume
@@ -113,22 +295,13 @@ export function ResumesListPage() {
           {live.length === 0 ? (
             <p className="sx-muted">No resume yet. Add one and Strova reads it.</p>
           ) : (
-            live.map((r) => <ResumeRow key={r.id} resume={r} roles={roles.data} />)
+            <ul className="sx-rows" aria-label="Your resumes">
+              {live.map((r) => (
+                <ResumeRow key={r.id} resume={r} roles={roles.data} />
+              ))}
+            </ul>
           )}
         </div>
-      )}
-      {live.length > 0 && (
-        <details className="sx-card sx-fold">
-          <summary>
-            <div className="sx-between">
-              <h2>Rename or delete resumes</h2>
-              <span className="caret" aria-hidden="true">
-                ▾
-              </span>
-            </div>
-          </summary>
-          <CvLibrary />
-        </details>
       )}
     </div>
   );
