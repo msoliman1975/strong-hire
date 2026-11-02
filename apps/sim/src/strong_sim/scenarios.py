@@ -30,7 +30,14 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
 from strong_core.config import find_repo_root
-from strong_core.schemas import Difficulty, InterviewType, Level, Mode, SessionConfig
+from strong_core.schemas import (
+    Difficulty,
+    InterviewType,
+    Level,
+    Mode,
+    RolePlayScenario,
+    SessionConfig,
+)
 from strong_core.sim import NAMES, PERSONAS, VOICE_ONLY, Behavior, Persona, Quality
 
 SCENARIOS_DIR = find_repo_root() / "evals" / "scenarios"
@@ -67,6 +74,8 @@ class Scenario(BaseModel):
     job_text: str = Field(default="", max_length=MAX_PASTED_CHARS)
     cv_text: str = Field(default="", max_length=MAX_PASTED_CHARS)
     level: Level | None = None
+    # RP-11: the call for a role-play scenario; required when interview_type is role_play.
+    role_play: RolePlayScenario | None = None
 
     @property
     def fixture(self) -> Persona:
@@ -101,6 +110,7 @@ class Scenario(BaseModel):
             mode=self.mode,
             duration_min=self.duration_min,
             level=self.run_level(),
+            role_play=self.role_play,
         )
 
     def check(self) -> None:
@@ -108,6 +118,8 @@ class Scenario(BaseModel):
             raise ValueError(f"{self.id}: unknown resume fixture {self.resume!r}")
         if self.behavior in VOICE_ONLY and self.channel != "voice":
             raise ValueError(f"{self.id}: behavior {self.behavior} needs the voice channel")
+        if (self.interview_type == InterviewType.ROLE_PLAY) != (self.role_play is not None):
+            raise ValueError(f"{self.id}: a role-play scenario, and only one, needs role_play")
         if self.job_text.strip() and self.level is None:
             raise ValueError(f"{self.id}: a pasted job needs a level")
 

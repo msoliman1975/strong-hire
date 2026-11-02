@@ -5216,7 +5216,7 @@ export interface components {
             /** Company Name */
             company_name: string | null;
             /** @enum {string} */
-            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen";
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen" | "role_play";
             /** Question */
             question: string;
             /** Competencies */
@@ -5801,7 +5801,7 @@ export interface components {
          * @description Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.
          * @enum {string}
          */
-        Competency: "ownership" | "impact" | "collaboration" | "conflict_handling" | "learning_from_failure" | "communication" | "role_fit" | "depth_of_experience" | "judgment" | "motivation" | "team_fit" | "scope_at_level" | "technical_depth" | "accuracy" | "reasoning" | "trade_offs" | "clarity_of_explanation" | "problem_framing" | "structure" | "user_and_business_sense" | "estimation_logic" | "prioritization" | "recommendation" | "logistics_and_expectations";
+        Competency: "ownership" | "impact" | "collaboration" | "conflict_handling" | "learning_from_failure" | "communication" | "role_fit" | "depth_of_experience" | "judgment" | "motivation" | "team_fit" | "scope_at_level" | "technical_depth" | "accuracy" | "reasoning" | "trade_offs" | "clarity_of_explanation" | "problem_framing" | "structure" | "user_and_business_sense" | "estimation_logic" | "prioritization" | "recommendation" | "logistics_and_expectations" | "discovery" | "objection_handling" | "value_articulation" | "closing";
         /** CompetencyMatch */
         CompetencyMatch: {
             competency: components["schemas"]["Competency"];
@@ -6308,6 +6308,8 @@ export interface components {
              * @description Plain reason when the session failed before it started.
              */
             failure_reason?: string | null;
+            /** @description RP-9: the buyer Strova played; role-play sessions only. */
+            buyer?: components["schemas"]["SessionBuyer"] | null;
         };
         /**
          * DeliveryMetrics
@@ -6394,6 +6396,24 @@ export interface components {
          * @enum {string}
          */
         DocumentKind: "job_posting" | "job_list" | "resume" | "cover_letter" | "company_page" | "article" | "error_page" | "other";
+        /**
+         * DraftBeat
+         * @description One beat of a role-play as the planner writes it (RP-4). The worker turns it into a
+         *     BriefQuestion: `opening` is what the buyer says to open the beat, `goal` stays hidden.
+         */
+        DraftBeat: {
+            /** Id */
+            id: string;
+            /** Opening */
+            opening: string;
+            /**
+             * Goal
+             * @description What the candidate should do.
+             */
+            goal: string;
+            /** Competencies */
+            competencies: components["schemas"]["Competency"][];
+        };
         /**
          * DraftQuestion
          * @description One question as the planner model writes it. The worker turns it into a BriefQuestion;
@@ -6703,7 +6723,7 @@ export interface components {
              */
             id: string;
             /** @enum {string} */
-            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen";
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen" | "role_play";
             /** Question */
             question: string;
             hints: components["schemas"]["QuestionHints"];
@@ -7017,7 +7037,7 @@ export interface components {
          *     COMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.
          * @enum {string}
          */
-        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom" | "recruiter_screen";
+        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom" | "recruiter_screen" | "role_play";
         /** InterviewWithReadiness */
         InterviewWithReadiness: {
             interview: components["schemas"]["InterviewOut"];
@@ -7068,7 +7088,7 @@ export interface components {
             target_values?: string[];
             /**
              * Questions
-             * @description 6 to 10; a mini interview has 3.
+             * @description 6 to 10; a mini interview has 3. Role-play: 2 to 4 beats, a mini has 1.
              */
             questions: components["schemas"]["BriefQuestion"][];
             /** Probe Areas */
@@ -7076,9 +7096,14 @@ export interface components {
             persona: components["schemas"]["PersonaBrief"];
             /**
              * Max Probes Per Question
-             * @description IV-3.
+             * @description IV-3: at most 3. Role-play: the buyer's replies per beat, at most 8 (RP-6).
              */
             max_probes_per_question: number;
+            /**
+             * @description RP-3: the hidden buyer brief, for Role-play sessions only. Never shown to the candidate before the debrief.
+             * @default null
+             */
+            role_play: components["schemas"]["RolePlayBrief"] | null;
             /**
              * Company Summary
              * @description AP-2: a short company summary from an auto-generated profile, shown to the interviewer labeled auto-generated. None for curated profiles and generic mode.
@@ -8574,7 +8599,7 @@ export interface components {
          * @description IV-3 follow-up rules: what an answer lacks, so the interviewer probes.
          * @enum {string}
          */
-        ProbeTrigger: "own_role" | "measurable_result" | "concrete_example" | "tradeoff_reasoning" | "off_topic";
+        ProbeTrigger: "own_role" | "measurable_result" | "concrete_example" | "tradeoff_reasoning" | "off_topic" | "needs_discovery" | "objection_unresolved" | "no_value_link" | "no_next_step";
         /** ProfileDiff */
         ProfileDiff: {
             /**
@@ -9499,7 +9524,7 @@ export interface components {
          *     `strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`.
          * @enum {string}
          */
-        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other" | "infra_security" | "data_analytics" | "eng_management" | "finance" | "consulting_strategy" | "project_program";
+        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other" | "infra_security" | "data_analytics" | "eng_management" | "finance" | "consulting_strategy" | "project_program" | "sales";
         /** RoleModel */
         RoleModel: {
             /** Role */
@@ -9528,6 +9553,92 @@ export interface components {
             /** Interviews */
             interviews: components["schemas"]["InterviewWithReadiness"][];
         };
+        /**
+         * RolePlayBrief
+         * @description RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer
+         *     reads it to judge discovery and closing. Never shown to the candidate before the debrief.
+         */
+        RolePlayBrief: {
+            scenario: components["schemas"]["RolePlayScenario"];
+            /** Persona Name */
+            persona_name: string;
+            /** Persona Title */
+            persona_title: string;
+            /**
+             * Company Summary
+             * @description The buyer's company.
+             */
+            company_summary: string;
+            /**
+             * Product
+             * @description What the candidate sells.
+             */
+            product: string;
+            /**
+             * Product Illustrative
+             * @description D-9: true when the posting named no product and the planner described one.
+             * @default false
+             */
+            product_illustrative: boolean;
+            /**
+             * Situation
+             * @description Why this call is happening.
+             */
+            situation: string;
+            /**
+             * Hidden Pains
+             * @description Said only when good discovery earns them.
+             */
+            hidden_pains: string[];
+            /** Budget */
+            budget: string;
+            /** Decision Process */
+            decision_process: string;
+            /** Objections */
+            objections: components["schemas"]["RolePlayObjection"][];
+            /**
+             * Curveball
+             * @description Tough only (D-8).
+             */
+            curveball?: string | null;
+            /**
+             * Success Condition
+             * @description What earns the next step, e.g. a booked demo.
+             */
+            success_condition: string;
+        };
+        /**
+         * RolePlayDraft
+         * @description What the planner model returns for a role-play brief (RP-4). Code adds the scenario, the
+         *     persona, probe limits and the time plan.
+         */
+        RolePlayDraft: {
+            buyer: components["schemas"]["RolePlayBrief"];
+            /** Beats */
+            beats: components["schemas"]["DraftBeat"][];
+        };
+        /**
+         * RolePlayObjection
+         * @description One objection the buyer raises in a role-play (RP-3).
+         */
+        RolePlayObjection: {
+            /**
+             * Text
+             * @description What the buyer says.
+             */
+            text: string;
+            /**
+             * When
+             * @description When to raise it, e.g. "after the price".
+             */
+            when: string;
+        };
+        /**
+         * RolePlayScenario
+         * @description RP-4, D-5: the kind of sales call a role-play simulates.
+         * @enum {string}
+         */
+        RolePlayScenario: "cold_call" | "discovery_call" | "demo_objections" | "negotiation_close";
         /** RoleSummary */
         RoleSummary: {
             /**
@@ -9809,6 +9920,23 @@ export interface components {
             at: string | null;
         };
         /**
+         * SessionBuyer
+         * @description RP-8, RP-9: who Strova plays in a role-play. The hidden part (`reveal`) is sent only once
+         *     the session has ended, for the debrief; never while the call can still run.
+         */
+        SessionBuyer: {
+            /** Name */
+            name: string;
+            /** Title */
+            title: string;
+            /** Company Summary */
+            company_summary: string;
+            /** Product */
+            product: string;
+            /** @description The full buyer brief, after the session ended (RP-9). */
+            reveal?: components["schemas"]["RolePlayBrief"] | null;
+        };
+        /**
          * SessionChannel
          * @description PL-7. How the candidate and the interviewer talk. Text runs the same controller and
          *     interviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it.
@@ -9837,6 +9965,8 @@ export interface components {
              * @default as_company
              */
             tone: components["schemas"]["Tone"];
+            /** @description RP-4, D-5: the call to simulate; required for Role-play only. */
+            role_play?: components["schemas"]["RolePlayScenario"] | null;
         };
         /** SessionFeedbackIn */
         SessionFeedbackIn: {
@@ -9897,6 +10027,8 @@ export interface components {
              * @description Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise.
              */
             failure_reason?: string | null;
+            /** @description RP-8: the buyer Strova plays; role-play sessions only. */
+            buyer?: components["schemas"]["SessionBuyer"] | null;
         };
         /** SessionReplay */
         SessionReplay: {

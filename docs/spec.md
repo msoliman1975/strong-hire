@@ -184,7 +184,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | PL-7 | Text-only session mode behind a dev flag, so the interviewer runs as text when local voice is too slow; the simulated-candidate tests reuse it. | P0 |
 | PL-8 | Cloud-portable deployment: only Postgres, Redis and S3-compatible storage (MinIO locally). Hetzner is the default target; only provisioning scripts are provider-specific. | P0 |
 
-Role families (RF-1 to RF-15) are specified in `docs/role-families-spec.md`. Custom interviews (CU-1 to CU-12) are specified in `docs/custom-interview-spec.md`, and the admin app (AA, AO, AU, AT, OB, AL, OC, SM, AI) in `docs/admin-spec.md`.
+Role families (RF-1 to RF-15) are specified in `docs/role-families-spec.md`, and the role-play interview type with the sales family (RP-1 to RP-13) in `docs/role-play-spec.md`. Custom interviews (CU-1 to CU-12) are specified in `docs/custom-interview-spec.md`, and the admin app (AA, AO, AU, AT, OB, AL, OC, SM, AI) in `docs/admin-spec.md`.
 
 ### v2.0 requirements
 

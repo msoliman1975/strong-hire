@@ -79,7 +79,7 @@ async function seed() {
     id: "00000000-0000-4000-8000-00000000d001",
     job_target_id: job.id,
     resume_id: resume.id,
-    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 10, level: "senior", custom: null, tone: "as_company" },
+    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 10, level: "senior", custom: null, tone: "as_company", role_play: null },
     channel: "voice",
     brief_ready: true,
     status: "completed",
@@ -87,6 +87,7 @@ async function seed() {
     ended_at: "2026-10-03T10:10:00Z",
     minutes_billed: 10,
     failure_reason: null,
+    buyer: null,
   });
   return { job, resume, gap };
 }

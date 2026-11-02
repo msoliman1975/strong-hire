@@ -27,8 +27,10 @@ from strong_core.schemas.enums import (
 BANK_INTERVIEW_TYPES: tuple[InterviewType, ...] = (
     *STANDARD_INTERVIEW_TYPES,
     InterviewType.RECRUITER_SCREEN,
+    InterviewType.ROLE_PLAY,
 )
-"""The types a bank question can have: the four standard types and Recruiter screen (RS-1)."""
+"""The types a bank question can have: the four standard types, Recruiter screen (RS-1) and
+Role-play scenario cards (RP-12)."""
 
 
 def _bank_type(value: InterviewType) -> InterviewType:

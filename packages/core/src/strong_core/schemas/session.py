@@ -25,6 +25,7 @@ from strong_core.schemas.enums import (
     ProbeTrigger,
     QuestionSource,
     RoleFamily,
+    RolePlayScenario,
     Speaker,
     Tone,
 )
@@ -36,6 +37,13 @@ MINI_DURATION_MIN: Final = 10
 MINI_MAX_PROBES: Final = 1
 FULL_MIN_QUESTIONS: Final = 6
 FULL_MIN_COMPETENCIES: Final = 4
+MAX_PROBES: Final = 3
+"""IV-3: at most 3 follow-ups per question, for every type but role-play."""
+ROLE_PLAY_MAX_BEATS: Final = 4
+"""RP-4: a role-play call has 2 to 4 beats; a mini has one."""
+ROLE_PLAY_MAX_TURNS: Final = 8
+ROLE_PLAY_MINI_MAX_TURNS: Final = 6
+"""RP-6: the buyer's replies per beat. They are the beat's follow-ups, so the probe limit."""
 BRIEF_COMPANY_SUMMARY_MAX: Final = 1200
 """AP-2: longest company summary a brief carries; a longer auto-profile summary is cut."""
 
@@ -64,6 +72,13 @@ class SessionConfig(Contract):
         default=Tone.AS_COMPANY,
         description="TN-1: the interviewer's tone. as_company uses the profile persona's tone.",
     )
+    role_play: RolePlayScenario | None = Field(
+        default=None, description="RP-4, D-5: the call to simulate; required for Role-play only."
+    )
+
+    @property
+    def is_role_play(self) -> bool:
+        return self.interview_type == InterviewType.ROLE_PLAY
 
     @property
     def is_mini(self) -> bool:
@@ -75,6 +90,8 @@ class SessionConfig(Contract):
 
     @model_validator(mode="after")
     def _check(self) -> SessionConfig:
+        if self.is_role_play != (self.role_play is not None):
+            raise ValueError("a role-play session, and only one, needs a role_play scenario")
         if not self.is_custom:
             if self.custom is not None:
                 raise ValueError("only a custom session has a custom setup")
@@ -141,6 +158,41 @@ class PhaseTime(Contract):
     minutes: int = Field(ge=0, le=45)
 
 
+class RolePlayObjection(Contract):
+    """One objection the buyer raises in a role-play (RP-3)."""
+
+    text: str = Field(min_length=1, max_length=240, description="What the buyer says.")
+    when: str = Field(
+        min_length=1, max_length=160, description='When to raise it, e.g. "after the price".'
+    )
+
+
+class RolePlayBrief(Contract):
+    """RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer
+    reads it to judge discovery and closing. Never shown to the candidate before the debrief."""
+
+    scenario: RolePlayScenario
+    persona_name: str = Field(min_length=1, max_length=60)
+    persona_title: str = Field(min_length=1, max_length=80)
+    company_summary: str = Field(min_length=1, max_length=300, description="The buyer's company.")
+    product: str = Field(min_length=1, max_length=240, description="What the candidate sells.")
+    product_illustrative: bool = Field(
+        default=False,
+        description="D-9: true when the posting named no product and the planner described one.",
+    )
+    situation: str = Field(min_length=1, max_length=400, description="Why this call is happening.")
+    hidden_pains: list[str] = Field(
+        min_length=1, max_length=4, description="Said only when good discovery earns them."
+    )
+    budget: str = Field(min_length=1, max_length=200)
+    decision_process: str = Field(min_length=1, max_length=240)
+    objections: list[RolePlayObjection] = Field(min_length=1, max_length=4)
+    curveball: str | None = Field(default=None, max_length=240, description="Tough only (D-8).")
+    success_condition: str = Field(
+        min_length=1, max_length=200, description="What earns the next step, e.g. a booked demo."
+    )
+
+
 class InterviewerBrief(Contract):
     """Built by the planner before each session. The live interviewer reads only this."""
 
@@ -163,11 +215,22 @@ class InterviewerBrief(Contract):
         description="Company value names (Principle.name) to probe. Empty in generic mode.",
     )
     questions: list[BriefQuestion] = Field(
-        min_length=3, max_length=10, description="6 to 10; a mini interview has 3."
+        min_length=1,
+        max_length=10,
+        description="6 to 10; a mini interview has 3. Role-play: 2 to 4 beats, a mini has 1.",
     )
     probe_areas: list[str] = Field(default_factory=list)
     persona: PersonaBrief
-    max_probes_per_question: int = Field(ge=0, le=3, description="IV-3.")
+    max_probes_per_question: int = Field(
+        ge=0,
+        le=ROLE_PLAY_MAX_TURNS,
+        description="IV-3: at most 3. Role-play: the buyer's replies per beat, at most 8 (RP-6).",
+    )
+    role_play: RolePlayBrief | None = Field(
+        default=None,
+        description="RP-3: the hidden buyer brief, for Role-play sessions only. Never shown to "
+        "the candidate before the debrief.",
+    )
     company_summary: str | None = Field(
         default=None,
         max_length=BRIEF_COMPANY_SUMMARY_MAX,
@@ -216,6 +279,28 @@ class InterviewerBrief(Contract):
             raise ValueError("pushback is only allowed in Tough difficulty")
         if self.coach_help and self.session.mode != Mode.COACH:
             raise ValueError("coach_help is only allowed in Coach mode")
+        if self.session.is_role_play:
+            self._check_role_play()
+        else:
+            self._check_questions()
+        if self.time_plan:
+            phases = [p.phase for p in self.time_plan]
+            if len(phases) != len(set(phases)):
+                raise ValueError("time_plan lists a phase more than once")
+            total = sum(p.minutes for p in self.time_plan)
+            if total != self.session.duration_min:
+                raise ValueError(
+                    f"time_plan adds up to {total} minutes, not {self.session.duration_min}"
+                )
+        return self
+
+    def _check_questions(self) -> None:
+        if self.role_play is not None:
+            raise ValueError("only a role-play session has a buyer brief")
+        if self.max_probes_per_question > MAX_PROBES:
+            raise ValueError(f"at most {MAX_PROBES} probes per question")
+        if len(self.questions) < 3:
+            raise ValueError("an interview needs at least 3 questions")
         if self.session.is_mini:
             if self.curveball:
                 raise ValueError("a mini interview has no curveball")
@@ -228,16 +313,23 @@ class InterviewerBrief(Contract):
                 raise ValueError(
                     f"a full interview needs at least {FULL_MIN_COMPETENCIES} target competencies"
                 )
-        if self.time_plan:
-            phases = [p.phase for p in self.time_plan]
-            if len(phases) != len(set(phases)):
-                raise ValueError("time_plan lists a phase more than once")
-            total = sum(p.minutes for p in self.time_plan)
-            if total != self.session.duration_min:
-                raise ValueError(
-                    f"time_plan adds up to {total} minutes, not {self.session.duration_min}"
-                )
-        return self
+
+    def _check_role_play(self) -> None:
+        """RP-3, RP-4, RP-6: a buyer brief, 2 to 4 beats (1 in a mini) and the turn limits."""
+        if self.role_play is None:
+            raise ValueError("a role-play session needs a buyer brief")
+        if self.role_play.scenario != self.session.role_play:
+            raise ValueError("the buyer brief's scenario must be the session's")
+        beats = len(self.questions)
+        if self.session.is_mini:
+            if beats != 1:
+                raise ValueError("a mini role-play has one beat")
+            if self.max_probes_per_question > ROLE_PLAY_MINI_MAX_TURNS:
+                raise ValueError(f"a mini role-play allows {ROLE_PLAY_MINI_MAX_TURNS} buyer turns")
+        elif not 2 <= beats <= ROLE_PLAY_MAX_BEATS:
+            raise ValueError(f"a role-play has 2 to {ROLE_PLAY_MAX_BEATS} beats")
+        if self.role_play.curveball and self.session.difficulty != Difficulty.TOUGH:
+            raise ValueError("the buyer's curveball is only for Tough difficulty")
 
 
 class DraftQuestion(Contract):
@@ -261,6 +353,24 @@ class BriefDraft(Contract):
 
     questions: list[DraftQuestion] = Field(min_length=6, max_length=12)
     curveball: str | None = Field(default=None, description="Only asked for in Tough difficulty.")
+
+
+class DraftBeat(Contract):
+    """One beat of a role-play as the planner writes it (RP-4). The worker turns it into a
+    BriefQuestion: `opening` is what the buyer says to open the beat, `goal` stays hidden."""
+
+    id: str = Field(pattern=r"^[a-z0-9_-]+$")
+    opening: str = Field(min_length=1, max_length=300)
+    goal: str = Field(min_length=1, max_length=200, description="What the candidate should do.")
+    competencies: list[Competency] = Field(min_length=1, max_length=3)
+
+
+class RolePlayDraft(Contract):
+    """What the planner model returns for a role-play brief (RP-4). Code adds the scenario, the
+    persona, probe limits and the time plan."""
+
+    buyer: RolePlayBrief
+    beats: list[DraftBeat] = Field(min_length=1, max_length=ROLE_PLAY_MAX_BEATS)
 
 
 class Turn(Contract):

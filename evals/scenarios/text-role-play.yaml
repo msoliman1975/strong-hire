@@ -1,0 +1,163 @@
+name: text-role-play
+description: 'RP-11: one 10-minute text role-play per call type (cold call, discovery, demo and objections,
+  negotiation and close), with a sales posting and a seller CV. The AI candidate plays the seller (candidate/persona_role_play).'
+scenarios:
+- id: rp-cold-call
+  interview_type: role_play
+  role_play: cold_call
+  duration_min: 10
+  level: new_grad
+  quality: average
+  job_text: |-
+    Sales Development Representative
+    Brightline Payroll
+    Denver, CO
+
+    Brightline Payroll runs payroll for 6,000 small businesses. SDRs open conversations with new customers.
+
+    What you will do:
+    - Make 60 calls and send 40 emails a day to new prospects
+    - Qualify interest and book meetings for account executives
+    - Keep the CRM up to date
+    - Learn our product and our customers' payroll problems
+
+    What you need:
+    - Bachelor's degree or 1 year in a customer-facing job
+    - Clear phone manner
+    - Resilience and coachability
+
+    Nice to have:
+    - Salesforce
+    - Experience in SaaS
+  cv_text: |-
+    Riley Chen
+    riley.chen@example.com
+
+    Sales Development Representative, Northpeak HR (2025 to now)
+    - Booked 18 qualified meetings a month against a target of 15
+    - Made 60 calls a day; best reply rate on the team for a new email sequence
+
+    Customer Service Associate, Lakeview Bank (2023 to 2025)
+    - Handled 50 customer calls a day with a 96 percent satisfaction score
+
+    Skills: cold calling, Salesforce, Outreach
+- id: rp-discovery-call
+  interview_type: role_play
+  role_play: discovery_call
+  duration_min: 10
+  level: mid
+  quality: average
+  job_text: |-
+    Account Executive, Mid-Market
+    CargoLink
+    Chicago, IL
+
+    CargoLink sells shipment tracking software to freight brokers. Mid-market account executives own deals from first call to signature.
+
+    What you will do:
+    - Run discovery calls and product demos
+    - Build and manage a pipeline of 30 to 50 deals
+    - Negotiate pricing and close new business
+    - Forecast your quarter accurately
+
+    What you need:
+    - 3+ years closing B2B software deals
+    - A track record of meeting quota
+    - Discovery and demo skills
+    - Experience with a sales methodology such as MEDDICC
+
+    Nice to have:
+    - Logistics or freight industry experience
+    - HubSpot
+  cv_text: |-
+    Jordan Patel
+    jordan.patel@example.com
+
+    Account Executive, Fleetwise Software (2021 to now)
+    - Closed 1.4 million dollars in new business last year, 118 percent of quota
+    - Ran discovery and demos for mid-market logistics companies; average deal 45,000 dollars
+
+    Sales Development Representative, Fleetwise Software (2019 to 2021)
+    - Promoted after two years at 130 percent of meeting target
+
+    Skills: discovery, demos, MEDDICC, HubSpot
+- id: rp-demo-objections
+  interview_type: role_play
+  role_play: demo_objections
+  duration_min: 10
+  level: mid
+  quality: average
+  job_text: |-
+    Account Executive, Mid-Market
+    CargoLink
+    Chicago, IL
+
+    CargoLink sells shipment tracking software to freight brokers. Mid-market account executives own deals from first call to signature.
+
+    What you will do:
+    - Run discovery calls and product demos
+    - Build and manage a pipeline of 30 to 50 deals
+    - Negotiate pricing and close new business
+    - Forecast your quarter accurately
+
+    What you need:
+    - 3+ years closing B2B software deals
+    - A track record of meeting quota
+    - Discovery and demo skills
+    - Experience with a sales methodology such as MEDDICC
+
+    Nice to have:
+    - Logistics or freight industry experience
+    - HubSpot
+  cv_text: |-
+    Jordan Patel
+    jordan.patel@example.com
+
+    Account Executive, Fleetwise Software (2021 to now)
+    - Closed 1.4 million dollars in new business last year, 118 percent of quota
+    - Ran discovery and demos for mid-market logistics companies; average deal 45,000 dollars
+
+    Sales Development Representative, Fleetwise Software (2019 to 2021)
+    - Promoted after two years at 130 percent of meeting target
+
+    Skills: discovery, demos, MEDDICC, HubSpot
+- id: rp-negotiation-close
+  interview_type: role_play
+  role_play: negotiation_close
+  duration_min: 10
+  level: senior
+  quality: average
+  job_text: |-
+    Senior Enterprise Account Executive
+    Sentinel Data
+    New York, NY (hybrid)
+
+    Sentinel Data sells data security software to large banks and insurers. Enterprise deals take 6 to 12 months.
+
+    What you will do:
+    - Own a territory of 25 enterprise accounts
+    - Lead complex deals with many buyers and a procurement team
+    - Build mutual close plans with champions
+    - Work with sales engineers on demos and security reviews
+
+    What you need:
+    - 7+ years in enterprise software sales
+    - Closed deals above 500,000 dollars
+    - Selling to financial services
+    - Forecast accuracy
+
+    Nice to have:
+    - Security or compliance products
+    - MEDDICC or Challenger training
+  cv_text: |-
+    Morgan Ellis
+    morgan.ellis@example.com
+
+    Enterprise Account Executive, Vaultline Security (2017 to now)
+    - Closed three deals above 1 million dollars with banks, each with a 9-month cycle
+    - Built mutual close plans with champions in IT security and procurement
+
+    Account Executive, Brightdesk (2013 to 2017)
+    - 110 percent of quota on average over four years
+
+    Skills: enterprise sales, negotiation, Challenger, Salesforce

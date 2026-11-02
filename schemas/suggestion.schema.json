@@ -26,7 +26,11 @@
         "estimation_logic",
         "prioritization",
         "recommendation",
-        "logistics_and_expectations"
+        "logistics_and_expectations",
+        "discovery",
+        "objection_handling",
+        "value_articulation",
+        "closing"
       ],
       "title": "Competency",
       "type": "string"

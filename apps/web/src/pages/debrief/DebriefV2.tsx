@@ -1,3 +1,4 @@
+import { BuyerReveal } from "./BuyerReveal";
 import "./debrief.css";
 import "../../components/ux/ux.css";
 
@@ -77,6 +78,7 @@ export function DebriefV2({
         coach={config.mode === "coach"}
       />
 
+      <BuyerReveal buyer={session.buyer} />
       <AnswerList answers={scorecard.per_question} />
       <DeliveryMetrics scorecard={scorecard} />
 

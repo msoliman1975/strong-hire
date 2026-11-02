@@ -1,0 +1,25 @@
+{
+  "company_name": "Brightline Payroll",
+  "title": "Sales Development Representative",
+  "role_family": "sales",
+  "level": "new_grad",
+  "level_label": "Representative",
+  "team": "Sales Development",
+  "location": "Denver, CO",
+  "must_have_skills": [
+    "Bachelor's degree or 1 year in a customer-facing job",
+    "Clear phone manner",
+    "Resilience and coachability"
+  ],
+  "nice_to_have_skills": [
+    "Salesforce",
+    "Experience in SaaS"
+  ],
+  "responsibilities": [
+    "Make 60 calls and send 40 emails a day to new prospects",
+    "Qualify interest and book meetings for account executives",
+    "Keep the CRM up to date",
+    "Learn our product and our customers' payroll problems"
+  ],
+  "source_url": null
+}
