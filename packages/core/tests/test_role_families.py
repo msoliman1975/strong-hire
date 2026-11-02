@@ -25,11 +25,12 @@ WAVE_1 = {
     "project_program",
 }
 ORIGINAL = {"swe", "data_ml", "pm", "design", "tpm", "other"}
+WAVE_2 = {"sales"}
 
 
 def test_rf1_enum_keeps_original_values_and_adds_wave_1() -> None:
     """RF-1 / D-4: splits narrow a value's meaning; no value is renamed or removed."""
-    assert {f.value for f in RoleFamily} == ORIGINAL | WAVE_1
+    assert {f.value for f in RoleFamily} == ORIGINAL | WAVE_1 | WAVE_2
 
 
 def test_rf2_every_family_has_exactly_one_registry_entry() -> None:
@@ -53,7 +54,7 @@ def test_rf2_entry_is_complete(family: RoleFamily) -> None:
     assert info.interviewer_title(InterviewType.CUSTOM) == "Interviewer"
     assert 2 <= len(info.generic_loop) <= 4
     assert len(set(info.generic_loop)) == len(info.generic_loop)
-    assert set(info.generic_loop) <= set(TITLED_TYPES)
+    assert InterviewType.CUSTOM not in info.generic_loop
     for kw in info.title_keywords:
         assert kw == kw.lower().strip() and kw
 

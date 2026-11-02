@@ -22,6 +22,7 @@ export const ROLE_LABELS: Record<string, string> = {
   finance: "finance",
   consulting_strategy: "consulting and strategy",
   project_program: "project and program manager",
+  sales: "sales",
 };
 
 const TYPE_LABELS: Record<string, string> = {

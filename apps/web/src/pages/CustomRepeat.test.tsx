@@ -35,6 +35,7 @@ const CUSTOM_CONFIG: SessionConfig = {
   duration_min: 30,
   level: "senior",
   tone: "as_company",
+  role_play: null,
   custom: {
     categories: [
       { category: "behavioral", share: 0.5, focus: ["Conflict with a peer"] },

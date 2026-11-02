@@ -7,7 +7,11 @@
         "measurable_result",
         "concrete_example",
         "tradeoff_reasoning",
-        "off_topic"
+        "off_topic",
+        "needs_discovery",
+        "objection_unresolved",
+        "no_value_link",
+        "no_next_step"
       ],
       "title": "ProbeTrigger",
       "type": "string"

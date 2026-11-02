@@ -33,6 +33,7 @@ const COMPETENCIES: Record<Kind, Competency[]> = {
   technical_qa: ["technical_depth", "accuracy", "reasoning", "trade_offs", "clarity_of_explanation"],
   case: ["problem_framing", "structure", "user_and_business_sense", "estimation_logic", "prioritization", "recommendation"],
   recruiter_screen: ["motivation", "communication", "role_fit", "logistics_and_expectations"],
+  role_play: ["discovery", "objection_handling", "value_articulation", "closing", "communication"],
   custom: [],
 };
 
@@ -42,6 +43,7 @@ const TITLES: Record<Kind, string> = {
   technical_qa: "Senior Engineer",
   case: "Product Lead",
   recruiter_screen: "Recruiter",
+  role_play: "Buyer",
   custom: "Interviewer",
 };
 
@@ -51,6 +53,7 @@ const DESCRIPTIONS: Record<Kind, string> = {
   technical_qa: "Talk through technical topics: depth, accuracy and trade-offs.",
   case: "Work a business or product problem out loud, with a recommendation.",
   recruiter_screen: "Motivation, background and logistics, in a short first call.",
+  role_play: "A mock sales call: Strova plays the buyer and you lead.",
   custom: "Your own mix of question types and questions.",
 };
 

@@ -6,7 +6,7 @@ import { apiClient, unwrap } from "./client";
 import type { BankCompany, Competency, Level, QuestionList, RoleFamily, StandardType } from "./types";
 
 /** A type the bank can filter by: the four standard types, and Recruiter screen (RS-1). */
-export type BankType = StandardType | "recruiter_screen";
+export type BankType = StandardType | "recruiter_screen" | "role_play";
 
 /** `company` is a company slug, "general" for general questions only, or null for all. */
 export interface QuestionFilter {
@@ -57,4 +57,6 @@ export const COMPETENCIES_BY_TYPE: Record<BankType, Competency[]> = {
   ],
   // RS-1: shares motivation, role fit and communication with the types above.
   recruiter_screen: ["motivation", "role_fit", "communication", "logistics_and_expectations"],
+  // RP-1: role-play scores the sales call; it shares communication.
+  role_play: ["discovery", "objection_handling", "value_articulation", "closing", "communication"],
 };

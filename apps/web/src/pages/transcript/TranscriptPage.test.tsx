@@ -34,7 +34,7 @@ const debrief: Debrief = {
   session: {
     id: "s1",
     job_target_id: "j1",
-    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null, tone: "as_company" },
+    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null, tone: "as_company", role_play: null },
     status: "completed",
     started_at: "2026-10-01T10:00:00Z",
     ended_at: "2026-10-01T10:30:00Z",

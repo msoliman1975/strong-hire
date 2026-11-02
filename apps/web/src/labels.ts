@@ -18,6 +18,7 @@ export const interviewTypeLabel: Record<InterviewType, string> = {
   case: "Case",
   custom: "Custom",
   recruiter_screen: "Recruiter screen",
+  role_play: "Sales role-play",
 };
 
 export const interviewTypeHint: Record<InterviewType, string> = {
@@ -27,6 +28,7 @@ export const interviewTypeHint: Record<InterviewType, string> = {
   case: "Product sense, estimation or system thinking.",
   custom: "Mix question types, pick focus topics and add your own questions.",
   recruiter_screen: "Why this role, your background, and pay and timing.",
+  role_play: "A mock sales call: Strova plays the buyer and you lead.",
 };
 
 export const difficultyLabel: Record<Difficulty, string> = {
@@ -80,6 +82,7 @@ export const roleFamilyLabel: Record<RoleFamily, string> = {
   finance: "Finance",
   consulting_strategy: "Consulting and strategy",
   project_program: "Project and program management",
+  sales: "Sales",
   other: "Other",
 };
 

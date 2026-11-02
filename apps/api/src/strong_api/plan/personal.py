@@ -64,6 +64,7 @@ TYPE_NAME: dict[InterviewType, str] = {
     InterviewType.TECHNICAL_QA: "Technical Q&A",
     InterviewType.CASE: "Case",
     InterviewType.RECRUITER_SCREEN: "Recruiter screen",
+    InterviewType.ROLE_PLAY: "Sales role-play",
     InterviewType.CUSTOM: "Custom",
 }
 # Story items come from the skills that stories prove: the behavioral and hiring manager ones.

@@ -157,6 +157,7 @@ export function SessionSetupPage() {
       level: chosenLevel,
       custom: isCustom ? custom.spec() : null,
       tone: "as_company", // TN-1: S11 adds the tone picker
+      role_play: null, // RP-8: the scenario picker comes with the role-play UI
     });
   };
 

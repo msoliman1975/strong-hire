@@ -894,7 +894,11 @@ export function sessionHandlers(store: MockStore) {
         id: newId(),
         job_target_id: body.job_target_id,
         resume_id: body.resume_id ?? readyCv,
-        config: { ...body.config, custom: withCustomDefaults(body.config.custom) },
+        config: {
+          ...body.config,
+          custom: withCustomDefaults(body.config.custom),
+          role_play: body.config.role_play ?? null,
+        },
         channel: body.channel ?? "voice",
         brief_ready: true,
         status: "created",
