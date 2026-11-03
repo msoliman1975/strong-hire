@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Resumes list</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
+<style>
+body{margin:0;background:#f4f3f8}
+a{color:#3d22c4}a:hover{color:#5332e6}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid transparent;background:#5332e6;color:#fff;font:inherit;font-weight:600;font-size:13.5px;text-decoration:none;cursor:pointer;box-sizing:border-box}
+.btn:hover{background:#3d22c4;color:#fff}
+.btn.lg{min-height:42px;padding:0 18px;font-size:14.5px}
+.btn.ghost{background:transparent;color:#17161f;border-color:#c9c5d6;font-weight:500}
+.btn.ghost:hover{background:#ecebf2;color:#17161f}
+.btn.quiet{background:transparent;color:#5e5b6b;font-weight:500;padding:0 10px}
+.btn.quiet:hover{background:#ecebf2;color:#17161f}
+.btn.danger:hover{background:#fbe7e3;color:#9a2c1b}
+.rail a{display:block;padding:8px 12px;border-radius:10px;color:#3c3a48;text-decoration:none;font-size:14.5px}
+.rail a.on{background:#eeeafe;color:#3d22c4;font-weight:600}
+@media (max-width:760px){.grid2{grid-template-columns:minmax(0,1fr) !important}.stats{gap:6px !important}}
+</style>
+</helmet>
+<div style="display:flex;flex-wrap:wrap;min-height:100vh;font-family:'Geist',system-ui,sans-serif;font-size:15px;line-height:1.5;color:#17161f;background:#f4f3f8">
+  <nav class="rail" aria-label="Main" style="flex:1 1 232px;max-width:232px;box-sizing:border-box;background:#fff;border-right:1px solid #e2e0ea;padding:20px 14px;display:flex;flex-direction:column;gap:4px">
+    <strong style="font-size:17px;padding:0 12px 14px">Strong Hire</strong>
+    <a href="#">Home</a>
+    <a href="#" class="on" aria-current="page">Mohamed's Resumes</a>
+    <a href="#">Target roles</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:32px 24px 64px">
+    <div style="max-width:1040px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <h1 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-0.02em">Mohamed's Resumes</h1>
+        <a class="btn lg" href="#">Add a resume</a>
+      </div>
+      <p style="margin:0;color:#5e5b6b">Your default resume feeds your story ideas and is used for new target roles. Use other resumes for roles where you sent a different version.</p>
+      <p style="margin:0;color:#5e5b6b;font-size:13.5px">3 of 5 · up to 1 MB each</p>
+
+      <div class="grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch">
+
+        <!-- Default resume, with high issues -->
+        <section aria-labelledby="r1" style="background:#fff;border:1px solid #e2e0ea;border-radius:16px;padding:20px 22px 14px;display:flex;flex-direction:column;gap:14px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <h2 id="r1" style="margin:0;font-size:19px;font-weight:700">Senior SWE resume</h2>
+            <span style="display:inline-flex;padding:2px 10px;border-radius:999px;font-size:12.5px;background:#17161f;color:#fff;font-weight:600">Default</span>
+          </div>
+          <dl class="stats" style="margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+            <div style="background:#f4f3f8;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column-reverse">
+              <dt style="font-size:12.5px;color:#5e5b6b">roles</dt>
+              <dd style="margin:0;font:600 26px/1.1 'Geist Mono',ui-monospace,monospace">7</dd>
+            </div>
+            <div style="background:#fdeedc;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column-reverse">
+              <dt style="font-size:12.5px;color:#8a4200">open issues</dt>
+              <dd style="margin:0;font:600 26px/1.1 'Geist Mono',ui-monospace,monospace;color:#8a4200;display:flex;align-items:center;gap:6px" title="Includes high-severity issues">
+                <svg width="14" height="14" viewBox="0 0 14 14" role="img" aria-label="Includes high-severity issues"><path d="M7 2 L13 12 H1 Z" fill="#a34d00"></path></svg>4
+              </dd>
+            </div>
+            <div style="background:#f4f3f8;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column-reverse">
+              <dt style="font-size:12.5px;color:#5e5b6b">story ideas</dt>
+              <dd style="margin:0;font:600 26px/1.1 'Geist Mono',ui-monospace,monospace">18</dd>
+            </div>
+          </dl>
+          <p style="margin:0;font-size:13.5px;color:#5e5b6b">Added Oct 28, 2026 · Edited Oct 28</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #e2e0ea;padding-top:12px;margin-top:auto">
+            <a class="btn" href="CheckA.dc.html">Show details</a>
+            <div style="display:flex;gap:2px;flex-wrap:wrap">
+              <button type="button" class="btn quiet" aria-label="Rename Senior SWE resume">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2.5l2.5 2.5L6 12.5H3.5V10z"></path></svg>Rename
+              </button>
+              <button type="button" class="btn quiet danger" aria-label="Delete Senior SWE resume">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5h11M6 4.5V3h4v1.5M4 4.5l.7 9h6.6l.7-9"></path></svg>Delete
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Other resume, no high issues -->
+        <section aria-labelledby="r2" style="background:#fff;border:1px solid #e2e0ea;border-radius:16px;padding:20px 22px 14px;display:flex;flex-direction:column;gap:14px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <h2 id="r2" style="margin:0;font-size:19px;font-weight:700">Platform lead resume</h2>
+          </div>
+          <dl class="stats" style="margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+            <div style="background:#f4f3f8;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column-reverse">
+              <dt style="font-size:12.5px;color:#5e5b6b">role</dt>
+              <dd style="margin:0;font:600 26px/1.1 'Geist Mono',ui-monospace,monospace">1</dd>
+            </div>
+            <div style="background:#f4f3f8;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column-reverse">
+              <dt style="font-size:12.5px;color:#5e5b6b">open issues</dt>
+              <dd style="margin:0;font:600 26px/1.1 'Geist Mono',ui-monospace,monospace">2</dd>
+            </div>
+            <div style="background:#f4f3f8;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column-reverse">
+              <dt style="font-size:12.5px;color:#5e5b6b">story ideas</dt>
+              <dd style="margin:0;font:600 26px/1.1 'Geist Mono',ui-monospace,monospace">9</dd>
+            </div>
+          </dl>
+          <p style="margin:0;font-size:13.5px;color:#5e5b6b">Added Sep 12, 2026 · Edited Oct 3</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #e2e0ea;padding-top:12px;margin-top:auto">
+            <a class="btn" href="CheckA.dc.html">Show details</a>
+            <div style="display:flex;gap:2px;flex-wrap:wrap">
+              <button type="button" class="btn quiet" aria-label="Set Platform lead resume as default">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M8 2l1.8 3.8 4.2.5-3.1 2.9.8 4.1L8 11.3 4.3 13.3l.8-4.1L2 6.3l4.2-.5z"></path></svg>Set as default
+              </button>
+              <button type="button" class="btn quiet" aria-label="Rename Platform lead resume">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2.5l2.5 2.5L6 12.5H3.5V10z"></path></svg>Rename
+              </button>
+              <button type="button" class="btn quiet danger" aria-label="Delete Platform lead resume">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5h11M6 4.5V3h4v1.5M4 4.5l.7 9h6.6l.7-9"></path></svg>Delete
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Still being read -->
+        <section aria-labelledby="r3" style="background:#fff;border:1px solid #e2e0ea;border-radius:16px;padding:20px 22px 14px;display:flex;flex-direction:column;gap:14px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <h2 id="r3" style="margin:0;font-size:19px;font-weight:700">Data engineering resume</h2>
+            <span style="display:inline-flex;padding:2px 10px;border-radius:999px;font-size:12.5px;background:#eeeafe;color:#3d22c4">Being read</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px" aria-hidden="true">
+            <div style="background:#f4f3f8;border-radius:12px;height:62px"></div>
+            <div style="background:#f4f3f8;border-radius:12px;height:62px"></div>
+            <div style="background:#f4f3f8;border-radius:12px;height:62px"></div>
+          </div>
+          <p style="margin:0;font-size:13.5px;color:#5e5b6b">Strova is reading this resume. The numbers show when she is done.</p>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #e2e0ea;padding-top:12px;margin-top:auto">
+            <button type="button" class="btn quiet" aria-label="Rename Data engineering resume">Rename</button>
+            <button type="button" class="btn quiet danger" aria-label="Delete Data engineering resume">Delete</button>
+          </div>
+        </section>
+
+        <!-- Free slot -->
+        <a href="#" style="border:1px dashed #c9c5d6;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:200px;color:#5e5b6b;text-decoration:none;text-align:center">
+          <span style="font-size:28px;line-height:1;color:#5332e6" aria-hidden="true">+</span>
+          <strong style="color:#17161f">Add a resume</strong>
+          <span style="font-size:13.5px">2 slots left. Add the version you sent for a role.</span>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

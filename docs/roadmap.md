@@ -17,6 +17,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | RMAP-6 | Waitlist: a confirmed address that joins again gets no email | api | Now | Done |
 | RMAP-7 | Story crafting with Strova: more room to type, and formatting | web, prompts | Now | Planned (in RMAP-8) |
 | RMAP-8 | Deep story crafting: STAR and CARL, organized slots, depth, flow check, improve | core, api, prompts, web | Now | Planned |
+| RMAP-9 | Resume screens: two-column lists, one guided check page | web | Now | Planned |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -271,3 +272,21 @@ SC-17 and SC-18.
 **Delivery:** a loop session builds it unattended, in nine PRs (SC00 to SC08), following
 `docs/story-crafting/execution-plan.md` and `docs/story-crafting/prompts/LOOP.md`.
 
+## RMAP-9: Resume screens redesign
+
+**Recorded:** 2026-11-03
+
+**What:**
+
+- The Resumes list becomes two columns of cards. Each card has three numbers (roles, open issues,
+  story ideas) and visible Show details, Set as default, Rename and Delete buttons.
+- Target roles use the same card shell.
+- The resume detail page is retired. Check your resume absorbs it as a guided page with four
+  steps: your career journey, Strova's findings, stories to tell in interviews, and stronger
+  resume lines. Less-used details move to drawers.
+
+**Design:** `docs/resume-screens/spec.md`, with the gap report, decisions D-1 to D-10 and
+requirements RS-1 to RS-16. The owner approved it, and the mockups, on 2026-11-03.
+
+**Delivery:** a loop session builds it unattended, in seven PRs (RS00 to RS06), following
+`docs/resume-screens/execution-plan.md` and `docs/resume-screens/prompts/LOOP.md`. Web only.
