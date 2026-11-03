@@ -71,21 +71,35 @@ async function signUp(page: Page, email: string) {
  * The default resume has a high-severity finding (Studio Nine ends before it starts), a 9-month
  * gap before Shoply and a missing start date (Freelance), so every finding kind shows.
  */
+interface SeedRole {
+  company: string;
+  title: string;
+  start: string | null;
+  end: string | null;
+  achievements: string[];
+  skills: string[];
+}
+interface SeedResume {
+  id: string;
+  resume: { roles: SeedRole[] } | null;
+}
+
 async function seed(page: Page) {
   return page.evaluate(
     async ([text, posting]) => {
       const json = { "content-type": "application/json" };
-      const upload = async (t: string) => {
+      const upload = async (t: string): Promise<SeedResume & { resume: NonNullable<SeedResume["resume"]> }> => {
         const form = new FormData();
         form.append("text", t);
-        const { resume } = await (await fetch("/api/resumes", { method: "POST", body: form })).json();
-        let record;
+        const { resume } = (await (await fetch("/api/resumes", { method: "POST", body: form })).json()) as { resume: { id: string } };
+        let record: SeedResume = { id: resume.id, resume: null };
         for (let i = 0; i < 40; i += 1) {
-          record = await (await fetch(`/api/resumes/${resume.id}`)).json();
+          record = (await (await fetch(`/api/resumes/${resume.id}`)).json()) as SeedResume;
           if (record.resume) break;
           await new Promise((ok) => setTimeout(ok, 250));
         }
-        return record;
+        if (!record.resume) throw new Error("The mock did not read the resume.");
+        return record as SeedResume & { resume: NonNullable<SeedResume["resume"]> };
       };
       const main = await upload(text);
       const r = main.resume;
@@ -97,10 +111,12 @@ async function seed(page: Page) {
       await fetch(`/api/resumes/${main.id}`, { method: "PUT", headers: json, body: JSON.stringify({ resume: r }) });
       await fetch(`/api/resumes/${main.id}`, { method: "PATCH", headers: json, body: JSON.stringify({ name: "Senior SWE resume" }) });
       const other = await upload(text.replace("Ana Lopez", "Ana Lopez (platform)"));
-      const created = await (await fetch("/api/job-targets", { method: "POST", headers: json, body: JSON.stringify({ text: posting }) })).json();
+      const created = (await (await fetch("/api/job-targets", { method: "POST", headers: json, body: JSON.stringify({ text: posting }) })).json()) as {
+        job_target: { id: string };
+      };
       const jobId = created.job_target.id;
       for (let i = 0; i < 20; i += 1) {
-        const j = await (await fetch(`/api/job-targets/${jobId}`)).json();
+        const j = (await (await fetch(`/api/job-targets/${jobId}`)).json()) as { posting?: { title?: string | null } | null };
         if (j.posting?.title) break;
         await new Promise((ok) => setTimeout(ok, 250));
       }
@@ -129,12 +145,12 @@ async function visit(page: Page, path: string) {
 /** RSD-15: no WCAG 2.1 A or AA violation and no horizontal scroll. */
 async function check(page: Page, name: string) {
   // Let the drawer's slide-in finish: mid-fade text would read as low contrast.
-  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))));
+  await page.evaluate("Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined)))");
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/rs-${name}.png`, fullPage: true });
   const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   const found = violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
   expect.soft(found, `accessibility of ${name}`).toEqual([]);
-  const scroll = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const scroll = Number(await page.evaluate("document.documentElement.scrollWidth - window.innerWidth"));
   expect.soft(scroll, `horizontal scroll on ${name}`).toBeLessThanOrEqual(0);
 }
 
