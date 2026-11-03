@@ -17,7 +17,8 @@ import { useSuggestions } from "../../api/suggestions";
 import type { Resume } from "../../api/types";
 import { ErrorNotice, Steps } from "../../components/ui";
 import { contextPath, newJobPath } from "../../paths";
-import { resumePath as legacyResumePath, usingRoleCount } from "../resumes/ResumesListPage";
+import { usingRoleCount } from "../resumes/ResumesListPage";
+import { addRolePath, dateChip, rolePath, roleTitle } from "../roles/shared";
 import { START } from "../start/paths";
 import { useAcceptedIssues } from "./acceptedIssues";
 import { CareerStrip } from "./check/CareerStrip";
@@ -33,7 +34,10 @@ import {
   type CvRole,
   type RoleErrors,
 } from "./check/draft";
-import { FindingsStep, orderFindings, WhatStrovaChecks } from "./check/FindingsStep";
+import { Drawer } from "./check/Drawer";
+import { AcceptedList, FindingsStep, orderFindings, WhatStrovaChecks } from "./check/FindingsStep";
+import { LinesStep } from "./check/LinesStep";
+import { StoriesStep } from "./check/StoriesStep";
 import { JourneyStep } from "./check/JourneyStep";
 import { CHECK_STEPS, defaultStep, ONBOARDING_STEPS, parseStep, StepList, type CheckStep, type StepInfo } from "./check/StepList";
 import { checkResume, thisMonth, type ResumeIssue } from "./resumeChecks";
@@ -126,8 +130,8 @@ export function ResumeCheckV2({
   const [madeMain, setMadeMain] = useState(false);
   /** The finding shown on step 2, by key; the first one when unset or gone. */
   const [findingKey, setFindingKey] = useState<string | null>(null);
-  const [acceptedOpen, setAcceptedOpen] = useState(false);
-  const [checksOpen, setChecksOpen] = useState(false);
+  /** RSD-14: the open drawer, if any. */
+  const [drawer, setDrawer] = useState<"roles" | "accepted" | "checks" | null>(null);
 
   // The checks read what the user sees, open editors included.
   const live = useMemo(
@@ -438,26 +442,33 @@ export function ResumeCheckV2({
   const footerLinks = (
     <>
       {usedBy > 0 && (
-        <Link className="cvc-link" to="/roles">
+        <button type="button" className="cvc-link" aria-haspopup="dialog" onClick={() => setDrawer("roles")}>
           {usedBy} {usedBy === 1 ? "role uses" : "roles use"} this resume ›
-        </Link>
+        </button>
       )}
-      <button
-        type="button"
-        className="cvc-link"
-        onClick={() => {
-          setAcceptedOpen(true);
-          goStep("findings");
-        }}
-      >
+      <button type="button" className="cvc-link" aria-haspopup="dialog" onClick={() => setDrawer("accepted")}>
         Findings you accepted · {acceptedFindings.length} ›
       </button>
-      <button type="button" className="cvc-link" aria-expanded={checksOpen} onClick={() => setChecksOpen((o) => !o)}>
+      <button type="button" className="cvc-link" aria-haspopup="dialog" onClick={() => setDrawer("checks")}>
         What Strova checks ›
       </button>
-      {checksOpen && <WhatStrovaChecks />}
     </>
   );
+  // RSD-14: the active roles whose interviews use this resume (the rule behind the count, D-4).
+  const usingRoles = (roles.data ?? []).filter(
+    (r) => !r.role.archived && r.interviews.some((i) => i.interview.resume_id === resumeId),
+  );
+  /** RSD-12: after a rewrite is added or undone, step 1 shows the saved resume again. */
+  const reloadSaved = async () => {
+    const record = await resumesApi.get(resumeId);
+    queryClient.setQueryData(keys.resume(resumeId), record);
+    if (record.resume) {
+      setDraft(toCvDraft(record.resume));
+      setEditing({});
+      setRoleErrors({});
+      setAdded(new Set());
+    }
+  };
 
   const nextCard = (
     <section className="cvc-card cvc-next" aria-label="Next step">
@@ -509,9 +520,15 @@ export function ResumeCheckV2({
             {usedBy > 0 && (
               <>
                 {" · "}
-                <Link className="cvc-link cvc-link--inline" to="/roles" data-testid="used-by">
+                <button
+                  type="button"
+                  className="cvc-link cvc-link--inline"
+                  data-testid="used-by"
+                  aria-haspopup="dialog"
+                  onClick={() => setDrawer("roles")}
+                >
                   Used by {usedBy} {usedBy === 1 ? "role" : "roles"}
-                </Link>
+                </button>
               </>
             )}
           </p>
@@ -581,7 +598,6 @@ export function ResumeCheckV2({
           {step === "findings" && (
             <FindingsStep
               findings={findings}
-              acceptedFindings={acceptedFindings}
               current={findingIndex}
               onSelect={selectFinding}
               roles={live.roles}
@@ -598,23 +614,10 @@ export function ResumeCheckV2({
               onAddSkills={addSkills}
               onFixElsewhere={fix}
               onOpenJourney={() => goStep("journey")}
-              acceptedOpen={acceptedOpen}
-              onAcceptedOpen={setAcceptedOpen}
             />
           )}
-          {(step === "stories" || step === "lines") && (
-            <section className="cvc-step-view cvc-card cvc-placeholder" aria-labelledby="cvc-later-h">
-              <h2 id="cvc-later-h">{step === "stories" ? "Stories to tell in interviews" : "Stronger resume lines"}</h2>
-              <p className="muted">
-                {step === "stories"
-                  ? "Strova's story ideas from this resume move to this step soon. For now they are on the resume page."
-                  : "Strova's resume-line rewrites from your stories move to this step soon. For now they are on the resume page."}
-              </p>
-              <Link className="btn btn--secondary" to={legacyResumePath(resumeId)}>
-                Open the resume page
-              </Link>
-            </section>
-          )}
+          {step === "stories" && <StoriesStep resumeId={resumeId} />}
+          {step === "lines" && <LinesStep resumeId={resumeId} onResumeChanged={() => void reloadSaved()} />}
           {step !== "journey" && (
             <CareerStrip
               roles={live.roles}
@@ -626,6 +629,43 @@ export function ResumeCheckV2({
           {step === "findings" && onboarding && nextCard}
         </div>
       </div>
+
+      <Drawer
+        open={drawer === "roles"}
+        title={`Used by ${usingRoles.length} ${usingRoles.length === 1 ? "role" : "roles"}`}
+        onClose={() => setDrawer(null)}
+      >
+        <p className="muted small">These roles rehearse with this resume. Edits here change what their interviewers read.</p>
+        <ul className="cvc-drawer__rows" aria-label="Roles that use this resume">
+          {usingRoles.map(({ role }) => (
+            <li key={role.id} className="cvc-drawer__row">
+              <span className="cvc-drawer__who">
+                <b>{role.company_name ?? roleTitle(role)}</b>
+                {role.company_name && <span className="muted small">{role.title ?? role.name}</span>}
+              </span>
+              <span className="row">
+                <span className="sx-chip">{dateChip(role).text}</span>
+                <Link to={rolePath(role.id)} aria-label={`Open ${roleTitle(role)}`}>
+                  Open
+                </Link>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <Link className="btn btn--secondary btn--small" to={addRolePath}>
+          Add a target role with this resume
+        </Link>
+      </Drawer>
+      <Drawer
+        open={drawer === "accepted"}
+        title={`Findings you accepted · ${acceptedFindings.length}`}
+        onClose={() => setDrawer(null)}
+      >
+        <AcceptedList findings={acceptedFindings} accepted={accepted} />
+      </Drawer>
+      <Drawer open={drawer === "checks"} title="What Strova checks" onClose={() => setDrawer(null)}>
+        <WhatStrovaChecks />
+      </Drawer>
     </div>
   );
 }

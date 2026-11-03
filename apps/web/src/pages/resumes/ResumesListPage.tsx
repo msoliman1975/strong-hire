@@ -27,7 +27,8 @@ import { START } from "../start/paths";
 /** "1 slot left.", "2 slots left." */
 const slotsLeft = (n: number) => `${n} ${n === 1 ? "slot" : "slots"} left.`;
 
-export const resumePath = (id: string) => `/resumes/${id}`;
+/** RSD-6: the one resume page is the check page. */
+export const resumePath = (id: string) => resumeCheckPath(id);
 
 /** "a, b and c". */
 const andList = (items: string[]) =>

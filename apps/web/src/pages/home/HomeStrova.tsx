@@ -17,6 +17,7 @@ import { useSuggestions } from "../../api/suggestions";
 import type { PersonalPlan, PlanGroup, PlanItem } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
+import { resumeCheckPath } from "../../paths";
 import { displayStatusLabel, useStories, type DisplayStatus } from "../stories/api";
 
 type Kind = PlanItem["kind"];
@@ -273,7 +274,7 @@ function SummaryCards() {
     .join(" · ");
   return (
     <div className="home-strova__cards" aria-label="Summary" role="region">
-      <Link className="sx-card tight home-strova__card" to={main ? `/resumes/${main.id}` : "/resumes"}>
+      <Link className="sx-card tight home-strova__card" to={main ? resumeCheckPath(main.id) : "/resumes"}>
         <div className="sx-eyebrow plain">{first ? `${first}'s Resumes` : "Your resumes"}</div>
         {main ? (
           <>
