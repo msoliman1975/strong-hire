@@ -194,7 +194,7 @@ test("RSD-1 to RSD-14: Resumes, the guided check page and Target roles work toge
   await expect(step(page, /Your career journey/)).toHaveAttribute("aria-current", "step");
   await page.getByRole("button", { name: "Edit Software Engineer II · Shoply" }).click();
   const editor = page.getByRole("group", { name: "Editing · Software Engineer II · Shoply" });
-  await editor.getByLabel("Achievement 1 at Software Engineer II · Shoply").fill("Built the refunds API used by 40,000 merchants in 12 countries");
+  await editor.getByRole("textbox", { name: "Achievement 1 at Software Engineer II · Shoply", exact: true }).fill("Built the refunds API used by 40,000 merchants in 12 countries");
   await editor.getByRole("button", { name: "Save role" }).click();
   await page.getByRole("button", { name: "Save and go back to resumes" }).click();
   await expect(page).toHaveURL(/\/resumes$/);
