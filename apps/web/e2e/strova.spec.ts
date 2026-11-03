@@ -280,6 +280,7 @@ test("build a story: craft with Strova; write it yourself, review, accept an edi
 
   // Write it yourself, then ask Strova to review and accept one edit.
   await page.goto("/stories/new");
+  await page.getByRole("radio", { name: /Five free-text parts/ }).check(); // the classic form
   await page.getByLabel("Story title").fill("Pushback from platform");
   await page.getByLabel(/Context/).fill("The platform team refused to change an API my team needed for the new checkout.");
   await page.getByLabel(/Stakes/).fill("Without it, we would miss the holiday launch.");
@@ -377,6 +378,7 @@ test("deep crafting: CARL, section by section, Ready, hint, flag, inline edit, i
 
   // SC-13: a classic story, Organize with Strova, Accept.
   await page.goto("/stories/new");
+  await page.getByRole("radio", { name: /Five free-text parts/ }).check(); // the classic form
   await page.getByLabel("Story title").fill("Pushback from platform");
   await page.getByLabel(/Context/).fill("The platform team refused to change an API my team needed.");
   await page.getByLabel(/Stakes/).fill("Without it, we would miss the holiday launch.");

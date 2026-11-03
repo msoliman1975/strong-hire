@@ -41,7 +41,7 @@ from strong_api.inputs.queue import REVIEW_STORY
 from strong_api.plan.story_fit import queue_story_fits_for_user
 from strong_api.stories.ask import ask_strova
 from strong_api.stories.flow import flow_check_if_ready, open_hints, visible_flags
-from strong_api.stories.outline import load_outline, ready
+from strong_api.stories.outline import load_outline, ready, save_outline
 from strong_api.stories.schemas import (
     DisplayStatus,
     ReviewQueued,
@@ -62,6 +62,7 @@ from strong_core.schemas import (
     Speaker,
     StoryAnswer,
     StoryNote,
+    StoryOutline,
     StoryPart,
     StorySource,
     StoryStatus,
@@ -176,7 +177,21 @@ async def list_stories(
 
 @router.post("/stories", status_code=status.HTTP_201_CREATED)
 async def create_story(body: StoryIn, db: Db, me: Me, queue: Queue) -> StoryOut:
-    """ST-1: create a draft story."""
+    """ST-1: create a draft story. SC-1, SC-10: with `style`, the story is written in STAR or
+    CARL: it starts with an outline holding the typed slots, and its five parts are rendered from
+    it (SC-14)."""
+    outline = None
+    if body.style is not None:
+        from strong_api.stories.outline_api import apply_user_edits  # it imports this module
+        from strong_api.stories.schemas import OutlinePatch
+
+        try:
+            outline = apply_user_edits(
+                StoryOutline.empty(body.style), OutlinePatch(slots=body.slots)
+            )
+        except (ValidationError, ValueError) as error:
+            detail = error.errors() if isinstance(error, ValidationError) else str(error)
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail) from None
     row = StoryRow(
         org_id=me.org_id,
         user_id=me.user_id,
@@ -187,6 +202,8 @@ async def create_story(body: StoryIn, db: Db, me: Me, queue: Queue) -> StoryOut:
         source=body.source,
         notes_json=[],
     )
+    if outline is not None:
+        save_outline(row, outline)
     db.add(row)
     saved = await _save(db, row)
     await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5

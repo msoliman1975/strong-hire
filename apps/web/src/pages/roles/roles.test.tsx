@@ -88,7 +88,7 @@ describe("target roles", () => {
     renderApp("/roles");
     expect(await screen.findByRole("heading", { level: 1, name: "Target roles" })).toBeInTheDocument();
     const c = await waitFor(() => {
-      const found = screen.getAllByRole("link").find((a) => a.getAttribute("href") === `/roles/${job.id}`);
+      const found = screen.getAllByRole("region").find((s) => within(s).queryByRole("link", { name: /Show details/ })?.getAttribute("href") === `/roles/${job.id}`);
       expect(found).toBeDefined();
       return found as HTMLElement;
     });
@@ -98,6 +98,28 @@ describe("target roles", () => {
     expect(within(c).getAllByRole("meter")).toHaveLength(2);
     expect(within(c).getAllByText("Not started")).toHaveLength(2);
     expect(screen.getByRole("link", { name: "Add a target role" })).toHaveAttribute("href", "/roles/new");
+  });
+
+  it("RSD-4: a role card uses the shared shell: tiles for match, interviews and days left, Show details, and no card link", async () => {
+    const { job } = await roleWithInterviews("behavioral", "hiring_manager");
+    renderApp("/roles");
+    const c = await waitFor(() => {
+      const found = screen.getAllByRole("region").find((s) => within(s).queryByRole("link", { name: /Show details/ })?.getAttribute("href") === `/roles/${job.id}`);
+      expect(found).toBeDefined();
+      return found as HTMLElement;
+    });
+    expect(c.tagName).toBe("SECTION");
+    expect(c.closest("a")).toBeNull();
+    expect(within(c).getAllByRole("term").map((t) => t.textContent)).toEqual(["match", "interviews", "days left"]);
+    const values = within(c).getAllByRole("definition").map((d) => d.textContent);
+    expect(values[1]).toBe("2");
+    // No interview date yet: days left is unknown.
+    expect(values[2]).toBe("—");
+    expect(within(c).getAllByRole("link")).toHaveLength(1);
+    expect(within(c).getByRole("heading", { level: 2 })).toBeInTheDocument();
+    const add = screen.getAllByRole("link").find((a) => a.classList.contains("sx-summary-add"));
+    expect(add).toHaveAttribute("href", "/roles/new");
+    expect(add).toHaveTextContent("Paste a job posting and Strova suggests the interviews.");
   });
 
   it("TG-2: Back from Check the role returns to the posting as typed; Continue goes on without reading it again", async () => {
@@ -459,5 +481,24 @@ describe("rehearsals", () => {
     await user.click(within(screen.getByRole("region", { name: "Next take" })).getByRole("button", { name: "Start the first take" }));
     await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/sessions\/.+\/live$/));
     expect((mockStore.db.sessions.at(-1) as SessionRecord).config.mode).toBe("coach");
+  });
+});
+
+describe("RSD-4: role tiles", () => {
+  it("RSD-4: days left is teal when 0 or more, and '—' otherwise; match is '—' when unknown; singular labels for 1", async () => {
+    const { roleStats } = await import("./RolesPage");
+    expect(roleStats(82, 3, 5)).toEqual([
+      { value: 82, label: "match" },
+      { value: 3, label: "interviews" },
+      { value: 5, label: "days left", tone: "teal" },
+    ]);
+    expect(roleStats(null, 1, 0)[2]).toEqual({ value: 0, label: "days left", tone: "teal" });
+    expect(roleStats(undefined, 1, 1)).toEqual([
+      { value: "—", label: "match" },
+      { value: 1, label: "interview" },
+      { value: 1, label: "day left", tone: "teal" },
+    ]);
+    expect(roleStats(70, 0, -2)[2]).toEqual({ value: "—", label: "days left" });
+    expect(roleStats(70, 0, null)[2]).toEqual({ value: "—", label: "days left" });
   });
 });

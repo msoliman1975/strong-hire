@@ -8,7 +8,8 @@ import { http, HttpResponse } from "msw/http";
 
 import type { Story, StoryAnswer, StoryIn, StoryPatch } from "../pages/stories/api";
 import { displayStatusOf, STORY_PARTS } from "../pages/stories/api";
-import { flowHandlers, outlineHandlers } from "./outlineMock";
+import { renderLegacy } from "./craftMock";
+import { flowHandlers, outlineHandlers, writtenOutline } from "./outlineMock";
 import { requestMockReview } from "./suggestionHandlers";
 
 const API = "*/api";
@@ -115,6 +116,12 @@ export function storyHandlers() {
         created_at: now,
         updated_at: now,
       });
+      if (body.style) {
+        // SC-1, SC-10: written in STAR or CARL; the five parts follow the outline (SC-14).
+        story.style = body.style;
+        story.outline = writtenOutline(body.style, body.slots);
+        Object.assign(story, renderLegacy(story.outline));
+      }
       stories.push(story);
       return HttpResponse.json(out(story), { status: 201 });
     }),
