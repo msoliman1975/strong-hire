@@ -19,7 +19,8 @@ export const reportTypeLabel: Record<ReportItem["type"], string> = {
 export const jobLabel = (r: { job_deleted: boolean; job_name: string | null }) =>
   r.job_deleted ? JD_DELETED : (r.job_name ?? "Job");
 
-function summary(r: ReportItem, v2: boolean): string {
+/** The muted line under a report: the match score and resume, or the interview and its result. */
+export function reportSummary(r: ReportItem, v2: boolean): string {
   if (r.type === "gap_report") {
     const cv = r.resume_deleted ? (v2 ? RESUME_DELETED : CV_DELETED) : (r.resume_name ?? (v2 ? "Resume" : "CV"));
     return `Match score ${r.match_score ?? "?"}. ${cv}`;
@@ -45,7 +46,7 @@ export function ReportList({ reports, showJob = true }: { reports: ReportItem[];
               <strong>{reportTypeLabel[r.type]}</strong>
               {showJob && <>: {jobLabel(r)}</>}
             </Link>
-            <p className="muted">{summary(r, v2)}</p>
+            <p className="muted">{reportSummary(r, v2)}</p>
           </div>
           <span className="muted">{formatDate(r.at)}</span>
         </li>

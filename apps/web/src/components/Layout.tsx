@@ -137,8 +137,8 @@ export function resumesLabel(fullName: string | null | undefined): string {
 
 /**
  * NV-1: the v2 rail (ux-spec section 5): exactly Home, {First name}'s Resumes, Target roles,
- * Rehearsals with Strova and Career Stories with Strova. NV-3: Question bank and Progress left
- * the rail; their routes still work. Account, Plan and billing, Reports and Sign out are in the
+ * Rehearsals with Strova, Career Stories with Strova and, last, Reports (NV-4). NV-3: Question
+ * bank left the rail; its route still works. Account, Plan and billing and Sign out are in the
  * top bar's avatar menu.
  */
 function v2Nav(fullName: string | null | undefined): NavItem[] {
@@ -148,6 +148,7 @@ function v2Nav(fullName: string | null | undefined): NavItem[] {
     { to: "/roles", label: "Target roles", match: /^\/(roles|jobs)(\/|$)/ },
     { to: "/rehearsals", label: "Rehearsals with Strova", match: /^\/(rehearsals|interviews|sessions)(\/|$)/ },
     { to: "/stories", label: "Career Stories with Strova", match: /^\/(stories|coach)(\/|$)/, tour: "coach" },
+    { to: "/reports", label: "Reports", match: /^\/reports(\/|$)/ },
   ];
 }
 
@@ -155,7 +156,7 @@ const ACCOUNT_LINK: NavItem = { to: "/account", label: "Account" };
 
 const DEV_NAV: NavItem = { to: "/dev/interview", label: "Text interview (dev)" };
 
-/** The v2 avatar menu after Account, Plan and billing and Reports. The dev text interview shows in dev builds only. */
+/** The v2 avatar menu after Profile, Account and Plan and billing. The dev text interview shows in dev builds only. */
 const V2_AVATAR_EXTRA = [{ to: "/help", label: "Help and how it works" }, ...(import.meta.env.DEV ? [DEV_NAV] : [])];
 
 /** UI-2, NV-1: the left rail menu. The v2 items show only when `v2_enabled` is on. */
