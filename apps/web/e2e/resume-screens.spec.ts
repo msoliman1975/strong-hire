@@ -128,6 +128,8 @@ async function visit(page: Page, path: string) {
 
 /** RSD-15: no WCAG 2.1 A or AA violation and no horizontal scroll. */
 async function check(page: Page, name: string) {
+  // Let the drawer's slide-in finish: mid-fade text would read as low contrast.
+  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))));
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/rs-${name}.png`, fullPage: true });
   const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   const found = violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
@@ -149,7 +151,7 @@ test("RSD-1 to RSD-14: Resumes, the guided check page and Target roles work toge
   await visit(page, "/resumes");
   const list = page.getByRole("list", { name: "Your resumes" });
   const main = list.getByRole("region", { name: "Senior SWE resume" });
-  await expect(main.getByText("Default")).toBeVisible();
+  await expect(main.getByText("Default", { exact: true })).toBeVisible();
   await expect(main.getByRole("term")).toHaveText(["role", /^open issues?$/, /^story ideas?$/]);
   await expect(main.getByRole("img", { name: "Includes high-severity issues" })).toBeVisible();
 
@@ -160,8 +162,8 @@ test("RSD-1 to RSD-14: Resumes, the guided check page and Target roles work toge
   await other.getByRole("button", { name: "Save name" }).click();
   const platform = list.getByRole("region", { name: "Platform resume" });
   await platform.getByRole("button", { name: "Set Platform resume as default" }).click();
-  await expect(platform.getByText("Default")).toBeVisible();
-  await expect(main.getByText("Default")).toHaveCount(0);
+  await expect(platform.getByText("Default", { exact: true })).toBeVisible();
+  await expect(main.getByText("Default", { exact: true })).toHaveCount(0);
 
   // 3. Show details lands on the check page, on Strova's findings (RSD-8).
   await main.getByRole("link", { name: /^Show details/ }).click();
