@@ -21,6 +21,7 @@ import type {
   ResumeIssues,
   ResumeMatch,
   ResumeOut,
+  StoryIdeaCount,
   StoryIdeasOut,
 } from "./types";
 
@@ -153,6 +154,8 @@ export const resumesApi = {
     unwrap(
       await apiClient.GET("/resumes/{resume_id}/story-ideas", { params: { path: { resume_id: resumeId } } }),
     ) as StoryIdeasOut,
+  /** RSD-16: every read resume's open and used story ideas, in one request. */
+  storyIdeaCounts: async () => unwrap(await apiClient.GET("/story-ideas/counts")) as StoryIdeaCount[],
   /** RM-4: "Not a story". */
   dismissIdea: async (resumeId: string, resumeLineRef: string) => {
     unwrap(

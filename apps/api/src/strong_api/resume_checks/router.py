@@ -6,6 +6,9 @@ the issues into open and accepted ones, using the keys stored by PUT .../accepte
 GET /resumes/{id}/story-ideas lists one idea per achievement that no story uses and the user has
 not dismissed, with the likely skills once the worker job has added them. POST
 .../story-ideas/dismiss stores "Not a story" as a dismissed story_idea suggestion.
+
+GET /story-ideas/counts gives the open and used counts of every resume in one read, for the
+Resumes list (RSD-16), with the same rules as the per-resume list.
 """
 
 from __future__ import annotations
@@ -166,10 +169,10 @@ def _story_texts(story: Story) -> str:
     )
 
 
-@router.get("/resumes/{resume_id}/story-ideas")
-async def story_ideas(resume_id: uuid.UUID, db: Db, me: Me) -> StoryIdeasOut:
+async def _ideas_for(
+    db: Db, me: Me, row: ResumeRow, resume: Resume, stories: list[Story]
+) -> StoryIdeasOut:
     """RM-4: one idea per achievement no story uses, not dismissed, with likely skills."""
-    row, resume = await _read_resume(db, me, resume_id)
     suggestions = {
         normalize(str(s.payload.get("achievement", ""))): s
         for s in await db.scalars(
@@ -181,11 +184,6 @@ async def story_ideas(resume_id: uuid.UUID, db: Db, me: Me) -> StoryIdeasOut:
             )
         )
     }
-    stories = list(
-        await db.scalars(
-            select(Story).where(Story.org_id == me.org_id, Story.user_id == me.user_id)
-        )
-    )
     by_id = {s.id: s for s in stories}
     texts = [(s, _story_texts(s)) for s in stories]
     ideas: list[StoryIdeaOut] = []
@@ -220,6 +218,50 @@ async def story_ideas(resume_id: uuid.UUID, db: Db, me: Me) -> StoryIdeasOut:
         )
     pending = any(normalize(i.achievement) not in suggestions for i in ideas)
     return StoryIdeasOut(ideas=ideas, used=used, skills="pending" if pending else "ready")
+
+
+async def _stories(db: Db, me: Me) -> list[Story]:
+    return list(
+        await db.scalars(
+            select(Story).where(Story.org_id == me.org_id, Story.user_id == me.user_id)
+        )
+    )
+
+
+@router.get("/resumes/{resume_id}/story-ideas")
+async def story_ideas(resume_id: uuid.UUID, db: Db, me: Me) -> StoryIdeasOut:
+    """RM-4: one idea per achievement no story uses, not dismissed, with likely skills."""
+    row, resume = await _read_resume(db, me, resume_id)
+    return await _ideas_for(db, me, row, resume, await _stories(db, me))
+
+
+class StoryIdeaCount(BaseModel):
+    """RSD-16: one resume's story ideas, counted with the rules of GET .../story-ideas."""
+
+    resume_id: uuid.UUID
+    ideas: int = Field(description="Open ideas: not used by a story and not dismissed.")
+    used: int = Field(description="Achievements a story already tells.")
+
+
+@router.get("/story-ideas/counts")
+async def story_idea_counts(db: Db, me: Me) -> list[StoryIdeaCount]:
+    """RSD-16: the story-idea counts of every resume that has been read, in one request."""
+    rows = list(
+        await db.scalars(
+            select(ResumeRow).where(
+                ResumeRow.org_id == me.org_id,
+                ResumeRow.user_id == me.user_id,
+                ResumeRow.deleted_at.is_(None),
+                ResumeRow.parsed_json.is_not(None),
+            )
+        )
+    )
+    stories = await _stories(db, me)
+    out: list[StoryIdeaCount] = []
+    for row in rows:
+        found = await _ideas_for(db, me, row, Resume.model_validate(row.parsed_json), stories)
+        out.append(StoryIdeaCount(resume_id=row.id, ideas=len(found.ideas), used=len(found.used)))
+    return out
 
 
 def _achievement_at(resume: Resume, ref: str) -> Achievement:

@@ -302,6 +302,16 @@ function defaultJobName(target: JobTargetOut): string {
   const host = target.source_url ? safeHost(target.source_url).replace(/^www\./, "") : "";
   return host || `Job description ${today()}`;
 }
+/** Like the API: a default name no live resume has, numbered " (2)", " (3)", at most 120 characters. */
+function uniqueName(name: string, taken: string[]): string {
+  if (!taken.includes(name)) return name;
+  for (let n = 2; ; n += 1) {
+    const suffix = ` (${n})`;
+    const candidate = `${name.slice(0, 120 - suffix.length).trimEnd()}${suffix}`;
+    if (!taken.includes(candidate)) return candidate;
+  }
+}
+
 function defaultResumeName(file: File | null): string {
   const stem = file ? file.name.replace(/\.[^.]*$/, "").trim() : "";
   return stem ? stem.slice(0, 120) : `Resume ${today()}`;
@@ -601,7 +611,12 @@ export function inputHandlers(store: MockStore) {
       // The worker stores the file when it runs, so has_file starts false, as in the API.
       const record: ResumeOut = {
         id: newId(),
-        name: defaultResumeName(hasFile ? file : null),
+        name: uniqueName(
+          defaultResumeName(hasFile ? file : null),
+          db()
+            .resumes.filter((x) => !x.deleted)
+            .map((x) => x.name ?? ""),
+        ),
         deleted: false,
         status: "pending",
         has_file: false,

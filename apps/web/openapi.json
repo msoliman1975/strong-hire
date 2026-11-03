@@ -1002,6 +1002,32 @@
         }
       }
     },
+    "/story-ideas/counts": {
+      "get": {
+        "tags": [
+          "resume checks"
+        ],
+        "summary": "Story Idea Counts",
+        "description": "RSD-16: the story-idea counts of every resume that has been read, in one request.",
+        "operationId": "story_idea_counts_story_ideas_counts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StoryIdeaCount"
+                  },
+                  "type": "array",
+                  "title": "Response Story Idea Counts Story Ideas Counts Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/resumes/{resume_id}/story-ideas/dismiss": {
       "post": {
         "tags": [
@@ -29208,6 +29234,33 @@
         ],
         "title": "StoryIdea",
         "type": "object"
+      },
+      "StoryIdeaCount": {
+        "properties": {
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "ideas": {
+            "type": "integer",
+            "title": "Ideas",
+            "description": "Open ideas: not used by a story and not dismissed."
+          },
+          "used": {
+            "type": "integer",
+            "title": "Used",
+            "description": "Achievements a story already tells."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume_id",
+          "ideas",
+          "used"
+        ],
+        "title": "StoryIdeaCount",
+        "description": "RSD-16: one resume's story ideas, counted with the rules of GET .../story-ideas."
       },
       "StoryIdeaOut": {
         "properties": {

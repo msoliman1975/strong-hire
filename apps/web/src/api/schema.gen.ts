@@ -339,6 +339,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/story-ideas/counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Story Idea Counts
+         * @description RSD-16: the story-idea counts of every resume that has been read, in one request.
+         */
+        get: operations["story_idea_counts_story_ideas_counts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/resumes/{resume_id}/story-ideas/dismiss": {
         parameters: {
             query?: never;
@@ -11445,6 +11465,27 @@ export interface components {
              */
             missing_parts?: components["schemas"]["StoryPart"][];
         };
+        /**
+         * StoryIdeaCount
+         * @description RSD-16: one resume's story ideas, counted with the rules of GET .../story-ideas.
+         */
+        StoryIdeaCount: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /**
+             * Ideas
+             * @description Open ideas: not used by a story and not dismissed.
+             */
+            ideas: number;
+            /**
+             * Used
+             * @description Achievements a story already tells.
+             */
+            used: number;
+        };
         /** StoryIdeaOut */
         StoryIdeaOut: {
             /** Achievement */
@@ -13161,6 +13202,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    story_idea_counts_story_ideas_counts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryIdeaCount"][];
                 };
             };
         };
