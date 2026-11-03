@@ -153,11 +153,15 @@ describe("coach session", () => {
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
     await user.type(screen.getByRole("textbox", { name: "Your reply" }), "We were losing checkouts every week.");
     await user.click(screen.getByRole("button", { name: "Send" }));
-    await screen.findByText(/Why did it matter/);
+    await screen.findByText(/Why did it matter/, undefined, { timeout: 4000 });
     await user.type(screen.getByRole("textbox", { name: "Story name" }), "Pushback from platform");
     await user.click(screen.getByRole("button", { name: "Save and exit" }));
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Pushback from platform" })).toBeInTheDocument();
+    // Save, end the session, then open the story page: several requests and a new page. It takes
+    // about 80 ms alone, but ran past the 1 s default under the full suite's load in CI.
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Pushback from platform" }, { timeout: 4000 }),
+    ).toBeInTheDocument();
     const saved = mockStoryLibrary().find((s) => s.title === "Pushback from platform");
     expect(saved?.context).toBe("We were losing checkouts every week.");
     expect(screen.getByTestId("where")).toHaveTextContent(`/stories/${saved?.id}`);
