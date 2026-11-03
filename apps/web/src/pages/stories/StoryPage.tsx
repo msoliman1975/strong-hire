@@ -18,6 +18,7 @@ import { Link, useParams } from "react-router";
 
 import { suggestionKeys, suggestionsApi, useSuggestions } from "../../api/suggestions";
 import type { Suggestion } from "../../api/types";
+import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading, STORY_PART_LABEL } from "../../components/ui";
 import { competencyLabel } from "../../labels";
 import { useTakes } from "../coach/api";
@@ -232,9 +233,19 @@ function CameFrom({ story }: { story: Story }) {
 function StorySuggestions({ story }: { story: Story }) {
   const list = useSuggestions("story", { story_id: story.id });
   const open = (list.data ?? []).filter((s) => s.kind !== "review");
-  if (open.length === 0) return null;
+  const review = (list.data ?? []).some((s) => s.kind === "review");
+  if (open.length === 0 && !review) return null;
   return (
     <div className="sx-stack" aria-label="Strova suggests" role="region">
+      {/* ST-11 (A): a review finished while the user was away says so here. */}
+      {review && (
+        <div className="sx-notice ok sx-row" role="status" data-testid="review-ready">
+          <Strova mode="celebrating" size={24} />
+          <span>
+            <strong>Strova's review is ready.</strong> <Link to={reviewPath(story.id)}>Open the review</Link>
+          </span>
+        </div>
+      )}
       {open.map((s) => (
         <StorySuggestion key={s.id} suggestion={s} storyId={story.id} styled={!!story.outline} />
       ))}
