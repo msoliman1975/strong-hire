@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 
+import { VerdictSeal } from "./ux/Seal";
+
 /**
  * The Strong Hire logo, "the Orbit" (SV-10): Strova's ring, open at the top right, and the
  * candidate as the green dot in the gap, on the way to the offer. The ring is Strova's coach
@@ -37,16 +39,14 @@ export function BrandMark({ size = 26, tone = "light" }: { size?: number; tone?:
   );
 }
 
-/** The green check alone, for earned verdicts (Hire and Strong Hire). Decorative: the verdict word carries the meaning. */
+/**
+ * The verdict seal (SV-13) for earned verdicts (Hire and Strong Hire). Decorative: the verdict
+ * word carries the meaning. Kept under this name for its existing call sites.
+ */
 export function CheckBadge({ size = 18, style }: { size?: number; style?: CSSProperties }) {
   return (
-    <svg className="check-badge" width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" style={style}>
-      <circle cx={24} cy={24} r={22} fill="var(--ok)" />
-      <CheckPath d="M13 24.6 L20.6 32.2 L35 17" width={6.4} />
-    </svg>
+    <span className="check-badge" style={style} aria-hidden="true">
+      <VerdictSeal size={size} />
+    </span>
   );
-}
-
-function CheckPath({ d, width }: { d: string; width: number }) {
-  return <path d={d} fill="none" stroke="#ffffff" strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />;
 }

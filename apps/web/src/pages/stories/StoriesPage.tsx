@@ -3,12 +3,22 @@
  * there. The status badge, used beside a story elsewhere, shows Draft, Ready or Proven (ST-8).
  */
 import { StatusBadge, StoryPartChip } from "../../components/ui";
+import { ProvenSeal } from "../../components/ux/Seal";
 import { displayStatusLabel, STORY_PARTS, type DisplayStatus } from "./api";
 
 export { CareerStoriesPage as StoriesPage } from "./CareerStoriesPage";
 
 export function StoryStatusBadge({ status }: { status: DisplayStatus }) {
-  return <StatusBadge tone={status === "proven" ? "ok" : "neutral"}>{displayStatusLabel[status]}</StatusBadge>;
+  return (
+    <StatusBadge tone={status === "proven" ? "ok" : "neutral"}>
+      {status === "proven" && (
+        <>
+          <ProvenSeal size={14} />{" "}
+        </>
+      )}
+      {displayStatusLabel[status]}
+    </StatusBadge>
+  );
 }
 
 /** Which of the five parts have text. Each chip names its part, so color is never the only cue. */

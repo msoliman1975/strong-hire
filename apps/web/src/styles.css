@@ -1070,6 +1070,25 @@ legend {
   }
 }
 
+/* SV-13: the verdict and Proven seals, in the celebrating green. */
+.sx-seal {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.sx-seal__soft {
+  fill: var(--sh-ok-soft);
+}
+
+.sx-seal__ink {
+  stroke: var(--sh-ok);
+}
+
+.sx-seal__fill {
+  fill: var(--sh-ok);
+}
+
 /* ------------------------------------------------------------ data display */
 
 .tag {

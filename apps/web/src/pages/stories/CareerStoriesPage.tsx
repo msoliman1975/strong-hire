@@ -17,6 +17,7 @@ import { suggestionKeys, suggestionsApi, useSuggestions } from "../../api/sugges
 import type { Suggestion } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
+import { ProvenSeal } from "../../components/ux/Seal";
 import { competencyLabel } from "../../labels";
 import { newCoachPath } from "../coach/paths";
 import { craftFromIdeaPath } from "../onboarding/check/StoriesStep";
@@ -164,6 +165,7 @@ function StoryRow({ story }: { story: Story }) {
           {meta.length > 0 && <span className="sx-small sx-muted">{meta.join(" · ")}</span>}
         </span>
         <span className={`sx-chip ${STATUS_CHIP[story.display_status]}`}>
+          {story.display_status === "proven" && <ProvenSeal size={14} />}
           {displayStatusLabel[story.display_status]}
         </span>
       </Link>

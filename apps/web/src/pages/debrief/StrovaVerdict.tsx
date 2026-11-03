@@ -5,6 +5,7 @@
  */
 import type { AnswersAtBar, Debrief, HireSignal, InterviewDetail, PreviousSignal, Scorecard } from "../../api/types";
 import { Strova } from "../../components/strova";
+import { VerdictSeal } from "../../components/ux/Seal";
 
 /** The notice under the verdict: the signal is practice, not a hiring prediction. */
 export const PRACTICE_NOTICE =
@@ -54,8 +55,11 @@ export function StrovaVerdict({
       <div className="sx-row debrief-verdict__facts">
         <div className="sx-stack">
           <span className="sx-small sx-muted">Hire signal</span>
-          <span className={`debrief-verdict__signal ${signalClass(scorecard.hire_signal)}`} data-testid="hire-signal">
-            {scorecard.hire_signal}
+          <span className="sx-row" style={{ gap: 8, alignItems: "center" }}>
+            {(scorecard.hire_signal === "Hire" || scorecard.hire_signal === "Strong Hire") && <VerdictSeal size={28} />}
+            <span className={`debrief-verdict__signal ${signalClass(scorecard.hire_signal)}`} data-testid="hire-signal">
+              {scorecard.hire_signal}
+            </span>
           </span>
           <span className="sx-small debrief-verdict__change" data-change={previous?.change ?? 0} data-testid="signal-change">
             {changeText(previous)}

@@ -19,6 +19,7 @@ import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
 import { ReadinessRing } from "../../components/ux/ReadinessRing";
+import { ProvenSeal } from "../../components/ux/Seal";
 import { betaRoleFamilies, competencyLabel, roleFamilyLabel } from "../../labels";
 import { newCoachPath } from "../coach/paths";
 import { usePlan } from "../plan/api";
@@ -380,6 +381,7 @@ export function RolePage() {
                   {row.story && row.strength !== "strong" && <span className="sx-small sx-muted">{row.reason}</span>}
                 </div>
                 <span className={`sx-chip ${row.story?.status === "proven" ? "ok" : s.cls}`}>
+                  {row.story?.status === "proven" && <ProvenSeal size={14} />}
                   {row.story?.status === "proven" ? "Proven" : s.label}
                 </span>
               </div>
