@@ -18,6 +18,8 @@ import type { InterviewWithReadiness, JobPosting } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
+import { ReadinessRing } from "../../components/ux/ReadinessRing";
+import { ProvenSeal } from "../../components/ux/Seal";
 import { betaRoleFamilies, competencyLabel, roleFamilyLabel } from "../../labels";
 import { newCoachPath } from "../coach/paths";
 import { usePlan } from "../plan/api";
@@ -33,12 +35,9 @@ function InterviewCard({ item, first }: { item: InterviewWithReadiness; first: b
   return (
     <Link className="sx-card tight" to={interviewPath(item.interview.id)} style={{ textDecoration: "none", color: "inherit" }}>
       <strong>{typeName(item.interview)}</strong>
-      <div className="sx-between">
-        <span className={`sx-score${score === null ? " sx-muted" : ""}`}>{score ?? "–"}</span>
+      <div className="sx-row" style={{ gap: 12, alignItems: "center" }}>
+        <ReadinessRing score={score} goal={item.readiness.goal} size={64} label={`${typeName(item.interview)} readiness`} />
         <span className="sx-small sx-muted">goal {item.readiness.goal}</span>
-      </div>
-      <div className="sx-bar">
-        <span style={{ width: `${score ?? 0}%` }} />
       </div>
       <span className="sx-small sx-muted">{takesMeta(item)}</span>
       <span className={`sx-btn sm${first ? "" : " ghost"}`} style={{ marginTop: 6 }}>
@@ -382,6 +381,7 @@ export function RolePage() {
                   {row.story && row.strength !== "strong" && <span className="sx-small sx-muted">{row.reason}</span>}
                 </div>
                 <span className={`sx-chip ${row.story?.status === "proven" ? "ok" : s.cls}`}>
+                  {row.story?.status === "proven" && <ProvenSeal size={14} />}
                   {row.story?.status === "proven" ? "Proven" : s.label}
                 </span>
               </div>

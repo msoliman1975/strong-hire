@@ -102,19 +102,18 @@ h1:focus {
 
 /* ------------------------------------------------------------ app shell */
 
-/* The Approved h logo: the official colors of logo.svg, and of logo-dark.svg on the dark room. */
+/* The Orbit logo (SV-10): Strova's coach violet ring and the earned-verdict green dot, as in favicon.svg. */
 .brand-mark {
   display: block;
   flex: none;
-  --brand-lamp: #14202b;
-  --brand-light: #f0a92e;
-  --brand-cut: #ffffff;
-  --brand-check: #1a7d50;
+  --brand-ring: #5332e6;
+  --brand-dot: #12775a;
 }
 
+/* On the dark live room: the light violet and a brighter green. */
 .brand-mark[data-tone="dark"] {
-  --brand-lamp: #f3f6f8;
-  --brand-cut: #3a4f63;
+  --brand-ring: #a594ff;
+  --brand-dot: #4fc495;
 }
 
 .check-badge {
@@ -1041,26 +1040,53 @@ legend {
   gap: var(--space-3);
 }
 
-.loading::before {
-  content: "";
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid var(--line-strong);
-  border-top-color: var(--accent);
-  animation: spin 900ms linear infinite;
+/* SV-12: Strova's thinking ring as the loading indicator. Violet (coach) by default, teal for the interviewer. */
+.sx-thinking {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
 }
 
-@keyframes spin {
+.sx-thinking path {
+  stroke: var(--sh-violet);
+  transform-box: view-box;
+  transform-origin: 24px 24px;
+  animation: sx-think 3s linear infinite;
+}
+
+.sx-thinking[data-hat="interviewer"] path {
+  stroke: var(--sh-teal);
+}
+
+@keyframes sx-think {
   to {
     transform: rotate(360deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .loading::before {
+  .sx-thinking path {
     animation: none;
   }
+}
+
+/* SV-13: the verdict and Proven seals, in the celebrating green. */
+.sx-seal {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.sx-seal__soft {
+  fill: var(--sh-ok-soft);
+}
+
+.sx-seal__ink {
+  stroke: var(--sh-ok);
+}
+
+.sx-seal__fill {
+  fill: var(--sh-ok);
 }
 
 /* ------------------------------------------------------------ data display */

@@ -1,5 +1,6 @@
 /** Small pieces the role, rehearsal and interview screens share (U07). */
 import type { InterviewWithReadiness, ResumeOut, RoleSummary } from "../../api/types";
+import { ReadinessRing } from "../../components/ux/ReadinessRing";
 import { interviewTypeLabel } from "../../labels";
 
 export const rolesPath = "/roles";
@@ -46,18 +47,14 @@ export function resumeLabel(resumes: ResumeOut[] | undefined, resumeId: string |
 
 export const typeName = (i: InterviewWithReadiness["interview"]) => interviewTypeLabel[i.interview_type];
 
-/** One readiness bar: "Behavioral 58" or "Not started". */
+/** One readiness row: a small readiness ring (SV-11), then "Behavioral 58" or "Not started". */
 export function ReadinessRow({ item }: { item: InterviewWithReadiness }) {
   const score = item.readiness.score;
   return (
-    <div>
-      <div className="sx-between sx-small">
-        <span>{typeName(item.interview)}</span>
-        {score === null ? <span className="sx-muted">Not started</span> : <span className="sx-mono">{score}</span>}
-      </div>
-      <div className="sx-bar" role="meter" aria-label={`${typeName(item.interview)} readiness`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={score ?? 0}>
-        <span style={{ width: `${score ?? 0}%` }} />
-      </div>
+    <div className="sx-row sx-small" style={{ gap: 8, alignItems: "center" }}>
+      <ReadinessRing score={score} goal={item.readiness.goal} size={24} label={`${typeName(item.interview)} readiness`} />
+      <span style={{ flex: 1 }}>{typeName(item.interview)}</span>
+      {score === null ? <span className="sx-muted">Not started</span> : <span className="sx-mono">{score}</span>}
     </div>
   );
 }

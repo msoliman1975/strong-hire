@@ -7,6 +7,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -14,7 +15,7 @@ import { gapApi } from "../../api/gap";
 import { jobTargetsApi, resumesApi } from "../../api/inputs";
 import { AppRoutes, createQueryClient } from "../../App";
 import { EMPTY_PROFILE } from "../../mocks/handlers";
-import { mockStore } from "../../mocks/node";
+import { mockStore, server } from "../../mocks/node";
 import { mockStory, resetMockStories } from "../../mocks/storyHandlers";
 import { setFeatureOverrides } from "../../theme/features";
 import { greeting, STROVA_INTRO } from "./HomeStrova";
@@ -103,6 +104,31 @@ describe("Home with Strova", () => {
     ]);
     expect(screen.queryByText(/Strova suggests/)).toBeNull();
     expect(screen.queryByRole("button", { name: "Dismiss" })).toBeNull();
+  });
+
+  it("SV-11: the Rehearsals card shows the best readiness as Strova's ring beside its text", async () => {
+    signIn("weekly");
+    server.use(
+      http.get("*/api/rehearsals", () =>
+        HttpResponse.json({
+          items: [
+            {
+              interview: { id: "iv1", interview_type: "behavioral" },
+              readiness: { interview_id: "iv1", kind: "practice_estimate", score: 78, goal: 75, competencies: [], change: null, takes_counted: 3 },
+              takes_count: 3,
+              last_signal: "Hire",
+              role: { id: "r1", company_name: "Stripe", name: null },
+            },
+          ],
+          next_interview_id: null,
+        }),
+      ),
+    );
+    renderHome();
+    const cards = await screen.findByRole("region", { name: "Summary" });
+    const ring = await within(cards).findByRole("meter", { name: "Best readiness, Stripe" });
+    expect(ring).toHaveAttribute("aria-valuetext", "78 of 100, goal 75, goal reached");
+    expect(within(cards).getByText(/Best: Stripe · 78/)).toBeInTheDocument();
   });
 
   it("HO-1: the summary cards sit right below Strova's next step, and a long resume name is cut to fit its card", async () => {

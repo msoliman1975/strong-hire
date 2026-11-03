@@ -146,6 +146,9 @@ describe("v2 debrief", () => {
     expect(within(verdict).getByRole("img", { name: "Strova is interviewing" })).toHaveAttribute("width", "72");
     expect(await within(verdict).findByText("Wearing the interviewer hat: Hiring Manager at Example Corp")).toBeInTheDocument();
     expect(within(verdict).getByTestId("readiness")).toHaveTextContent("58");
+    // SV-11: the readiness is Strova's ring, a meter that names the score and the goal.
+    const ring = within(verdict).getByRole("meter", { name: "Readiness for this interview" });
+    expect(ring).toHaveAttribute("aria-valuetext", "58 of 100, goal 75");
     expect(within(verdict).getByTestId("hire-signal")).toBeInTheDocument();
     expect(within(verdict).getByTestId("answers-at-bar")).toBeInTheDocument();
     // The verdict comes before the answers.

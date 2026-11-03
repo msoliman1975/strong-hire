@@ -167,7 +167,7 @@ img {
   color: var(--ink);
 }
 
-/* SV-7: the Strong Hire lockup with "with Strova" in the muted colour. No new logo. */
+/* SV-7: the Strong Hire lockup with "with Strova" in the muted colour. */
 .brand__with {
   margin-left: 2px;
   font-weight: 400;
@@ -175,12 +175,10 @@ img {
   color: var(--muted);
 }
 
-/* The Approved h logo keeps the official colors of logo.svg, never the action or status tokens. */
+/* The Orbit logo (SV-10): Strova's coach violet ring and the earned-verdict green dot. */
 .brand-mark {
-  --brand-lamp: #14202b;
-  --brand-light: #f0a92e;
-  --brand-cut: #ffffff;
-  --brand-check: #1a7d50;
+  --brand-ring: #5332e6;
+  --brand-dot: #12775a;
 }
 
 .site-nav {

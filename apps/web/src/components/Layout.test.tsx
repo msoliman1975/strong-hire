@@ -183,7 +183,7 @@ describe("SV-7, NV-3 v2 top bar and old routes", () => {
     const user = renderShell(true);
     const bar = await screen.findByRole("banner", { name: "Top bar" });
     const brand = within(bar).getByRole("link", { name: "Strong Hire with Strova, home" });
-    // The existing logo, never a Strova avatar or mark.
+    // The Orbit logo (SV-10), never Strova's avatar.
     expect(within(brand).getByRole("img", { name: "Strong Hire" })).toBeInTheDocument();
     expect(brand.querySelector(".strova")).toBeNull();
     expect(brand).toHaveTextContent("Strong Hirewith Strova");

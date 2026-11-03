@@ -1,32 +1,46 @@
-/** The Approved h logo keeps its four parts in every tone (UI-1), and the slogan stays hidden until it is agreed. */
+/** The Orbit logo keeps its two parts in every tone (SV-10), and the slogan stays hidden until it is agreed. */
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { hasSlogan, SLOGAN } from "../labels";
-import { BrandMark, CheckBadge } from "./BrandMark";
+import { BrandMark, CheckBadge, ORBIT_DOT, ORBIT_RING } from "./BrandMark";
 
 describe("BrandMark", () => {
   it.each(["light", "stage", "dark"] as const)(
-    "UI-1: the %s tone draws the lamp, the amber light, the chair-h cut out of it, and the green check",
+    "SV-10: the %s tone draws Strova's open ring and the candidate's dot in the gap",
     (tone) => {
       const { container } = render(<BrandMark tone={tone} />);
       const svg = screen.getByRole("img", { name: "Strong Hire" });
       const parts = [...svg.querySelectorAll("[data-part]")].map((el) => el.getAttribute("data-part"));
-      // In this order: the chair after the light, so it is a cut-out, never ink on top.
-      expect(parts).toEqual(["lamp", "light", "chair", "check"]);
-      expect(container.querySelector('[data-part="light"]')).toHaveAttribute("fill", "var(--brand-light)");
-      const chair = [...container.querySelectorAll('[data-part="chair"] > *')];
-      expect(chair.length).toBe(2);
-      for (const piece of chair) expect(piece).toHaveAttribute("fill", "var(--brand-cut)");
-      expect(container.querySelector('[data-part="check"] circle[fill="var(--brand-check)"]')).not.toBeNull();
-      expect(container.querySelector('[data-part="check"] path[stroke="#ffffff"]')).not.toBeNull();
+      expect(parts).toEqual(["ring", "dot"]);
+      const ring = container.querySelector('[data-part="ring"]');
+      expect(ring).toHaveAttribute("d", ORBIT_RING);
+      expect(ring).toHaveAttribute("stroke", "var(--brand-ring)");
+      expect(ring).toHaveAttribute("fill", "none");
+      expect(container.querySelector('[data-part="dot"]')).toHaveAttribute("fill", "var(--brand-dot)");
     },
   );
 
-  it("UI-1: never colors the light green; the light and the check use different colors", () => {
+  it("SV-10: the ring stays open and the dot sits in its gap, clear of the stroke", () => {
+    // The ring's two ends and the dot centre are on the same circle (r 18 around 24,24).
+    const ends = [...ORBIT_RING.matchAll(/(-?\d+\.?\d*) (-?\d+\.?\d*)(?= A| *$)/g)].map((m) => [
+      Number(m[1]),
+      Number(m[2]),
+    ]);
+    expect(ends).toHaveLength(2);
+    const onCircle = ([x, y]: number[]) => Math.hypot(x - 24, y - 24);
+    for (const end of ends) expect(onCircle(end)).toBeCloseTo(18, 1);
+    expect(onCircle([ORBIT_DOT.cx, ORBIT_DOT.cy])).toBeCloseTo(18, 1);
+    // Each end (round cap, half the 5 px stroke) keeps at least 1.5 px from the dot.
+    for (const [x, y] of ends) {
+      expect(Math.hypot(x - ORBIT_DOT.cx, y - ORBIT_DOT.cy) - ORBIT_DOT.r - 2.5).toBeGreaterThanOrEqual(1.5);
+    }
+  });
+
+  it("SV-10: never colors the dot like the ring", () => {
     const { container } = render(<BrandMark />);
-    expect(container.querySelector('[data-part="light"]')?.getAttribute("fill")).not.toBe(
-      container.querySelector('[data-part="check"] circle:last-of-type')?.getAttribute("fill"),
+    expect(container.querySelector('[data-part="dot"]')?.getAttribute("fill")).not.toBe(
+      container.querySelector('[data-part="ring"]')?.getAttribute("stroke"),
     );
   });
 

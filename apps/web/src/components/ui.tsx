@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import type { HireSignal } from "../api/types";
 import { hireSignalTone, rubricLabel } from "../labels";
 import { CheckBadge } from "./BrandMark";
+import { ThinkingRing } from "./ux/ThinkingRing";
 
 const HIRE_SIGNALS: HireSignal[] = ["Strong Hire", "Hire", "Lean Hire", "Lean No Hire", "No Hire"];
 
@@ -45,6 +46,7 @@ export function PageHead({
 export function Loading({ label = "Loading" }: { label?: string }) {
   return (
     <p className="loading" role="status">
+      <ThinkingRing />
       {label}
     </p>
   );

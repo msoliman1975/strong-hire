@@ -279,9 +279,13 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 | SV-4 | Every avatar has an accessible label naming the state. | P0 |
 | SV-5 | Below 64 px the side effects are hidden. | P0 |
 | SV-6 | The live room shows "Strova is acting as {title} at {company}" and a state chip, driven by the interviewer state. | P0 |
-| SV-7 | The app top bar and the site header use the lockup with the existing Strong Hire logo; Strova never appears as a logo. | P0 |
+| SV-7 | The app top bar and the site header use the lockup with the Strong Hire logo (the Orbit, SV-10); Strova's avatar never stands in for the logo. | P0 |
 | SV-8 | The marketing site has the "Meet Strova" section with the animated avatar and the approved copy. | P0 |
 | SV-9 | Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged. | P0 |
+| SV-10 | The Strong Hire logo is the Orbit: Strova's violet ring, open at the top right, with the candidate's green dot in the gap. The app, the site, the favicons, the app icon and Strova's emails use the same drawing. | P0 |
+| SV-11 | Readiness is drawn as Strova's ring: a teal arc that fills from the top toward a goal tick, green with no tick at or above the goal, an empty track with a dash before the first Realistic take. It is a meter with the score, goal and "goal reached" in its text, on the interview page, the role page, Rehearsals, Target roles, the debrief's verdict and Home's Rehearsals card. | P1 |
+| SV-12 | Every loading state shows Strova's thinking ring (the zigzag ring from her thinking mode, drawn with 12 deeper teeth so it reads at 16 to 24 px) beside the loading text. Violet by default, teal for the interviewer. It turns once every 3 s and stops under reduced motion; the text is the status. | P1 |
+| SV-13 | Earned results carry a seal in the brand's ring shape and the celebrating green: Hire and Strong Hire show the verdict seal (a closed green ring with a check) beside the signal, in the debrief and wherever the check badge was; a Proven story shows the Proven seal (Strova's thinking zigzag, frozen and filled green, with a white check) beside the word Proven. Seals are decorative; the word carries the meaning. | P1 |
 
 **Onboarding**
 

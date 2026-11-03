@@ -1,13 +1,19 @@
 import type { CSSProperties } from "react";
 
+import { VerdictSeal } from "./ux/Seal";
+
 /**
- * The Strong Hire logo, "the Approved h": a lamp, its light, the candidate's chair cut out of
- * the light in the shape of an "h", and the green check of an earned verdict. The colors come
- * from `logo.svg` (light and stage tones) and `logo-dark.svg` (dark tone, the live room), as the
- * --brand-* variables on `.brand-mark` in styles.css; never the app's action or status tokens.
- * Rules: never remove the check, never color the light green, never draw the chair on top of the light.
+ * The Strong Hire logo, "the Orbit" (SV-10): Strova's ring, open at the top right, and the
+ * candidate as the green dot in the gap, on the way to the offer. The ring is Strova's coach
+ * violet and the dot is the green of an earned verdict, so the logo and the agent share one shape.
+ * The colors are the --brand-* variables on `.brand-mark` in styles.css (light, and dark for the
+ * live room). The gap is drawn, never painted over, so the mark sits on any background.
+ * Rules: never close the ring, never move the dot out of the gap, never color the dot violet.
  * The wordmark "Strong Hire" sits next to it in text, never inside the SVG.
  */
+export const ORBIT_RING = "M41.56 20.03 A18 18 0 1 1 27.97 6.44";
+export const ORBIT_DOT = { cx: 36.73, cy: 11.27, r: 5.5 } as const;
+
 export function BrandMark({ size = 26, tone = "light" }: { size?: number; tone?: "light" | "stage" | "dark" }) {
   const t = tone === "stage" ? "light" : tone;
   return (
@@ -20,35 +26,27 @@ export function BrandMark({ size = 26, tone = "light" }: { size?: number; tone?:
       role="img"
       aria-label="Strong Hire"
     >
-      <rect x={18} y={1.5} width={12} height={5} rx={1.5} fill="var(--brand-lamp)" data-part="lamp" />
-      <path d="M19.5 6.5 L28.5 6.5 L42 44 L6 44 Z" fill="var(--brand-light)" data-part="light" />
-      {/* The chair, after the light and in the cut-out color: a hole in the light, never ink on top. */}
-      <g data-part="chair">
-        <rect x={17} y={18} width={4.5} height={24} rx={1} fill="var(--brand-cut)" />
-        <path
-          d="M21.5 28.5 H26 A5.5 5.5 0 0 1 31.5 34 V42 H27 V34.5 A1.5 1.5 0 0 0 25.5 33 H21.5 Z"
-          fill="var(--brand-cut)"
-        />
-      </g>
-      <g data-part="check">
-        <circle cx={38} cy={38} r={9.5} fill="var(--brand-cut)" />
-        <circle cx={38} cy={38} r={8} fill="var(--brand-check)" />
-        <CheckPath d="M34 38.2 L36.8 41 L42 35.5" width={2.4} />
-      </g>
+      <path
+        d={ORBIT_RING}
+        fill="none"
+        stroke="var(--brand-ring)"
+        strokeWidth={5}
+        strokeLinecap="round"
+        data-part="ring"
+      />
+      <circle {...ORBIT_DOT} fill="var(--brand-dot)" data-part="dot" />
     </svg>
   );
 }
 
-/** The green check alone, for earned verdicts (Hire and Strong Hire). Decorative: the verdict word carries the meaning. */
+/**
+ * The verdict seal (SV-13) for earned verdicts (Hire and Strong Hire). Decorative: the verdict
+ * word carries the meaning. Kept under this name for its existing call sites.
+ */
 export function CheckBadge({ size = 18, style }: { size?: number; style?: CSSProperties }) {
   return (
-    <svg className="check-badge" width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" style={style}>
-      <circle cx={24} cy={24} r={22} fill="var(--ok)" />
-      <CheckPath d="M13 24.6 L20.6 32.2 L35 17" width={6.4} />
-    </svg>
+    <span className="check-badge" style={style} aria-hidden="true">
+      <VerdictSeal size={size} />
+    </span>
   );
-}
-
-function CheckPath({ d, width }: { d: string; width: number }) {
-  return <path d={d} fill="none" stroke="#ffffff" strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />;
 }

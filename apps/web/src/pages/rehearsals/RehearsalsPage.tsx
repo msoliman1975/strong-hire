@@ -11,6 +11,7 @@ import type { RehearsalItem } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
+import { ReadinessRing } from "../../components/ux/ReadinessRing";
 import { DEFAULT_TAKE_MINUTES, interviewPath, takesMeta, typeName } from "../roles/shared";
 
 const GOAL = 75;
@@ -168,14 +169,9 @@ export function RehearsalsPage() {
                   </strong>
                   <span className="sx-small sx-muted">{takesMeta(item)}</span>
                 </div>
-                <div style={{ flex: "0 1 220px", minWidth: 140 }}>
-                  <div className="sx-between sx-small">
-                    <span className="sx-muted">Readiness</span>
-                    <span className="sx-mono">{score ?? "–"}</span>
-                  </div>
-                  <div className="sx-bar">
-                    <span style={{ width: `${score ?? 0}%` }} />
-                  </div>
+                <div className="sx-row sx-small" style={{ gap: 8, alignItems: "center" }}>
+                  <span className="sx-muted">Readiness</span>
+                  <ReadinessRing score={score} goal={item.readiness.goal} size={44} label={`${typeName(item.interview)} readiness`} />
                 </div>
                 <span className={`sx-btn sm${score === null ? " ghost" : ""}`}>{item.takes_count === 0 ? "Start" : "Retake"}</span>
               </Link>
