@@ -173,11 +173,11 @@ test("RSD-1 to RSD-14: Resumes, the guided check page and Target roles work toge
 
   // 4. Fix the gap in place: the count drops and the next finding shows (RSD-10).
   const before = await count(page, /Strova's findings/);
-  await page.getByRole("list", { name: "Next findings" }).getByRole("button", { name: /gap/ }).click();
+  await page.getByRole("list", { name: "Next findings" }).getByRole("button", { name: /gap.*between Invoicely and Shoply/ }).click();
   await finding(page).getByLabel("Invoicely ended").fill("2021-01");
   await finding(page).getByRole("button", { name: "Save dates" }).click();
   await expect.poll(() => count(page, /Strova's findings/)).toBe(before - 1);
-  await expect(finding(page).getByRole("heading", { name: /gap/ })).toHaveCount(0);
+  await expect(page.getByTestId("findings-step").getByText(/between Invoicely and Shoply/)).toHaveCount(0);
 
   // 5. Accept a finding with a reason, then Undo it from the drawer (IN-12, RSD-14).
   await page.getByRole("list", { name: "Next findings" }).getByRole("button", { name: /No start date on Freelance/ }).click();
