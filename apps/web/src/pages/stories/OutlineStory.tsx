@@ -402,6 +402,11 @@ const editKey = (e: { section: string; slot: string; step?: number | null }) => 
 
 // --- the outline --------------------------------------------------------------------------------
 
+/** One section of the outline, edited in place (exported for Review with Strova's Edit). */
+export function EditableSection(props: { story: Story; outline: StoryOutline; section: Section }) {
+  return <SectionCard {...props} />;
+}
+
 function SectionCard({ story, outline, section, readOnly }: { story: Story; outline: StoryOutline; section: Section; readOnly?: boolean }) {
   const [improving, setImproving] = useState(false);
   const label = SECTION_LABEL[section.section];

@@ -973,3 +973,32 @@
   flex-direction: column;
   gap: 8px;
 }
+
+/* --- ST-11 (A, B): Review with Strova, done and Edit ------------------------------------------- */
+
+.review-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-editor textarea {
+  width: 100%;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.review-editor__label {
+  font-weight: 700;
+}
+
+.review-note {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-heading {
+  font-size: 1.125rem;
+  margin: 0;
+}
