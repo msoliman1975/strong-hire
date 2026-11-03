@@ -212,8 +212,10 @@ test("RSD-1 to RSD-14: Resumes, the guided check page and Target roles work toge
   const editor = page.getByRole("group", { name: "Editing · Software Engineer II · Shoply" });
   await editor.getByRole("textbox", { name: "Achievement 1 at Software Engineer II · Shoply", exact: true }).fill("Built the refunds API used by 40,000 merchants in 12 countries");
   await editor.getByRole("button", { name: "Save role" }).click();
-  await page.getByRole("button", { name: "Save and go back to resumes" }).click();
-  await expect(page).toHaveURL(/\/resumes$/);
+  // Save changes keeps the page; a reload shows the saved line.
+  await page.getByRole("button", { name: "Save changes" }).click();
+  await expect(page.getByText("Changes saved.").first()).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`/resumes/${mainId}/check`));
   await visit(page, `/resumes/${mainId}/check?step=journey`);
   await expect(page.getByText("Built the refunds API used by 40,000 merchants in 12 countries")).toBeVisible();
 

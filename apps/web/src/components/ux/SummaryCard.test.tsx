@@ -169,6 +169,10 @@ describe("RSD-5: the card shell CSS", () => {
     expect(block).toMatch(/\.sx-stat dd \{[^}]*font: 600 26px\/1\.1 var\(--sh-font-mono\);/);
   });
 
+  it("keeps two columns only while each card is at least 400 px wide, so footers stay on one line", () => {
+    expect(block).toMatch(/\.sx-grid2\.stretch \{ grid-template-columns: repeat\(auto-fill, minmax\(min\(100%, 400px\), 1fr\)\); \}/);
+  });
+
   it("stretches the grid and puts a top rule on the wrapping footer", () => {
     expect(block).toMatch(/\.sx-grid2\.stretch \{ align-items: stretch; \}/);
     expect(block).toMatch(/\.sx-summary__foot \{[^}]*flex-wrap: wrap;[^}]*border-top: 1px solid var\(--sh-line\);/);

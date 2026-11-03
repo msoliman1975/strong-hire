@@ -311,15 +311,19 @@ function Recommends(props: FindingsStepProps & { finding: ResumeIssue }) {
     );
   } else if (skills.length > 0) {
     body = (
-      <button type="button" className="btn btn--small" disabled={props.saving} onClick={() => props.onAddSkills(skills)}>
-        Add {skills.join(", ")}
-      </button>
+      <div className="row">
+        <button type="button" className="btn btn--small" disabled={props.saving} onClick={() => props.onAddSkills(skills)}>
+          Add {skills.join(", ")}
+        </button>
+      </div>
     );
   } else {
     body = (
-      <button type="button" className="btn btn--small" onClick={() => props.onFixElsewhere(finding)}>
-        {finding.fixLabel}
-      </button>
+      <div className="row">
+        <button type="button" className="btn btn--small" onClick={() => props.onFixElsewhere(finding)}>
+          {finding.fixLabel}
+        </button>
+      </div>
     );
   }
 

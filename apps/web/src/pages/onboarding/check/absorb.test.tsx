@@ -195,7 +195,10 @@ describe("RSD-14: the drawers", () => {
     expect(within(rows).getAllByRole("listitem")).toHaveLength(1);
     expect(within(rows).getByText("No date yet")).toBeInTheDocument();
     expect(within(rows).getByRole("link", { name: /^Open / })).toHaveAttribute("href", `/roles/${job.id}`);
-    expect(within(drawer).getByRole("link", { name: "Add a target role with this resume" })).toHaveAttribute("href", "/roles/new");
+    expect(within(drawer).getByRole("link", { name: "Add a target role with this resume" })).toHaveAttribute(
+      "href",
+      `/roles/new?resume=${r.id}`,
+    );
     expect(within(drawer).getByRole("button", { name: "Close" })).toHaveFocus();
 
     await user.keyboard("{Escape}");
