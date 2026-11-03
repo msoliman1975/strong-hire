@@ -5,6 +5,7 @@
  */
 import type { AnswersAtBar, Debrief, HireSignal, InterviewDetail, PreviousSignal, Scorecard } from "../../api/types";
 import { Strova } from "../../components/strova";
+import { ReadinessRing } from "../../components/ux/ReadinessRing";
 import { VerdictSeal } from "../../components/ux/Seal";
 
 /** The notice under the verdict: the signal is practice, not a hiring prediction. */
@@ -76,8 +77,8 @@ export function StrovaVerdict({
         {interview && (
           <div className="sx-stack">
             <span className="sx-small sx-muted">Readiness</span>
-            <span className="sx-mono debrief-verdict__num" data-testid="readiness">
-              {readiness ?? "—"}
+            <span data-testid="readiness">
+              <ReadinessRing score={readiness} goal={interview.readiness.goal} size={56} label="Readiness for this interview" />
             </span>
           </div>
         )}

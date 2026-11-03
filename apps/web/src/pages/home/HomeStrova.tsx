@@ -17,6 +17,7 @@ import { useSuggestions } from "../../api/suggestions";
 import type { PersonalPlan, PlanGroup, PlanItem } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
+import { ReadinessRing } from "../../components/ux/ReadinessRing";
 import { resumeCheckPath } from "../../paths";
 import { displayStatusLabel, useStories, type DisplayStatus } from "../stories/api";
 
@@ -309,7 +310,13 @@ function SummaryCards() {
         <div className="sx-eyebrow teal">Rehearsals with Strova</div>
         <h3>{plural(items.length, "interview")}</h3>
         {best && (
-          <span className="sx-small sx-muted">
+          <span className="sx-small sx-muted sx-row" style={{ gap: 6, alignItems: "center" }}>
+            <ReadinessRing
+              score={best.readiness.score}
+              goal={best.readiness.goal}
+              size={20}
+              label={`Best readiness, ${best.role.company_name ?? best.role.name ?? "role"}`}
+            />
             Best: {best.role.company_name ?? best.role.name} · {best.readiness.score}
           </span>
         )}
