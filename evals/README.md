@@ -39,7 +39,8 @@ Suites live in `suites/<name>.yaml`:
 | `gap` | Gap analysis over the P2 posting and resume fixtures: 7 matched pairs (one in company mode) and 4 mismatched pairs, 2 runs each |
 | `coach` | Coach evals (CO-9): 4 simulated candidates (vague, overclaim, off topic, strong), each in the gentle and the direct style |
 | `suggestions` | Suggestion checks (SG-7): tune a story, new story, improve a resume line and review, each with a reply from the user's words and one that adds a fact |
-| `full` | `goldset`, `simulated`, `gap`, `coach` and `suggestions` |
+| `crafting` | Deep story crafting (SC-15, SC-4, SC-5, SC-9): no new facts in crafting turns, improve, organize and rewrite (tempting cases: ranges, "about", tools, names); depth of the engine; the flow check on seeded stories |
+| `full` | `goldset`, `simulated`, `gap`, `coach`, `suggestions` and `crafting` |
 
 ## Metrics and thresholds
 

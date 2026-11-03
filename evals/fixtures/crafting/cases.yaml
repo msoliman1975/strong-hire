@@ -1,0 +1,125 @@
+# Deep story crafting evals (SC-15, SC-9). See strong_evals/crafting.py.
+# No-new-facts cases: a reply Strova could give, and whether the product's check keeps it.
+# The quotes are always real; what changes is the text's facts.
+
+- id: craft-reworded-kept
+  kind: craft_turn
+  said: ["At Acme I was the tech lead on checkout, and the payments migration was two weeks late."]
+  reply:
+    message: "What did you do first?"
+    slot_updates:
+      - {section: situation, slot: role, text: "I led the checkout team at Acme.", quotes: ["At Acme I was the tech lead on checkout"]}
+  expect: kept
+
+- id: craft-range-point-rejected
+  kind: craft_turn
+  said: ["It took between 30 and 40 days to move checkout to the new provider."]
+  reply:
+    message: "Why did it take that long?"
+    slot_updates:
+      - {section: situation, slot: timeframe, text: "It took 35 days.", quotes: ["It took between 30 and 40 days"]}
+  expect: rejected
+
+- id: craft-hedge-dropped-rejected
+  kind: craft_turn
+  said: ["About 25 engineers were blocked while checkout was down."]
+  reply:
+    message: "What did you do?"
+    slot_updates:
+      - {section: situation, slot: scale, text: "25 engineers were blocked.", quotes: ["About 25 engineers were blocked"]}
+  expect: rejected
+
+- id: craft-hedge-kept
+  kind: craft_turn
+  said: ["About 25 engineers were blocked while checkout was down."]
+  reply:
+    message: "What did you do?"
+    slot_updates:
+      - {section: situation, slot: scale, text: "About 25 engineers were blocked.", quotes: ["About 25 engineers were blocked"]}
+  expect: kept
+
+- id: craft-tool-added-rejected
+  kind: craft_turn
+  said: ["I moved our events off the old queue so checkout stopped dropping orders."]
+  reply:
+    message: "Why that way?"
+    slot_updates:
+      - {section: action, slot: did, step: 0, text: "I moved our events to Kafka.", quotes: ["I moved our events off the old queue"]}
+  expect: rejected
+
+- id: improve-kept
+  kind: improve
+  section: result
+  said: ["We were done a week before Black Friday and not one payment failed."]
+  reply:
+    edits:
+      - {section: result, slot: metric, after: "We finished a week before Black Friday, and not one payment failed.", quotes: ["We were done a week before Black Friday and not one payment failed"]}
+  expect: kept
+
+- id: improve-computed-result-rejected
+  kind: improve
+  section: result
+  said: ["Errors went from 2% to 0.3% after the move."]
+  reply:
+    edits:
+      - {section: result, slot: metric, after: "Errors fell by 85%.", quotes: ["Errors went from 2% to 0.3%"]}
+  expect: rejected
+
+- id: organize-name-added-rejected
+  kind: organize
+  said: ["I was the tech lead on checkout.", "We moved checkout to the new payments provider."]
+  reply:
+    outline:
+      style: star
+      sections:
+        - {section: situation, slots: {role: {text: "I was the tech lead on checkout at Stripe.", quotes: ["I was the tech lead on checkout"], status: filled}}}
+        - {section: task, slots: {}}
+        - {section: action, steps: [{}]}
+        - {section: result, slots: {}, metric: {status: empty}}
+        - {section: learning, slots: {}}
+  expect: rejected
+
+- id: rewrite-kept
+  kind: rewrite
+  said: ["I was the tech lead on checkout.", "If it broke I wanted it to break small."]
+  reply:
+    outline:
+      style: carl
+      sections:
+        - {section: challenge, slots: {role: {text: "I led checkout.", quotes: ["I was the tech lead on checkout"], status: filled}}}
+        - {section: action, steps: [{why: {text: "If it broke, I wanted it to break small.", quotes: ["If it broke I wanted it to break small"], status: filled}}]}
+        - {section: result, slots: {}, metric: {status: empty}}
+        - {section: learning, slots: {}}
+  expect: kept
+
+# Flow cases (SC-9): seeded stories. On the fake profile `reply` is the model's check.
+
+- id: flow-incoherent
+  kind: flow
+  story:
+    situation.role: "I was the tech lead on a team of five."
+    situation.problem: "The payments migration was two weeks late."
+    situation.stakeholders: "Finance wanted the old provider kept as a fallback."
+    action.did.0: "I rewrote the onboarding emails."
+    result.metric: "We shipped a month early with a team of eight."
+  reply:
+    flags:
+      - {key: "action_vs_problem:situation.problem:action.did[0]", type: action_vs_problem, slots: [{section: situation, slot: problem}, {section: action, slot: did, step: 0}], question: "How did the onboarding emails get the migration back on track?"}
+      - {key: "result_vs_problem:situation.problem:result.metric", type: result_vs_problem, slots: [{section: situation, slot: problem}, {section: result, slot: metric}], question: "Did the result fix the late migration?"}
+      - {key: "number_conflict:situation.role:result.metric", type: number_conflict, slots: [{section: situation, slot: role}, {section: result, slot: metric}], question: "Was the team five people, or eight?"}
+      - {key: "timeline_conflict:situation.problem:result.metric", type: timeline_conflict, slots: [{section: situation, slot: problem}, {section: result, slot: metric}], question: "You were two weeks late, then a month early. What happened in between?"}
+      - {key: "loose_end:situation.stakeholders", type: loose_end, slots: [{section: situation, slot: stakeholders}], question: "What happened with finance's fallback?"}
+  expect_flags: [action_vs_problem, result_vs_problem, number_conflict, timeline_conflict, loose_end]
+
+- id: flow-coherent
+  kind: flow
+  story:
+    situation.role: "I was the tech lead on checkout."
+    situation.problem: "The payments migration was two weeks late."
+    action.did.0: "I split the rollout by country."
+    action.why.0: "A full switch could not be rolled back fast."
+    result.metric: "We caught up and shipped a week before Black Friday."
+    learning.lesson: "Cut big launches into small steps."
+  reply:
+    flags: []
+  expect_flags: []

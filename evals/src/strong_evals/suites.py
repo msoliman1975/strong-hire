@@ -81,6 +81,7 @@ class Suite(Contract):
     gap: list[GapSpec] = Field(default_factory=list)
     coach: list[CoachSpec] = Field(default_factory=list)
     suggestions: list[str] | Literal["all"] = Field(default_factory=list)
+    crafting: bool = False  # deep story crafting: no new facts, depth, flow (SC-15)
 
 
 def suite_names(folder: Path = SUITES_DIR) -> list[str]:
@@ -110,4 +111,5 @@ def load_suite(name: str, folder: Path = SUITES_DIR) -> Suite:
             suite.suggestions = "all"
         else:
             suite.suggestions = list(dict.fromkeys([*suite.suggestions, *sub.suggestions]))
+        suite.crafting = suite.crafting or sub.crafting
     return suite

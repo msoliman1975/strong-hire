@@ -33,6 +33,7 @@ from datetime import UTC, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.coach import engine
+from strong_api.coach.facts import new_facts
 from strong_api.stories.outline import ready, save_outline, strip_markdown
 from strong_core.db.models import CoachSession, CoachTurn
 from strong_core.db.models import Story as StoryRow
@@ -345,6 +346,9 @@ def _backed(update: SlotUpdate, said: str) -> str | None:
     for number in engine.NUMBER.findall(numbers):
         if number not in quoted:
             return f"number not in the quotes: {number}"
+    invented = new_facts(numbers, said)  # SC-15: facts, not wording
+    if invented:
+        return f"new fact: {invented[0]}"
     return None
 
 
