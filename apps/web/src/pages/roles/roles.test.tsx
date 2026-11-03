@@ -270,7 +270,10 @@ describe("a deleted resume (RMAP-5)", () => {
     const user = renderApp("/resumes");
     const list = await screen.findByRole("list", { name: "Your resumes" });
     const row = await waitFor(() => {
-      const found = within(list).getAllByRole("listitem").find((li) => li.textContent?.includes("Used by"));
+      // The resume the role uses: its roles tile says 1 (RSD-1).
+      const found = within(list)
+        .getAllByRole("listitem")
+        .find((li) => within(li).queryAllByRole("definition")[0]?.textContent === "1");
       expect(found).toBeDefined();
       return found as HTMLElement;
     });

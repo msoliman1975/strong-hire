@@ -210,16 +210,19 @@ describe("resume pages", () => {
     else mockStore.db.profiles[EMAIL] = { ...(await import("../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
     const user = renderApp("/resumes");
     expect(await screen.findByRole("heading", { level: 1, name: "Ana's Resumes" })).toBeInTheDocument();
-    const card = (await screen.findByText("Default")).closest(".sx-card") as HTMLElement;
-    expect(within(card).getAllByRole("link", { name: /^Open (?!breakdown)/ })).toHaveLength(2);
-    // RMAP-2: one list only, each row with its breakdown.
-    expect(within(card).getAllByRole("link", { name: /^Open breakdown for / })).toHaveLength(2);
+    const list = await screen.findByRole("list", { name: "Your resumes" });
+    // RMAP-2: one list only, each card with Show details to the check page (RSD-3, D-1).
+    expect(within(list).getAllByRole("link", { name: /^Show details/ })).toHaveLength(2);
+    expect(within(list).queryAllByRole("link", { name: /^Open/ })).toHaveLength(0);
     expect(screen.queryByRole("list", { name: "Saved resumes" })).not.toBeInTheDocument();
     const main = screen.getByText("Default");
-    expect(main.closest(".sx-list-row")).toHaveTextContent(first.name ?? "");
-    expect(await within(main.closest(".sx-list-row") as HTMLElement).findByText(/Not used by a role/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Make default" }));
-    await waitFor(() => expect(screen.getByText("Default").closest(".sx-list-row")).toHaveTextContent(second.name ?? ""));
+    const mainCard = main.closest("section") as HTMLElement;
+    expect(mainCard).toHaveTextContent(first.name ?? "");
+    // No role uses it: the roles tile is 0 (RSD-1).
+    await waitFor(() => expect(within(mainCard).getAllByRole("definition")[0]).toHaveTextContent("0"));
+    expect(within(mainCard).queryByRole("button", { name: /as default$/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: `Set ${second.name ?? ""} as default` }));
+    await waitFor(() => expect(screen.getByText("Default").closest("section")).toHaveTextContent(second.name ?? ""));
   });
 
   it("RM-3: the resume page has breakdown and issues first, then Strova's story ideas, closed with their counts", async () => {

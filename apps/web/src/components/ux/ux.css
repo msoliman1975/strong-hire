@@ -173,6 +173,7 @@ a.sx-card, a.sx-card:hover { color: inherit; text-decoration: none; }
 .sx-summary__meta { margin: 0; font-size: 13.5px; color: var(--sh-muted); }
 .sx-summary__foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--sh-line); padding-top: 12px; margin-top: auto; }
 .sx-summary__actions { display: flex; gap: 2px; flex-wrap: wrap; margin-left: auto; }
+.sx-summary__actions .sx-btn.quiet { padding: 0 10px; gap: 6px; }
 .sx-summary__actions .sx-btn.quiet.danger:hover { background: var(--sh-danger-soft); color: var(--sh-danger-ink); }
 .sx-summary-add { border: 1px dashed var(--sh-line-strong); border-radius: var(--sh-radius); padding: 20px 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 200px; color: var(--sh-muted); text-decoration: none; text-align: center; }
 .sx-summary-add:hover { border-color: var(--sh-violet); background: var(--sh-violet-soft); color: var(--sh-muted); text-decoration: none; }

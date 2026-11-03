@@ -261,7 +261,7 @@ describe("v2 Check your CV", () => {
     const puts = recordPutBodies();
     const user = renderAt("/resumes");
     const list = await screen.findByRole("list", { name: "Your resumes" });
-    await user.click(within(list).getAllByRole("link", { name: /^Open breakdown for / })[0]);
+    await user.click(within(list).getAllByRole("link", { name: /^Show details/ })[0]);
     await screen.findByRole("complementary", { name: "What we found" });
 
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply" }));
@@ -280,7 +280,7 @@ describe("v2 Check your CV", () => {
     ]);
 
     // Opened again from Resumes and edited again: still two roles.
-    await user.click(within(await screen.findByRole("list", { name: "Your resumes" })).getAllByRole("link", { name: /^Open breakdown for / })[0]);
+    await user.click(within(await screen.findByRole("list", { name: "Your resumes" })).getAllByRole("link", { name: /^Show details/ })[0]);
     await screen.findByRole("complementary", { name: "What we found" });
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply Inc" }));
     const again = screen.getByRole("group", { name: "Editing · Software Engineer II · Shoply Inc" });
@@ -404,21 +404,25 @@ describe("v2 coming back to a saved CV", () => {
     expect(screen.getAllByRole("button", { name: "Back to resumes" })).toHaveLength(2);
   };
 
-  it("IN-12, RMAP-2: the resume row shows its state and opens the same breakdown, accepted issues kept", async () => {
+  it("IN-12, RMAP-2, RSD-1: the resume card shows the same open issues as the breakdown, and Show details opens it", async () => {
     await seed();
     confirmed();
     const user = renderAt("/resumes");
     const list = await screen.findByRole("list", { name: "Your resumes" });
     const row = within(list).getAllByRole("listitem")[0];
-    expect(row).toHaveTextContent(/\d+ issues? open( · \d+ high)? · 1 accepted/);
     expect(row).toHaveTextContent(/Added [A-Z][a-z]{2} \d+, \d{4} · Edited Oct 28/);
-    const open = within(row).getByRole("link", { name: /^Open breakdown for / });
-    expect(open).toHaveAttribute("href", `/resumes/${mockStore.db.resumes[0].id}/check`);
-    await user.click(open);
+    const terms = within(row).getAllByRole("term").map((t) => t.textContent);
+    expect(terms[1]).toMatch(/^open issues?$/);
+    const open = Number(within(row).getAllByRole("definition")[1].textContent);
+    const details = within(row).getByRole("link", { name: /^Show details/ });
+    expect(details).toHaveAttribute("href", `/resumes/${mockStore.db.resumes[0].id}/check`);
+    await user.click(details);
     await expectSameBreakdown();
+    // D-4: the list and the check page count open issues the same way.
+    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(new RegExp(`· ${open} issues? open$`));
   });
 
-  it("RMAP-2: one list; Rename and Delete sit in the row's More menu", async () => {
+  it("RMAP-2, RSD-3: one list; Rename and Delete sit in the card footer, with no More menu", async () => {
     await seed();
     const user = renderAt("/resumes");
     const list = await screen.findByRole("list", { name: "Your resumes" });
@@ -428,13 +432,9 @@ describe("v2 coming back to a saved CV", () => {
     // RMAP-3: a resume never saved from the editor has no "Not checked yet" next to its issues.
     expect(row).not.toHaveTextContent(/checked/i);
     expect(row).not.toHaveTextContent(/Edited/);
-    expect(within(row).getByRole("link", { name: /^Open breakdown for / })).toBeInTheDocument();
-    expect(within(row).getByRole("link", { name: /^Open (?!breakdown)/ })).toHaveAttribute(
-      "href",
-      `/resumes/${mockStore.db.resumes[0].id}`,
-    );
+    expect(within(row).getByRole("link", { name: /^Show details/ })).toBeInTheDocument();
+    expect(within(row).queryByText(/More/)).not.toBeInTheDocument();
 
-    await user.click(within(row).getByText("More ▾"));
     await user.click(within(row).getByRole("button", { name: /^Rename / }));
     const field = within(row).getByRole("textbox", { name: "New name" });
     await user.clear(field);
@@ -442,7 +442,7 @@ describe("v2 coming back to a saved CV", () => {
     expect(within(row).getByRole("alert")).toHaveTextContent("Enter a name.");
     await user.type(field, "Payments resume");
     await user.click(within(row).getByRole("button", { name: "Save name" }));
-    expect(await within(list).findByRole("link", { name: "Payments resume" })).toBeInTheDocument();
+    expect(await within(list).findByRole("heading", { name: "Payments resume" })).toBeInTheDocument();
     expect(mockStore.db.resumes[0].name).toBe("Payments resume");
   });
 
