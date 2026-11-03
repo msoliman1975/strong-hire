@@ -955,7 +955,9 @@ export interface paths {
         put?: never;
         /**
          * Create Story
-         * @description ST-1: create a draft story.
+         * @description ST-1: create a draft story. SC-1, SC-10: with `style`, the story is written in STAR or
+         *     CARL: it starts with an outline holding the typed slots, and its five parts are rendered from
+         *     it (SC-14).
          */
         post: operations["create_story_stories_post"];
         delete?: never;
@@ -11548,6 +11550,13 @@ export interface components {
              * @enum {string}
              */
             source: "manual" | "coach";
+            /** @description SC-1, SC-10: write it yourself in STAR or CARL. The story starts with an outline holding `slots`, as typed (no model call); the five parts are rendered from it, so they are not sent. Null writes a classic five-part story. */
+            style?: components["schemas"]["StoryStyle"] | null;
+            /**
+             * Slots
+             * @description With `style`: the user's text for each slot (as PATCH /stories/{id}/outline).
+             */
+            slots?: components["schemas"]["SlotEditIn"][];
         };
         /**
          * StoryNote

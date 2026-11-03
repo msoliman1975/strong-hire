@@ -2812,7 +2812,7 @@
           "stories"
         ],
         "summary": "Create Story",
-        "description": "ST-1: create a draft story.",
+        "description": "ST-1: create a draft story. SC-1, SC-10: with `style`, the story is written in STAR or\nCARL: it starts with an outline holding the typed slots, and its five parts are rendered from\nit (SC-14).",
         "operationId": "create_story_stories_post",
         "requestBody": {
           "required": true,
@@ -29448,6 +29448,26 @@
             "title": "Source",
             "description": "A debrief answer becomes a story through POST /stories/from-answer.",
             "default": "manual"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryStyle"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-1, SC-10: write it yourself in STAR or CARL. The story starts with an outline holding `slots`, as typed (no model call); the five parts are rendered from it, so they are not sent. Null writes a classic five-part story."
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/SlotEditIn"
+            },
+            "type": "array",
+            "maxItems": 60,
+            "title": "Slots",
+            "description": "With `style`: the user's text for each slot (as PATCH /stories/{id}/outline)."
           }
         },
         "additionalProperties": false,
