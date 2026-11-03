@@ -43,8 +43,3 @@
   font-weight: 700;
   color: var(--sh-ink);
 }
-
-.progress-reports__heading {
-  font-size: 1.25rem;
-  margin: 0 0 12px;
-}

@@ -125,14 +125,15 @@ describe("Progress page (v2)", () => {
   it("ST-3: lists the stories that need work (drafts, missing parts, coach notes), each with Work on it", async () => {
     resetMockStories([PROVEN, DRAFT, NOTED]);
     renderApp("/reports");
-    expect(await screen.findByRole("heading", { level: 1, name: "Progress" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Reports" })).toBeInTheDocument();
     const rows = await screen.findAllByTestId("story-to-work-on");
     expect(rows.map((r) => within(r).getAllByRole("link")[0].textContent)).toEqual(["Pushback from platform", "Vendor"]);
     expect(rows[0]).toHaveTextContent("Not proven yet · Missing stakes, your action, result, reflection");
     expect(rows[1]).toHaveTextContent("1 coach note");
     expect(within(rows[0]).getByRole("link", { name: "Work on it" })).toHaveAttribute("href", "/coach/new?story=s2");
-    // The reports stay below.
-    expect(screen.getByRole("region", { name: "Report list" })).toBeInTheDocument();
+    // NV-4: the reports come first, then the stories.
+    const list = screen.getByRole("region", { name: "Report list" });
+    expect(list.compareDocumentPosition(rows[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("ST-3: a proven, complete story with no coach notes needs no work", () => {

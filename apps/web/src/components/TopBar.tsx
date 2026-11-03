@@ -224,10 +224,9 @@ const AVATAR_LINKS: { to: string; label: string }[] = [
   { to: "/account/profile", label: "Profile" },
   { to: "/account", label: "Account" },
   { to: "/account#plan", label: "Plan and billing" },
-  { to: "/reports", label: "Reports" },
 ];
 
-/** Initials that open Profile, Account, Plan and billing, Reports, Help and how it works, and Sign out. */
+/** Initials that open Profile, Account, Plan and billing, Help and how it works, and Sign out. */
 export function AvatarMenu({
   name,
   email,
