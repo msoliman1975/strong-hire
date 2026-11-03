@@ -2,8 +2,13 @@
  * ST-10 (mockup #write): Write it yourself. A title and the five parts, each with its hint. Save
  * as a Draft goes back to Career Stories; Save and ask Strova to review saves, queues the review
  * (ST-11) and opens Review with Strova. `?skill=` tags the story first (Home coverage, plan gaps).
+ *
+ * SC-1, SC-10: the story can be written in STAR or CARL (STAR is preselected): the outline's
+ * sections and slots, in the user's own words, saved as typed with no model call. "Five free-text
+ * parts" keeps the classic form.
  */
 import "../../components/ux/ux.css";
+import "../coach/coach.css";
 import "./stories.css";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +17,9 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 
 import { Strova } from "../../components/strova";
 import { ErrorNotice, STORY_PART_LABEL } from "../../components/ui";
+import { STYLE_DESCRIPTION, STYLE_NAME, STYLE_SECTIONS, SECTION_LABEL, type StoryStyle } from "../coach/outline";
 import { SKILLS, STORY_PARTS, storiesApi, storyKeys, type Competency } from "./api";
+import { WriteOutline, writtenSlots, type Written } from "./WriteOutline";
 import { reviewPath, storiesPath } from "./paths";
 
 export const PART_HINT: Record<(typeof STORY_PARTS)[number], string> = {
@@ -24,6 +31,22 @@ export const PART_HINT: Record<(typeof STORY_PARTS)[number], string> = {
 };
 
 type Parts = Record<(typeof STORY_PARTS)[number], string>;
+type Shape = StoryStyle | "classic";
+
+const SHAPES: { value: Shape; name: string; sections: string; description: string }[] = [
+  ...(["star", "carl"] as StoryStyle[]).map((s) => ({
+    value: s,
+    name: STYLE_NAME[s],
+    sections: STYLE_SECTIONS[s].map((x) => SECTION_LABEL[x]).join(" · "),
+    description: STYLE_DESCRIPTION[s],
+  })),
+  {
+    value: "classic",
+    name: "Five free-text parts",
+    sections: "One box each for context, stakes, action, result and reflection",
+    description: "As before. You can organize it into STAR later.",
+  },
+];
 
 export function NewStoryPage() {
   const [params] = useSearchParams();
@@ -32,17 +55,24 @@ export function NewStoryPage() {
   const [title, setTitle] = useState("");
   const [parts, setParts] = useState<Parts>({ context: "", stakes: "", action: "", result: "", reflection: "" });
   const [missing, setMissing] = useState(false);
+  const [shape, setShape] = useState<Shape>("star");
+  const [written, setWritten] = useState<Written>({});
+  const [steps, setSteps] = useState(1);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const save = useMutation({
     mutationFn: async (review: boolean) => {
-      const story = await storiesApi.create({
-        title: title.trim(),
-        ...Object.fromEntries(STORY_PARTS.map((p) => [p, parts[p].trim() || null])),
-        skills,
-        source: "manual",
-      });
+      const story = await storiesApi.create(
+        shape === "classic"
+          ? {
+              title: title.trim(),
+              ...Object.fromEntries(STORY_PARTS.map((p) => [p, parts[p].trim() || null])),
+              skills,
+              source: "manual",
+            }
+          : { title: title.trim(), skills, source: "manual", style: shape, slots: writtenSlots(shape, written, steps) },
+      );
       if (review) await storiesApi.review(story.id);
       return { story, review };
     },
@@ -68,7 +98,9 @@ export function NewStoryPage() {
       <div className="sx-stack">
         <div className="sx-eyebrow plain">Write it yourself</div>
         <h1>New story</h1>
-        <p className="sx-small sx-muted">Write each part in your own words. You can leave parts empty and come back.</p>
+        <p className="sx-small sx-muted">
+          Write it in your own words. You can leave parts empty and come back; nothing is added that you didn't write.
+        </p>
       </div>
       <form className="sx-card" aria-label="Write a story" onSubmit={(e) => e.preventDefault()} noValidate>
         <div className="sx-field">
@@ -91,7 +123,23 @@ export function NewStoryPage() {
             </span>
           )}
         </div>
-        {STORY_PARTS.map((p) => (
+        <fieldset className="coach-start__styles write-shape">
+          <legend className="coach-start__legend">Story shape</legend>
+          <div className="coach-start__options">
+            {SHAPES.map((o) => (
+              <label key={o.value} className="coach-style" data-checked={shape === o.value || undefined}>
+                <input type="radio" name="story-shape" value={o.value} checked={shape === o.value} onChange={() => setShape(o.value)} />
+                <span className="coach-style__name">{o.name}</span>
+                <span className="coach-style__sections">{o.sections}</span>
+                <span className="muted small">{o.description}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        {shape !== "classic" && (
+          <WriteOutline style={shape} values={written} onChange={setWritten} steps={steps} onSteps={setSteps} />
+        )}
+        {shape === "classic" && STORY_PARTS.map((p) => (
           <div key={p} className="sx-field">
             <label htmlFor={`write-${p}`} className="write-part" data-part={p}>
               ● {STORY_PART_LABEL[p]}

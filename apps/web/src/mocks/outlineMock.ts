@@ -264,3 +264,15 @@ export function flowHandlers(find: (id: string) => Story | undefined, out: (s: S
     }),
   ];
 }
+
+/** SC-1, SC-10: a story written in STAR or CARL: the user's typed slots in an empty outline. */
+export function writtenOutline(style: StoryStyle, slots: OutlinePatch["slots"] = []): StoryOutline {
+  const outline = emptyOutline(style);
+  for (const e of slots ?? []) {
+    const s = sectionFor(outline, e.section);
+    const text = (e.text ?? "").trim();
+    if (!s || !text) continue;
+    putSlot(s, e.slot, e.step, filled(text, true), e.slot === "metric" ? { before: e.before ?? null, after: e.after ?? null, unit: e.unit ?? null } : {});
+  }
+  return outline;
+}

@@ -162,6 +162,7 @@ describe("Write it yourself (ST-10)", () => {
   it("ST-10: Save as a Draft saves the title and parts and goes back to Career Stories", async () => {
     const user = userEvent.setup();
     renderAt("/stories/new?skill=conflict_handling");
+    await user.click(screen.getByRole("radio", { name: /Five free-text parts/ })); // the classic form
     expect(screen.getByRole("textbox", { name: /Your action/ })).toHaveAttribute(
       "placeholder",
       "What you did yourself, and the trade-offs",
@@ -180,6 +181,7 @@ describe("Write it yourself (ST-10)", () => {
   it("ST-10, ST-11: Save and ask Strova to review opens Review with Strova on the new story", async () => {
     const user = userEvent.setup();
     renderAt("/stories/new");
+    await user.click(screen.getByRole("radio", { name: /Five free-text parts/ })); // the classic form
     await user.type(screen.getByRole("textbox", { name: "Story title" }), "Pushback on the API");
     await user.type(screen.getByRole("textbox", { name: /Your action/ }), "We talked to them and worked it out.");
     await user.click(screen.getByRole("button", { name: "Save and ask Strova to review" }));

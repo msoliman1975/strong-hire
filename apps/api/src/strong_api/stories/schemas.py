@@ -6,7 +6,7 @@ from __future__ import annotations
 import uuid
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from strong_core.schemas import (
     ACTION_STEPS_MAX,
@@ -55,8 +55,28 @@ class StoryIn(_In):
         default=StorySource.MANUAL,
         description="A debrief answer becomes a story through POST /stories/from-answer.",
     )
+    style: StoryStyle | None = Field(
+        default=None,
+        description="SC-1, SC-10: write it yourself in STAR or CARL. The story starts with an "
+        "outline holding `slots`, as typed (no model call); the five parts are rendered from "
+        "it, so they are not sent. Null writes a classic five-part story.",
+    )
+    slots: list[SlotEditIn] = Field(
+        default_factory=list,
+        max_length=60,
+        description="With `style`: the user's text for each slot (as PATCH /stories/{id}/outline).",
+    )
 
     _skills = field_validator("skills")(_unique)
+
+    @model_validator(mode="after")
+    def _style_or_parts(self) -> StoryIn:
+        parts = [self.context, self.stakes, self.action, self.result, self.reflection]
+        if self.style is not None and any(p and p.strip() for p in parts):
+            raise ValueError("a story in STAR or CARL is written in its slots, not the five parts")
+        if self.style is None and self.slots:
+            raise ValueError("slots need a style (star or carl)")
+        return self
 
 
 class StoryPatch(_In):
@@ -186,3 +206,6 @@ class StyleSwitchOut(BaseModel):
         description="The rewrite to accept (POST /stories/{id}/style/accept) or discard. Slots "
         "the user typed stay theirs; Strova's slots carry quotes.",
     )
+
+
+StoryIn.model_rebuild()  # `slots` refers to SlotEditIn, defined above
