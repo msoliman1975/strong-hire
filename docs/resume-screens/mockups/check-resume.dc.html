@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Check C2: Guided, revised</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
+<style>
+body{margin:0;background:#f4f3f8}
+a{color:#3d22c4}a:hover{color:#5332e6}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid transparent;background:#5332e6;color:#fff;font:inherit;font-weight:600;font-size:13.5px;text-decoration:none;cursor:pointer;box-sizing:border-box}
+.btn:hover{background:#3d22c4;color:#fff}
+.btn.lg{min-height:42px;padding:0 18px;font-size:14.5px}
+.btn.ghost{background:#fff;color:#17161f;border-color:#c9c5d6;font-weight:500}
+.btn.ghost:hover{background:#ecebf2;color:#17161f}
+.btn.quiet{background:transparent;color:#5e5b6b;font-weight:500;padding:0 10px}
+.btn.quiet:hover{background:#ecebf2;color:#17161f}
+.card{background:#fff;border:1px solid #e2e0ea;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.lbl{font:500 11.5px 'Geist Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#5e5b6b;margin:0}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;font-size:12.5px;border:1px solid #e2e0ea;color:#3c3a48;white-space:nowrap;background:#fff}
+.dir{display:inline-flex;align-items:center;gap:4px;font:500 11px 'Geist Mono',monospace;letter-spacing:.04em;color:#5e5b6b;background:#f4f3f8;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.step{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;background:#fff;border:1px solid #e2e0ea;border-radius:14px;padding:12px 14px;font:inherit;color:#17161f;cursor:pointer;min-height:56px;box-sizing:border-box}
+.step:hover{border-color:#c9c5d6}
+.step[aria-current="step"]{border:2px solid #5332e6;background:#eeeafe;padding:11px 13px}
+.dot{width:32px;height:32px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font:600 13px 'Geist Mono',monospace;background:#ecebf2;color:#3c3a48}
+.num{font:600 18px 'Geist Mono',monospace}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.edit{background:none;border:0;color:#3d22c4;font:inherit;font-size:13.5px;cursor:pointer;text-decoration:underline;padding:0}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.field label{font-weight:600}
+.field input{font:inherit;padding:9px 12px;border:1px solid #c9c5d6;border-radius:10px;background:#fff;color:#17161f;min-width:0}
+.drow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #e2e0ea;flex-wrap:wrap}
+.tl{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr);gap:0 14px}
+.tl .rail{display:flex;flex-direction:column;align-items:center}
+.tl .pin{width:14px;height:14px;border-radius:999px;background:#5332e6;border:3px solid #eeeafe;margin-top:4px;box-sizing:content-box}
+.tl .line{flex:1;width:2px;background:#e2e0ea;margin:2px 0}
+.tl .line.gap{background:repeating-linear-gradient(#a34d00 0 6px,transparent 6px 11px)}
+ul.ach{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+@media (max-width:900px){.gc{grid-template-columns:minmax(0,1fr) !important}}
+</style>
+</helmet>
+<div style="display:flex;flex-wrap:wrap;min-height:100vh;font-family:'Geist',system-ui,sans-serif;font-size:15px;line-height:1.5;color:#17161f;background:#f4f3f8">
+  <nav aria-label="Main" style="flex:1 1 232px;max-width:232px;box-sizing:border-box;background:#fff;border-right:1px solid #e2e0ea;padding:20px 14px;display:flex;flex-direction:column;gap:4px">
+    <strong style="font-size:17px;padding:0 12px 14px">Strong Hire</strong>
+    <a href="#" style="display:block;padding:8px 12px;border-radius:10px;color:#3c3a48;text-decoration:none;font-size:14.5px">Home</a>
+    <a href="Main.dc.html" aria-current="page" style="display:block;padding:8px 12px;border-radius:10px;background:#eeeafe;color:#3d22c4;font-weight:600;text-decoration:none;font-size:14.5px">Mohamed's Resumes</a>
+    <a href="Roles.dc.html" style="display:block;padding:8px 12px;border-radius:10px;color:#3c3a48;text-decoration:none;font-size:14.5px">Target roles</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;box-sizing:border-box;padding:28px 24px 64px">
+    <div style="max-width:1160px;display:flex;flex-direction:column;gap:18px">
+      <a href="Main.dc.html" style="font-size:13.5px;color:#5e5b6b;text-decoration:none">← Mohamed's Resumes</a>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+          <div class="row"><h1 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-0.02em">Senior SWE resume</h1><span class="chip" style="background:#17161f;color:#fff;border-color:transparent;font-weight:600">Default</span></div>
+          <p style="margin:0;color:#5e5b6b;font-size:14px">Added Oct 28, 2026 · Last saved Oct 28 · <button type="button" class="edit" onClick="{{openRoles}}">Used by 7 roles</button></p>
+        </div>
+        <div class="row"><a class="btn ghost lg" href="#">Upload a new version</a><a class="btn lg" href="#">Use for an interview</a></div>
+      </div>
+
+      <div class="gc" style="display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start">
+        <!-- Steps -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px" aria-label="Steps">
+            <li><button type="button" class="step" aria-current="{{cJourney}}" onClick="{{sJourney}}"><span class="dot" aria-hidden="true">1</span><span><b style="font-weight:600">Your career journey</b><br><span style="font-size:13px;color:#5e5b6b">4 roles · 9 years · 11 achievements</span></span><span style="color:#5e5b6b">›</span></button></li>
+            <li><button type="button" class="step" aria-current="{{cFind}}" onClick="{{sFind}}"><span class="dot" aria-hidden="true" style="background:#fdeedc;color:#8a4200">2</span><span><b style="font-weight:600">Strova's findings</b><br><span style="font-size:13px;color:#5e5b6b">and the fixes she recommends · 2 high</span></span><span class="num" style="color:#8a4200">4</span></button></li>
+            <li><button type="button" class="step" aria-current="{{cStories}}" onClick="{{sStories}}"><span class="dot" aria-hidden="true">3</span><span><b style="font-weight:600">Stories to tell in interviews</b><br><span class="dir">Resume → Interview</span></span><span class="num" style="color:#3d22c4">18</span></button></li>
+            <li><button type="button" class="step" aria-current="{{cLines}}" onClick="{{sLines}}"><span class="dot" aria-hidden="true">4</span><span><b style="font-weight:600">Stronger resume lines</b><br><span class="dir">Your stories → Resume</span></span><span class="num" style="color:#3d22c4">2</span></button></li>
+          </ol>
+          <div class="card" style="padding:10px 16px;gap:2px">
+            <button type="button" class="edit" onClick="{{openRoles}}" style="text-align:left;padding:6px 0;text-decoration:none">7 roles use this resume ›</button>
+            <button type="button" class="edit" onClick="{{openAccepted}}" style="text-align:left;padding:6px 0;text-decoration:none">6 findings you accepted ›</button>
+            <button type="button" class="edit" onClick="{{openChecks}}" style="text-align:left;padding:6px 0;text-decoration:none">What Strova checks ›</button>
+          </div>
+        </div>
+
+        <!-- Focus panel -->
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+
+          <!-- 1. Career journey: the editable resume as a timeline -->
+          <sc-if value="{{isJourney}}" hint-placeholder-val="{{false}}">
+            <section class="card" aria-labelledby="j-h" style="gap:14px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><h2 id="j-h" style="margin:0;font-size:20px;font-weight:700">Your career journey</h2><span style="font-size:13.5px;color:#5e5b6b">What Strova read. Edit anything she got wrong.</span></div>
+              <div style="background:#f4f3f8;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px"><span><span class="lbl">Summary</span><br><span style="font-size:14px">Backend engineer with 9 years building payment and messaging platforms. I lead migrations of high-traffic services and coach engineers through their first on-call.</span></span><button type="button" class="edit">Edit</button></div>
+
+              <div>
+                <div class="tl">
+                  <div class="rail"><span class="pin"></span><span class="line"></span></div>
+                  <div style="padding-bottom:18px">
+                    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span><b style="font-weight:600">Senior Software Engineer · Ledgerline</b><br><span style="font-size:13px;color:#5e5b6b">Mar 2021 – now · 5 yrs 8 mos · current</span></span><span class="row"><span class="chip" style="background:#fdeedc;color:#8a4200;border-color:transparent;font-weight:600">1 finding</span><button type="button" class="edit">Edit</button></span></div>
+                    <ul class="ach"><li>Led the move of the ledger service to event sourcing, cutting reconciliation from 6 hours to 20 minutes.</li><li>Mentored 4 engineers to their first on-call rotation; all 4 now lead incidents.</li><li>Worked on the fraud rules engine.</li></ul>
+                  </div>
+                  <div class="rail"><span class="pin"></span><span class="line"></span></div>
+                  <div style="padding-bottom:18px">
+                    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span><b style="font-weight:600">Software Engineer · Brightwave Messaging</b><br><span style="font-size:13px;color:#5e5b6b">Aug 2017 – Feb 2021 · 3 yrs 7 mos</span></span><button type="button" class="edit">Edit</button></div>
+                    <ul class="ach"><li>Built the delivery-receipt pipeline on Kafka, handling 40k messages a second at peak.</li><li>Cut p99 send latency from 900 ms to 180 ms by batching carrier calls.</li></ul>
+                  </div>
+                  <div class="rail"><span class="pin"></span><span class="line gap"></span></div>
+                  <div style="padding-bottom:10px">
+                    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span><b style="font-weight:600">Software Engineer · Kitepath</b><br><span style="font-size:13px;color:#5e5b6b">Aug 2015 – Jul 2017 · 2 yrs</span></span><span class="row"><span class="chip" style="background:#fdeedc;color:#8a4200;border-color:transparent;font-weight:600">1 finding</span><button type="button" class="edit">Edit</button></span></div>
+                    <ul class="ach"><li>Shipped the billing export used by 300 customers.</li></ul>
+                    <button type="button" onClick="{{sFind}}" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:#fdeedc;border:0;border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;color:#8a4200;font-weight:600;cursor:pointer">5-month gap · Mar to Aug 2015 · see the fix ›</button>
+                  </div>
+                  <div class="rail"><span class="pin" style="background:#c9c5d6"></span></div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span><b style="font-weight:600">Junior Developer · Studio Nine</b><br><span style="font-size:13px;color:#5e5b6b">2014 – Mar 2015</span></span><button type="button" class="edit">Edit</button></div>
+                  </div>
+                </div>
+                <button type="button" class="edit" style="margin-top:12px;text-decoration:none">+ Add a role</button>
+              </div>
+
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+                <div style="background:#f4f3f8;border-radius:12px;padding:12px 14px"><div style="display:flex;justify-content:space-between"><span class="lbl">Skills · 14</span><button type="button" class="edit">Edit</button></div><span style="font-size:13.5px">Go, Postgres, gRPC, AWS +10</span></div>
+                <div style="background:#f4f3f8;border-radius:12px;padding:12px 14px"><div style="display:flex;justify-content:space-between"><span class="lbl">Education</span><button type="button" class="edit">Edit</button></div><span style="font-size:13.5px">BSc Computer Science · Cairo University</span></div>
+                <div style="background:#f4f3f8;border-radius:12px;padding:12px 14px"><div style="display:flex;justify-content:space-between"><span class="lbl">Certifications</span><button type="button" class="edit">Edit</button></div><span style="font-size:13.5px">AWS SA Associate</span></div>
+              </div>
+            </section>
+          </sc-if>
+
+          <!-- 2. Findings -->
+          <sc-if value="{{isFind}}" hint-placeholder-val="{{true}}">
+            <section class="card" style="border-top:4px solid #a34d00;gap:14px" aria-labelledby="f-up">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="lbl" style="color:#8a4200">Finding 1 of 4 · high</span><span class="row" style="gap:4px"><button type="button" class="btn quiet" aria-label="Previous finding">‹</button><button type="button" class="btn quiet" aria-label="Next finding">›</button></span></div>
+              <h2 id="f-up" style="margin:0;font-size:22px;font-weight:700">A 5-month gap before Kitepath</h2>
+              <p style="margin:0;font-size:14.5px">Mar 2015 to Aug 2015. Interviewers ask about gaps over 3 months.</p>
+              <div style="display:flex;flex-direction:column;gap:10px;background:#f4f3f8;border-radius:12px;padding:14px">
+                <span class="lbl" style="color:#3d22c4">Strova recommends</span>
+                <span style="font-size:14px">Check the dates first. If they are right, accept the gap and say why, then practice the question.</span>
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+                  <div class="field"><label for="c2-s9">Studio Nine ended</label><input id="c2-s9" type="text" value="2015-03"></div>
+                  <div class="field"><label for="c2-kp">Kitepath started</label><input id="c2-kp" type="text" value="2015-08"></div>
+                </div>
+              </div>
+              <div class="row"><button type="button" class="btn lg">Save dates</button><button type="button" class="btn ghost">Accept: career break</button><button type="button" class="btn ghost">Accept: studying</button></div>
+              <a href="#" style="font-size:13.5px">Practice "tell me about this gap" with Strova</a>
+            </section>
+            <p class="lbl" style="margin-top:4px">Next findings</p>
+            <div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 18px"><span><b style="font-weight:600">An achievement with no result</b> <span style="color:#5e5b6b;font-size:13.5px">· Ledgerline</span></span><span class="chip" style="background:#fdeedc;color:#8a4200;border-color:transparent;font-weight:600">high</span></div>
+            <div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 18px"><span><b style="font-weight:600">One achievement only</b> <span style="color:#5e5b6b;font-size:13.5px">· Kitepath</span></span></div>
+            <div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 18px"><span><b style="font-weight:600">Skills used but not listed</b> <span style="color:#5e5b6b;font-size:13.5px">· Kafka, Terraform</span></span></div>
+          </sc-if>
+
+          <!-- 3. Stories to tell -->
+          <sc-if value="{{isStories}}" hint-placeholder-val="{{false}}">
+            <section class="card" style="border-top:4px solid #5332e6;gap:14px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="row" style="gap:8px"><span class="lbl" style="color:#3d22c4">Story 1 of 18</span><span class="dir">Resume → Interview</span></span><span class="row" style="gap:4px"><button type="button" class="btn quiet" aria-label="Previous">‹</button><button type="button" class="btn quiet" aria-label="Next">›</button></span></div>
+              <p style="margin:0;font-size:14px;color:#5e5b6b">This achievement could answer a behavioral question. Craft it once with Strova and reuse it in every interview.</p>
+              <h2 style="margin:0;font-size:20px;font-weight:700">Led the move of the ledger service to event sourcing, cutting reconciliation from 6 hours to 20 minutes.</h2>
+              <div class="row" style="gap:6px"><span class="chip" style="background:#eeeafe;color:#3d22c4;border-color:transparent">Technical leadership</span><span class="chip" style="background:#eeeafe;color:#3d22c4;border-color:transparent">Ownership</span><span style="font-size:13.5px;color:#5e5b6b">Still needs: stakes, reflection</span></div>
+              <div class="row"><a class="btn lg" href="#">Craft with Strova</a><button type="button" class="btn ghost">Not a story</button></div>
+            </section>
+            <p class="lbl" style="margin-top:4px">Already crafted · 3</p>
+            <div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 18px;gap:10px;flex-wrap:wrap"><span style="color:#5e5b6b;font-size:14px">Cut p99 send latency from 900 ms to 180 ms</span><a href="#" style="color:#0f5f48;font-weight:600;font-size:13.5px">Story: Carrier batching</a></div>
+          </sc-if>
+
+          <!-- 4. Stronger resume lines -->
+          <sc-if value="{{isLines}}" hint-placeholder-val="{{false}}">
+            <section class="card" style="border-top:4px solid #5332e6;gap:12px">
+              <div class="row" style="gap:8px"><span class="lbl" style="color:#3d22c4">Line 1 of 2</span><span class="dir">Your stories → Resume</span></div>
+              <p style="margin:0;font-size:14px;color:#5e5b6b">You told Strova a result in your story "Carrier batching" that your resume leaves out. Here is the line with it.</p>
+              <div style="font-size:15px;padding:12px 14px;border-radius:10px;background:#f4f3f8"><del style="color:#b4321f">Improved send latency.</del><br><ins style="color:#12775a;text-decoration:none">Cut p99 send latency from 900 ms to 180 ms by batching carrier calls.</ins></div>
+              <div class="row"><button type="button" class="btn lg">Add to resume</button><button type="button" class="btn quiet">Dismiss</button></div>
+            </section>
+          </sc-if>
+
+          <!-- Compact journey strip under steps 2-4 -->
+          <sc-if value="{{showStrip}}" hint-placeholder-val="{{true}}">
+            <section class="card" aria-label="Career journey at a glance" style="gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span class="lbl">Your career journey</span><button type="button" class="edit" onClick="{{sJourney}}">Open and edit</button></div>
+              <div style="display:flex;gap:4px;align-items:stretch;height:44px" role="img" aria-label="Timeline: Studio Nine 2014 to 2015, gap, Kitepath 2015 to 2017, Brightwave 2017 to 2021, Ledgerline 2021 to now">
+                <span style="flex:1.2;background:#ecebf2;border-radius:8px;font-size:11.5px;padding:4px 6px;color:#3c3a48;overflow:hidden">Studio Nine</span>
+                <span style="flex:.5;border-radius:8px;background:repeating-linear-gradient(135deg,#fdeedc 0 6px,#f6d9b8 6px 12px)"></span>
+                <span style="flex:2;background:#ecebf2;border-radius:8px;font-size:11.5px;padding:4px 6px;color:#3c3a48;box-shadow:inset 0 0 0 2px #a34d00">Kitepath</span>
+                <span style="flex:3.6;background:#ecebf2;border-radius:8px;font-size:11.5px;padding:4px 6px;color:#3c3a48">Brightwave</span>
+                <span style="flex:5.7;background:#eeeafe;border-radius:8px;font-size:11.5px;padding:4px 6px;color:#3d22c4;font-weight:600">Ledgerline · now</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font:500 11.5px 'Geist Mono',monospace;color:#5e5b6b"><span>2014</span><span>2017</span><span>2021</span><span>now</span></div>
+            </section>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{anyOpen}}" hint-placeholder-val="{{false}}">
+    <button type="button" aria-label="Close drawer" tabindex="-1" style="position:fixed;inset:0;border:0;padding:0;background:rgb(23 22 31 / 35%);z-index:10;cursor:default" onClick="{{close}}"></button>
+    <aside role="dialog" aria-modal="true" aria-labelledby="c2-drawer" style="position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);box-sizing:border-box;background:#fff;border-left:1px solid #e2e0ea;box-shadow:0 6px 24px rgb(23 22 31 / 14%);z-index:11;display:flex;flex-direction:column;font-family:'Geist',system-ui,sans-serif;color:#17161f">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid #e2e0ea"><h2 id="c2-drawer" style="margin:0;font-size:19px;font-weight:700">{{drawerTitle}}</h2><button type="button" class="btn quiet" onClick="{{close}}" aria-label="Close"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button></div>
+      <div style="flex:1;overflow:auto;padding:16px 22px 24px;display:flex;flex-direction:column;gap:10px;font-size:14px">
+        <sc-if value="{{isRoles}}" hint-placeholder-val="{{false}}">
+          <p style="margin:0;color:#5e5b6b">These roles rehearse with this resume. Edits here change what their interviewers read.</p>
+          <div>
+            <sc-for list="{{roles}}" as="r" hint-placeholder-count="7">
+              <div class="drow"><div style="display:flex;flex-direction:column"><b style="font-weight:600">{{r.company}}</b><span style="font-size:13.5px;color:#5e5b6b">{{r.title}}</span></div><div class="row"><span class="chip">{{r.stage}}</span><a href="Roles.dc.html" style="font-size:13.5px">Open</a></div></div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{isAccepted}}" hint-placeholder-val="{{false}}">
+          <sc-for list="{{accepted}}" as="a" hint-placeholder-count="6">
+            <div class="drow"><span>✓ {{a.title}} <span style="color:#5e5b6b">· {{a.why}}</span></span><button type="button" class="edit">Undo</button></div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{isChecks}}" hint-placeholder-val="{{false}}">
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:10px">
+            <li><b>Dates:</b> gaps over 3 months, overlapping roles, end before start, future dates, years only, missing dates, current role not marked.</li>
+            <li><b>Detail:</b> roles with fewer than 2 achievements, achievements with no result, "we" with no "I", a very short or missing summary.</li>
+            <li><b>Fit for level:</b> a Senior target with no scope signals.</li>
+            <li><b>Consistency:</b> skills used in roles but missing from Skills, the same company listed twice.</li>
+            <li><b>Against a job:</b> the job's must-have skills that your resume never shows.</li>
+          </ul>
+        </sc-if>
+      </div>
+    </aside>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startStep":{"editor":"enum","options":["journey","find","stories","lines"],"default":"find"},"$preview":{"width":1280,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const st = s.step || this.props.startStep || 'find';
+    const d = s.drawer || 'none';
+    const step = (k) => () => this.setState({ step: k });
+    const dr = (k) => () => this.setState({ drawer: k });
+    const cur = (k) => (st === k ? 'step' : 'false');
+    const titles = { roles: 'Used by 7 roles', accepted: 'Findings you accepted · 6', checks: 'What Strova checks' };
+    return {
+      isJourney: st === 'journey', isFind: st === 'find', isStories: st === 'stories', isLines: st === 'lines',
+      showStrip: st !== 'journey',
+      cJourney: cur('journey'), cFind: cur('find'), cStories: cur('stories'), cLines: cur('lines'),
+      sJourney: step('journey'), sFind: step('find'), sStories: step('stories'), sLines: step('lines'),
+      anyOpen: d !== 'none', isRoles: d === 'roles', isAccepted: d === 'accepted', isChecks: d === 'checks',
+      drawerTitle: titles[d] || '',
+      openRoles: dr('roles'), openAccepted: dr('accepted'), openChecks: dr('checks'), close: dr('none'),
+      roles: [
+        { company: 'Hussh', title: 'Senior Backend Engineer', stage: 'Applied' },
+        { company: 'Twilio', title: 'Staff Software Engineer', stage: 'Interview Nov 7' },
+        { company: 'Google', title: 'Senior Software Engineer', stage: 'Screen done' },
+        { company: 'Anthropic', title: 'Software Engineer, Infrastructure', stage: 'Applied' },
+        { company: 'Rubrik', title: 'Senior Backend Engineer', stage: 'No date yet' },
+        { company: 'Rubrik', title: 'Staff Engineer, Platform', stage: 'No date yet' },
+        { company: 'Sourcegraph', title: 'Software Engineer', stage: 'Applied' }
+      ],
+      accepted: [
+        { title: 'Years only on Studio Nine', why: 'Left old dates off on purpose' },
+        { title: 'Summary under 30 words', why: 'Kept short' },
+        { title: '"We" with no "I"', why: 'Team result' },
+        { title: 'No scope signals', why: 'Not targeting Staff' },
+        { title: 'Overlapping roles', why: 'Contract work' },
+        { title: 'Missing end month', why: 'Accepted' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
