@@ -424,7 +424,8 @@ test("returning: Home plan items open the interview, the story work and the resu
 
   await home();
   await (await group("resume", "Resume gaps and issues")).getByRole("link").first().click();
-  await expect(page).toHaveURL(/\/resumes\/[^/]+$/);
+  // RSD-6: the plan's /resumes/{id} link lands on the check page, the one resume page.
+  await expect(page).toHaveURL(/\/resumes\/[^/]+\/check$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await shot(page, "41-resume");
 });
