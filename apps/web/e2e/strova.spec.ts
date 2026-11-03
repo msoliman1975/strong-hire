@@ -142,7 +142,7 @@ test("add a target role: three steps, then the role page", async ({ page }) => {
   await shot(page, "13-role");
 });
 
-test("RMAP-2: Resumes is one list; each row opens its breakdown and has Rename and Delete under More", async ({ page }) => {
+test("RMAP-2, RSD-1, RSD-3: Resumes is one list of cards; Show details opens the check page; Rename and Delete are in plain sight", async ({ page }) => {
   await firstUse(page, "resumes@example.com");
   await page.goto("/resumes");
   await expect(page.getByRole("heading", { level: 1, name: "Ana's Resumes" })).toBeVisible();
@@ -151,26 +151,19 @@ test("RMAP-2: Resumes is one list; each row opens its breakdown and has Rename a
   await expect(page.getByText("Rename or delete resumes")).toHaveCount(0);
   const row = list.getByRole("listitem").first();
   await expect(row).toContainText("Default");
-  await expect(row).toContainText(/\d+ issues? open/);
+  await expect(row.getByRole("term")).toHaveText(["roles", /^open issues?$/, /^story ideas?$/]);
   await expect(row).toContainText(/Added [A-Z][a-z]{2} \d+, \d{4}/);
   // RMAP-3: first use goes through the breakdown without the editor, so nothing says "Not checked yet".
   await expect(row).not.toContainText(/checked/i);
+  await expect(row.getByText(/More/)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /Add a resume.*slots left/ })).toBeVisible();
   await shot(page, "07-resumes");
-  await row.getByText("More ▾").click();
-  await expect(row.getByRole("button", { name: /^Rename / })).toBeVisible();
-  await shot(page, "08-resumes-more");
-  await page.keyboard.press("Escape");
-  await expect(row.getByRole("button", { name: /^Rename / })).toBeHidden();
-  await page.getByRole("heading", { level: 1 }).click();
-  await row.getByText("More ▾").click();
-  await page.getByRole("heading", { level: 1 }).click();
-  await expect(row.getByRole("button", { name: /^Rename / })).toBeHidden();
-  await row.getByText("More ▾").click();
   await row.getByRole("button", { name: /^Rename / }).click();
+  await shot(page, "08-resumes-rename");
   await row.getByLabel("New name").fill("Payments resume");
   await row.getByRole("button", { name: "Save name" }).click();
-  await expect(list.getByRole("link", { name: "Payments resume", exact: true })).toBeVisible();
-  await row.getByRole("link", { name: /^Open breakdown for / }).click();
+  await expect(list.getByRole("heading", { name: "Payments resume", exact: true })).toBeVisible();
+  await row.getByRole("link", { name: /^Show details/ }).click();
   await expect(page).toHaveURL(/\/resumes\/[^/]+\/check$/);
 });
 
@@ -216,8 +209,8 @@ test("RMAP-5: deleting a role's resume flags the role; Use this resume moves it"
   await page.goto("/resumes");
   const list = page.getByRole("list", { name: "Your resumes" });
   await expect(list.getByRole("listitem")).toHaveCount(2);
-  const used = list.getByRole("listitem").filter({ hasText: /Used by Stripe/ });
-  await used.getByText("More ▾").click();
+  // RSD-1: the resume the role uses has 1 in its roles tile.
+  const used = list.getByRole("listitem").filter({ has: page.getByRole("term").filter({ hasText: /^role$/ }) });
   await used.getByRole("button", { name: /^Delete / }).click();
   const dialog = used.getByRole("dialog", { name: "Delete this resume?" });
   await expect(dialog.getByTestId("delete-roles-note")).toContainText("uses this resume");

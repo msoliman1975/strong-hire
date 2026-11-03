@@ -1,11 +1,12 @@
 /**
- * RM-1 (mockup #cvs): "{First name}'s Resumes". One list, one row per resume, the main one marked.
- * Each row has its roles, open issues, story ideas, date added and check state (IN-12), and every
- * action: Open, Open breakdown, Make default (RM-2; "default" in the UI, `is_main` in the API), and Rename or Delete in the row's "More" menu (R1).
- * RMAP-2: this replaces the second "Saved resumes" list that the page used to fold below.
+ * RM-1, RSD-1 to RSD-3 (mockup "Resumes list (2 columns)"): "{First name}'s Resumes". One card per
+ * resume in two columns, the default one marked. Each card has three tiles (roles using it, open
+ * issues, story ideas), "Added {date} · Edited {date}", and its actions in plain sight: Show details
+ * (the check page), Set as default (RM-2; "default" in the UI, `is_main` in the API), Rename and
+ * Delete (R1, RMAP-5). RMAP-2: this is the one resume list.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router";
 
 import { resumesApi } from "../../api/inputs";
@@ -15,14 +16,16 @@ import type { ResumeOut, RoleOut } from "../../api/types";
 import { resumesLabel } from "../../components/Layout";
 import { NAME_MAX, useLibraryRefresh, validateName } from "../../components/LibrarySection";
 import { ErrorNotice, Loading } from "../../components/ui";
+import { AddCard, SummaryCard, type StatTileProps } from "../../components/ux/SummaryCard";
 import "../../components/ux/ux.css";
 import { formatDate } from "../../labels";
 import { MAX_RESUME_MB, MAX_RESUMES, RESUMES_FULL } from "../../limits";
 import { resumeCheckPath } from "../../paths";
-import { editedLabel, issuesOpen, resumeIssueCounts } from "../onboarding/resumeSummary";
+import { editedLabel, resumeIssueCounts } from "../onboarding/resumeSummary";
 import { START } from "../start/paths";
 
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+/** "1 slot left.", "2 slots left." */
+const slotsLeft = (n: number) => `${n} ${n === 1 ? "slot" : "slots"} left.`;
 
 export const resumePath = (id: string) => `/resumes/${id}`;
 
@@ -64,29 +67,59 @@ export function deleteRolesNote(roles: RoleOut[] | undefined, resumeId: string):
 }
 
 /**
- * "10 issues open · 2 high · 1 accepted", worked out with the same rules as the breakdown (IN-12),
- * so the list and the breakdown always agree.
+ * RSD-1, D-4: how many roles use this resume: the roles with an interview on it, the rule behind
+ * `usedBy`.
  */
-function issueFacts(resume: ResumeOut): string | null {
-  const counts = resumeIssueCounts(resume);
-  if (!counts) return null;
-  return [
-    issuesOpen(counts.open),
-    counts.high > 0 ? `${counts.high} high` : null,
-    counts.accepted > 0 ? `${counts.accepted} accepted` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+export function usingRoleCount(roles: RoleOut[] | undefined, resumeId: string): number | null {
+  if (!roles) return null;
+  return roles.filter((r) => r.interviews.some((i) => i.interview.resume_id === resumeId)).length;
 }
 
-function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | undefined }) {
+export const HIGH_MARK_LABEL = "Includes high-severity issues";
+
+/**
+ * RSD-1, RSD-2: the three tiles. Counts come from the same helpers as the check page (D-4):
+ * `usingRoleCount`, `resumeIssueCounts` and the story-ideas query. "—" while a count loads.
+ */
+export function resumeStats(
+  roleCount: number | null,
+  issues: { open: number; high: number } | null,
+  ideas: number | null,
+): readonly [StatTileProps, StatTileProps, StatTileProps] {
+  const word = (n: number | null, one: string, many: string) => (n === 1 ? one : many);
+  return [
+    { value: roleCount ?? "—", label: word(roleCount, "role", "roles") },
+    issues && issues.high > 0
+      ? { value: issues.open, label: word(issues.open, "open issue", "open issues"), tone: "warn", markLabel: HIGH_MARK_LABEL }
+      : { value: issues?.open ?? "—", label: word(issues?.open ?? null, "open issue", "open issues") },
+    { value: ideas ?? "—", label: word(ideas, "story idea", "story ideas") },
+  ];
+}
+
+const ICONS = {
+  star: "M8 2l1.8 3.8 4.2.5-3.1 2.9.8 4.1L8 11.3 4.3 13.3l.8-4.1L2 6.3l4.2-.5z",
+  pencil: "M11 2.5l2.5 2.5L6 12.5H3.5V10z",
+  trash: "M2.5 4.5h11M6 4.5V3h4v1.5M4 4.5l.7 9h6.6l.7-9",
+};
+
+/** A small stroke icon for a footer button; the button's text and label carry the meaning. */
+function Icon({ d }: { d: string }) {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d={d} />
+    </svg>
+  );
+}
+
+function ResumeCard({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | undefined }) {
   const ready = resume.status === "extracted";
   const label = resume.name ?? "Resume";
+  // RSD-16: one story-ideas request per card. There is no batched read without a backend change (D-8).
   const ideas = useStoryIdeas(ready ? resume.id : null);
   const queryClient = useQueryClient();
   const refresh = useLibraryRefresh();
-  const menu = useRef<HTMLDetailsElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const deleteButton = useRef<HTMLButtonElement>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
 
@@ -112,25 +145,6 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
     },
   });
 
-  const closeMenu = () => menu.current?.removeAttribute("open");
-  // The More menu closes on a click outside it and on Escape, like any menu.
-  useEffect(() => {
-    const onDown = (e: PointerEvent) => {
-      if (menu.current && !menu.current.contains(e.target as Node)) closeMenu();
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && menu.current?.open) {
-        closeMenu();
-        menu.current.querySelector("summary")?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, []);
   const onRename = (e: FormEvent) => {
     e.preventDefault();
     if (editing === null) return;
@@ -138,109 +152,119 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
     setNameError(problem);
     if (!problem) rename.mutate(editing.trim());
   };
+  const closeDialog = () => {
+    dialog.current?.close?.();
+    dialog.current?.removeAttribute("open");
+    deleteButton.current?.focus();
+  };
 
-  const facts = !ready
-    ? ["Still being read"]
-    : [usedBy(roles, resume.id), issueFacts(resume), ideas.data ? plural(ideas.data.ideas.length, "story idea") : null].filter(
-        Boolean,
-      );
-  const dates = [`Added ${formatDate(resume.uploaded_at)}`, ready ? editedLabel(resume) : null].filter(Boolean);
+  const counts = ready ? resumeIssueCounts(resume) : null;
+  const stats = resumeStats(usingRoleCount(roles, resume.id), counts, ideas.data ? ideas.data.ideas.length : null);
+  const meta = ready
+    ? [`Added ${formatDate(resume.uploaded_at)}`, editedLabel(resume)].filter(Boolean).join(" · ")
+    : "Strova is reading this resume. The numbers show when she is done.";
+  const chip = resume.is_main ? (
+    <span className="sx-chip dark">Default</span>
+  ) : !ready ? (
+    <span className="sx-chip v">Being read</span>
+  ) : null;
+
+  const renameButton = (
+    <button
+      type="button"
+      className="sx-btn quiet sm"
+      aria-label={`Rename ${label}`}
+      onClick={() => {
+        setNameError(null);
+        setEditing(resume.name ?? "");
+      }}
+    >
+      <Icon d={ICONS.pencil} />
+      Rename
+    </button>
+  );
+  const actions = (
+    <>
+      {ready && !resume.is_main && (
+        <button
+          type="button"
+          className="sx-btn quiet sm"
+          aria-label={`Set ${label} as default`}
+          onClick={() => makeMain.mutate()}
+          disabled={makeMain.isPending}
+        >
+          <Icon d={ICONS.star} />
+          Set as default
+        </button>
+      )}
+      {renameButton}
+      <button
+        ref={deleteButton}
+        type="button"
+        className="sx-btn quiet sm danger"
+        aria-label={`Delete ${label}`}
+        onClick={() => {
+          remove.reset();
+          const d = dialog.current;
+          if (d && typeof d.showModal === "function") d.showModal();
+          else d?.setAttribute("open", "");
+        }}
+      >
+        <Icon d={ICONS.trash} />
+        Delete
+      </button>
+    </>
+  );
 
   return (
-    <li className="sx-list-row" data-testid="resume-row">
-      {editing !== null ? (
-        <form className="sx-row" onSubmit={onRename} noValidate aria-label={`Rename ${label}`} style={{ flex: 1 }}>
-          <label className="visually-hidden" htmlFor={`rename-${resume.id}`}>
-            New name
-          </label>
-          <input
-            id={`rename-${resume.id}`}
-            type="text"
-            value={editing}
-            maxLength={NAME_MAX + 20}
-            onChange={(e) => setEditing(e.target.value)}
-            autoFocus
-          />
-          <button type="submit" className="sx-btn sm" disabled={rename.isPending}>
-            Save name
-          </button>
-          <button type="button" className="sx-btn quiet sm" onClick={() => setEditing(null)}>
-            Cancel
-          </button>
-          {nameError && (
-            <p className="field-error" role="alert">
-              {nameError}
-            </p>
-          )}
-          {rename.isError && <ErrorNotice error={rename.error} />}
-        </form>
-      ) : (
-        <>
-          <div className="sx-stack" style={{ gap: 2, minWidth: 0 }}>
-            <strong>
-              <Link className="sx-plain" to={resumePath(resume.id)}>
-                {label}
-              </Link>{" "}
-              {resume.is_main && <span className="sx-chip dark">Default</span>}
-            </strong>
-            <span className="sx-small sx-muted">{facts.join(" · ")}</span>
-            <span className="sx-small sx-muted">{dates.join(" · ")}</span>
-          </div>
-          <span className="sx-row">
-            {!resume.is_main && (
-              <button
-                type="button"
-                className="sx-btn quiet sm"
-                onClick={() => makeMain.mutate()}
-                disabled={makeMain.isPending}
-              >
-                Make default
-              </button>
-            )}
-            {ready && (
-              <Link className="sx-btn ghost sm" to={resumeCheckPath(resume.id)} aria-label={`Open breakdown for ${label}`}>
-                Open breakdown
-              </Link>
-            )}
-            <Link className="sx-btn sm" to={resumePath(resume.id)} aria-label={`Open ${label}`}>
-              Open
+    <li data-testid="resume-row" style={{ display: "grid", listStyle: "none", minWidth: 0 }}>
+      <SummaryCard
+        title={label}
+        chip={chip}
+        stats={stats}
+        loading={!ready}
+        meta={editing === null ? meta : undefined}
+        primary={
+          ready && editing === null ? (
+            <Link className="sx-btn sm" to={resumeCheckPath(resume.id)} aria-label={`Show details: ${label}`}>
+              Show details
             </Link>
-            <details className="sx-menu" ref={menu}>
-              <summary className="sx-btn quiet sm" aria-label={`More actions for ${label}`}>
-                More ▾
-              </summary>
-              <div className="sx-menu__list" role="group" aria-label={`More actions for ${label}`}>
-                <button
-                  type="button"
-                  aria-label={`Rename ${label}`}
-                  onClick={() => {
-                    closeMenu();
-                    setNameError(null);
-                    setEditing(resume.name ?? "");
-                  }}
-                >
-                  Rename
-                </button>
-                <button
-                  type="button"
-                  aria-label={`Delete ${label}`}
-                  onClick={() => {
-                    closeMenu();
-                    remove.reset();
-                    const d = dialog.current;
-                    if (d && typeof d.showModal === "function") d.showModal();
-                    else d?.setAttribute("open", "");
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </details>
-          </span>
-          {makeMain.isError && <ErrorNotice error={makeMain.error} />}
-        </>
-      )}
-      <dialog ref={dialog} aria-labelledby={`delete-${resume.id}`} className="sx-dialog">
+          ) : undefined
+        }
+        actions={editing === null ? actions : undefined}
+      >
+        {editing !== null && (
+          <form className="sx-stack" onSubmit={onRename} noValidate aria-label={`Rename ${label}`}>
+            <div className="sx-field">
+              <label htmlFor={`rename-${resume.id}`}>New name</label>
+              <input
+                id={`rename-${resume.id}`}
+                type="text"
+                value={editing}
+                maxLength={NAME_MAX + 20}
+                onChange={(e) => setEditing(e.target.value)}
+                autoFocus
+              />
+            </div>
+            {nameError && (
+              <p className="field-error" role="alert">
+                {nameError}
+              </p>
+            )}
+            {rename.isError && <ErrorNotice error={rename.error} />}
+            <div className="sx-row">
+              <button type="submit" className="sx-btn sm" disabled={rename.isPending}>
+                Save name
+              </button>
+              <button type="button" className="sx-btn quiet sm" onClick={() => setEditing(null)}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+        {makeMain.isError && <ErrorNotice error={makeMain.error} />}
+      </SummaryCard>
+      <dialog ref={dialog} aria-labelledby={`delete-${resume.id}`} className="sx-dialog" onClose={() => deleteButton.current?.focus()}>
         <div className="sx-card">
           <h2 id={`delete-${resume.id}`}>Delete this resume?</h2>
           <p className="sx-small sx-muted">
@@ -257,14 +281,7 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
             <button type="button" className="sx-btn sm" disabled={remove.isPending} onClick={() => remove.mutate()}>
               Delete
             </button>
-            <button
-              type="button"
-              className="sx-btn quiet sm"
-              onClick={() => {
-                dialog.current?.close?.();
-                dialog.current?.removeAttribute("open");
-              }}
-            >
+            <button type="button" className="sx-btn quiet sm" onClick={closeDialog}>
               Keep it
             </button>
           </div>
@@ -311,16 +328,25 @@ export function ResumesListPage() {
       )}
       {resumes.isPending && <Loading label="Loading your resumes" />}
       {resumes.isError && <ErrorNotice error={resumes.error} />}
-      {resumes.data && (
-        <div className="sx-card">
-          {live.length === 0 ? (
-            <p className="sx-muted">No resume yet. Add one and Strova reads it.</p>
-          ) : (
-            <ul className="sx-rows" aria-label="Your resumes">
-              {live.map((r) => (
-                <ResumeRow key={r.id} resume={r} roles={roles.data} />
-              ))}
-            </ul>
+      {resumes.data && live.length === 0 && (
+        <div className="sx-card dashed">
+          <p className="sx-muted">No resume yet. Add one and Strova reads it.</p>
+        </div>
+      )}
+      {resumes.data && live.length > 0 && (
+        <div className="sx-grid2 stretch">
+          {/* The list keeps its semantics; its items sit in the page grid (display: contents). */}
+          <ul role="list" aria-label="Your resumes" style={{ display: "contents" }}>
+            {live.map((r) => (
+              <ResumeCard key={r.id} resume={r} roles={roles.data} />
+            ))}
+          </ul>
+          {!full && (
+            <AddCard
+              to={START}
+              title="Add a resume"
+              hint={`${slotsLeft(MAX_RESUMES - live.length)} Add the version you sent for a role.`}
+            />
           )}
         </div>
       )}
