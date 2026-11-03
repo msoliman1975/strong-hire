@@ -256,6 +256,25 @@ describe("RSD-10: Strova's findings", () => {
     expect(screen.queryByRole("heading", { name: "A skill missing from Skills" })).not.toBeInTheDocument();
   });
 
+  it("RSD-10: a finding with no form keeps a normal button (not full width) that opens its field on step 1", async () => {
+    const { resume, record } = await seed();
+    // A copy: the mock's fixture resume is shared with the other tests.
+    record.resume = structuredClone(record.resume!);
+    record.resume.roles.push({ company: "Shoply", title: "Software Engineer I", start: "2019-01", end: "2021-02", achievements: ["Fixed checkout bugs"], skills: [] });
+    record.resume.roles[1].start = "2016-01";
+    record.resume.roles[1].end = "2018-12";
+    const user = renderAt(`/resumes/${resume.id}/check`);
+    await ready();
+    await user.click(within(screen.getByRole("list", { name: "Next findings" })).getByRole("button", { name: /Shoply listed 2 times/ }));
+    const open = within(finding()).getByRole("button", { name: "Open the role" });
+    // The Strova recommends box is a column; the button sits in a row so it keeps its pill shape.
+    expect(open.parentElement).toHaveClass("row");
+    expect(open.parentElement?.parentElement).toHaveClass("cvc-recommends");
+    await user.click(open);
+    expect(current()).toBe(stepButton(/Your career journey/));
+    expect(screen.getByRole("group", { name: /^Editing · Software Engineer/ })).toBeInTheDocument();
+  });
+
   it("RSD-10: with nothing open it says so and links to step 1", async () => {
     const { resume, record } = await seed();
     const { checkResume, thisMonth } = await import("../resumeChecks");

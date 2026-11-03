@@ -18,7 +18,7 @@ import type { Resume } from "../../api/types";
 import { ErrorNotice, Steps } from "../../components/ui";
 import { contextPath, newJobPath } from "../../paths";
 import { usingRoleCount } from "../resumes/ResumesListPage";
-import { addRolePath, dateChip, rolePath, roleTitle } from "../roles/shared";
+import { addRoleWithResumePath, dateChip, rolePath, roleTitle } from "../roles/shared";
 import { START } from "../start/paths";
 import { useAcceptedIssues } from "./acceptedIssues";
 import { CareerStrip } from "./check/CareerStrip";
@@ -415,8 +415,8 @@ export function ResumeCheckV2({
       Save draft
     </button>
   ) : (
-    <button type="button" className="btn btn--secondary" onClick={() => saveThen("/resumes")} disabled={save.isPending}>
-      Save and go back to resumes
+    <button type="button" className="btn btn--secondary" onClick={onSaveDraft} disabled={save.isPending}>
+      Save changes
     </button>
   );
 
@@ -484,6 +484,12 @@ export function ResumeCheckV2({
         {saveButton}
         {primary}
       </div>
+      {/* Outside onboarding, Save changes is here, so its confirmation is here too. */}
+      {!jobId && (
+        <p className="muted small cvc-next__saved" aria-live="polite">
+          {saved && !save.isPending ? "Changes saved." : ""}
+        </p>
+      )}
     </section>
   );
 
@@ -551,7 +557,7 @@ export function ResumeCheckV2({
         </div>
       </header>
       <div aria-live="polite" className="cvc-status">
-        {saved && !save.isPending && <p className="muted">Draft saved.</p>}
+        {jobId && saved && !save.isPending && <p className="muted">Draft saved.</p>}
       </div>
       {blocked && (
         <p className="field-error" role="alert">
@@ -652,7 +658,7 @@ export function ResumeCheckV2({
             </li>
           ))}
         </ul>
-        <Link className="btn btn--secondary btn--small" to={addRolePath}>
+        <Link className="btn btn--secondary btn--small" to={addRoleWithResumePath(resumeId)}>
           Add a target role with this resume
         </Link>
       </Drawer>
