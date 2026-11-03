@@ -13,7 +13,6 @@ import { jobTargetsApi, resumesApi } from "./api/inputs";
 import { AppRoutes, createQueryClient } from "./App";
 import { mockStore } from "./mocks/node";
 import { mockStory, resetMockStories } from "./mocks/storyHandlers";
-import { workReasons } from "./pages/progress/StoriesToWorkOn";
 import { setFeatureOverrides } from "./theme/features";
 
 afterEach(() => setFeatureOverrides({}));
@@ -122,29 +121,35 @@ describe("Progress page (v2)", () => {
     notes: [{ text: "Say the number first.", at: "2026-10-05T09:00:00Z", session_id: null, question_ref: null }],
   });
 
-  it("ST-3: lists the stories that need work (drafts, missing parts, coach notes), each with Work on it", async () => {
+  it("NV-4: Reports has three lists (gap reports, debriefs, stories) with their counts; Stories shows every story with its status", async () => {
     resetMockStories([PROVEN, DRAFT, NOTED]);
-    renderApp("/reports");
+    const user = renderApp("/reports");
     expect(await screen.findByRole("heading", { level: 1, name: "Reports" })).toBeInTheDocument();
-    const rows = await screen.findAllByTestId("story-to-work-on");
-    expect(rows.map((r) => within(r).getAllByRole("link")[0].textContent)).toEqual(["Pushback from platform", "Vendor"]);
-    expect(rows[0]).toHaveTextContent("Not proven yet · Missing stakes, your action, result, reflection");
-    expect(rows[1]).toHaveTextContent("1 coach note");
-    expect(within(rows[0]).getByRole("link", { name: "Work on it" })).toHaveAttribute("href", "/coach/new?story=s2");
-    // NV-4: the reports come first, then the stories.
-    const list = screen.getByRole("region", { name: "Report list" });
-    expect(list.compareDocumentPosition(rows[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
+    const views = screen.getByRole("group", { name: "Show" });
+    expect(within(views).getByRole("button", { name: /^Gap reports/ })).toHaveAttribute("aria-pressed", "true");
+    await within(views).findByRole("button", { name: "Stories · 3" });
+    // No role cards any more.
+    expect(document.querySelector(".sx-summary")).toBeNull();
 
-  it("ST-3: a proven, complete story with no coach notes needs no work", () => {
-    expect(workReasons(PROVEN)).toEqual([]);
+    await user.click(within(views).getByRole("button", { name: "Stories · 3" }));
+    expect(screen.getByTestId("where")).toHaveTextContent("type=stories");
+    const list = await screen.findByRole("list", { name: "Stories" });
+    const links = within(list).getAllByRole("link");
+    expect(links).toHaveLength(3);
+    const byTitle = (t: string) => links.find((l) => l.textContent?.includes(t)) as HTMLElement;
+    expect(byTitle("Checkout migration")).toHaveTextContent("Proven");
+    expect(byTitle("Pushback from platform")).toHaveTextContent("Draft");
+    expect(byTitle("Vendor")).toHaveTextContent("1 coach note");
+    expect(byTitle("Pushback from platform")).toHaveAttribute("href", "/stories/s2");
+    // The target role filter is for reports only.
+    expect(screen.queryByLabelText("Target role")).toBeNull();
   });
 
   it("FL-1: with v2 off, the page is still Reports, with no story list", async () => {
     resetMockStories([DRAFT]);
     renderApp("/reports", false);
     expect(await screen.findByRole("heading", { level: 1, name: "Reports" })).toBeInTheDocument();
-    expect(screen.queryByTestId("story-to-work-on")).toBeNull();
+    expect(screen.queryByRole("list", { name: "Stories" })).toBeNull();
   });
 });
 
