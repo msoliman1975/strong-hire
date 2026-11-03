@@ -168,6 +168,30 @@ describe("target roles", () => {
     expect(kept).toEqual(["behavioral", "technical_qa"]);
   });
 
+  it("RSD-14: a role added from a resume's roles drawer is measured against that resume", async () => {
+    const first = new FormData();
+    first.append("text", "Backend engineer, Python and Go.");
+    await resumesApi.upload(first);
+    const second = new FormData();
+    second.append("text", "Platform engineer, Kubernetes and Terraform.");
+    const { resume: other } = await resumesApi.upload(second);
+    await resumesApi.get(other.id);
+    await resumesApi.rename(other.id, "Platform resume");
+    const user = renderApp(`/roles/new?resume=${other.id}`);
+    await user.click(await screen.findByRole("button", { name: "paste the text" }));
+    await user.click(screen.getByRole("textbox", { name: "Job posting text" }));
+    await user.paste("Senior engineer, payments. ".repeat(10));
+    await user.click(screen.getByRole("button", { name: "Read the posting" }));
+    await screen.findByRole("textbox", { name: "Company" }, { timeout: 4000 });
+    await user.click(screen.getByRole("button", { name: "Looks right" }));
+    await screen.findByRole("checkbox", { name: /Behavioral/ });
+    await waitFor(() => expect(screen.getByText(/Measured against:/)).toHaveTextContent("Platform resume"));
+    expect(screen.getByText(/Measured against:/)).not.toHaveTextContent("(default)");
+    await user.click(screen.getByRole("button", { name: "Create the role" }));
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/[^/]+$/));
+    expect((mockStore.db.interviews ?? []).every((i) => i.resume_id === other.id)).toBe(true);
+  });
+
   it("RF-10: the job category on the check step drives the suggested interviews and is saved", async () => {
     const form = new FormData();
     form.append("text", "Strategy consultant, market entry and profitability cases.");

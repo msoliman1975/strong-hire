@@ -237,9 +237,13 @@ describe("v2 Check your CV", () => {
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply" }));
     await user.click(screen.getByRole("button", { name: "Remove the role Software Engineer II · Shoply" }));
 
-    await user.click(screen.getByRole("button", { name: "Save and go back to resumes" }));
-    expect(await screen.findByRole("heading", { level: 1, name: /Resumes$/i })).toBeInTheDocument();
+    // Save changes stays on the page; Back to resumes saves too and goes back.
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(await screen.findByText("Changes saved.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Your career journey" })).toBeInTheDocument();
     expect(puts[0].resume.roles.map((r) => r.company)).toEqual(["Northwind Labs", "Invoicely"]);
+    await user.click(screen.getByRole("button", { name: "Back to resumes" }));
+    expect(await screen.findByRole("heading", { level: 1, name: /Resumes$/i })).toBeInTheDocument();
   });
 
   it("IN-3 regression: editing a role updates that role, and never adds one", async () => {
@@ -402,7 +406,7 @@ describe("v2 Check your CV", () => {
     const next = screen.getAllByRole("button", { name: "Add a job description to practice for" });
     expect(next).toHaveLength(2);
     expect(
-      within(screen.getByRole("region", { name: "Next step" })).getByRole("button", { name: "Save and go back to resumes" }),
+      within(screen.getByRole("region", { name: "Next step" })).getByRole("button", { name: "Save changes" }),
     ).toBeInTheDocument();
     await user.click(next[1]);
     expect(await screen.findByRole("heading", { level: 1, name: "Add a target role" })).toBeInTheDocument();

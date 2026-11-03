@@ -9,7 +9,7 @@
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 
 import { gapApi } from "../../api/gap";
 import { useJob, useJobTask, useResumes } from "../../api/hooks";
@@ -326,7 +326,9 @@ function InterviewsStep({ jobId, posting, date, onBack }: { jobId: string; posti
   const resumes = useResumes();
   const live = (resumes.data ?? []).filter((r) => !r.deleted);
   const main = live.find((r) => r.is_main) ?? live[0];
-  const [resumeId, setResumeId] = useState<string | null>(null);
+  // From a resume's check page (its roles drawer), the role starts on that resume.
+  const [params] = useSearchParams();
+  const [resumeId, setResumeId] = useState<string | null>(() => params.get("resume"));
   const [chooseResume, setChooseResume] = useState(false);
   const [compare, setCompare] = useState(false);
   const [kept, setKept] = useState<Set<Kind> | null>(null);
