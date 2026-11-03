@@ -33,6 +33,7 @@ import {
   StoryPartChip,
 } from "../../components/ui";
 import { displayStatusOf, STORY_PARTS, storiesApi, storyKeys, type Competency, type Story } from "../stories/api";
+import { Markdown } from "../../components/markdown/markdown";
 import { Strova } from "../../components/strova";
 import { StoryStatusBadge } from "../stories/StoriesPage";
 import { storiesPath, storyPath } from "../stories/paths";
@@ -278,10 +279,18 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
                     </span>
                   )}
                   <div className="coach-turn__body">
-                    <p>
-                      <span className="visually-hidden">{t.speaker === "coach" ? "Coach: " : "You: "}</span>
-                      {t.text}
-                    </p>
+                    {t.speaker === "candidate" && crafting ? (
+                      // SC-18: the candidate's formatted reply, rendered safely (no HTML).
+                      <div>
+                        <span className="visually-hidden">You: </span>
+                        <Markdown text={t.text} />
+                      </div>
+                    ) : (
+                      <p>
+                        <span className="visually-hidden">{t.speaker === "coach" ? "Coach: " : "You: "}</span>
+                        {t.text}
+                      </p>
+                    )}
                     {t.speaker === "coach" && t.seq === lastCoach && tipOn && (
                       <p className="coach-turn__tip">Tip: say “I”, not “we”</p>
                     )}

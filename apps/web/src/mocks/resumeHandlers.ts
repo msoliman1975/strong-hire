@@ -5,7 +5,7 @@
  */
 import { http, HttpResponse } from "msw/http";
 
-import type { PlanSettingsIn, ResumeIssues, ResumeOut, StoryIdeaOut, StoryIdeasOut } from "../api/types";
+import type { PlanSettingsIn, ResumeIssues, ResumeOut, StoryIdeaCount, StoryIdeaOut, StoryIdeasOut } from "../api/types";
 import { parseStoredKey } from "../pages/onboarding/acceptedIssues";
 import { checkResume, thisMonth } from "../pages/onboarding/resumeChecks";
 import type { MockStore } from "./db";
@@ -46,6 +46,38 @@ const reading = () =>
 export function resumeHandlers(store: MockStore) {
   const live = (id: unknown): ResumeOut | undefined => store.db.resumes.find((r) => r.id === id && !r.deleted);
   const dismissed = () => (store.db.storyIdeaDismissed ??= {});
+  /** RM-4: one idea per achievement no story uses and not dismissed (the API's rules). */
+  const ideasFor = (r: ResumeOut): StoryIdeasOut => {
+    const resume = r.resume;
+    if (!resume) return { ideas: [], used: [], skills: "ready" };
+    const gone = new Set(dismissed()[r.id] ?? []);
+    const stories = mockStoryLibrary().map((s) => ({
+      story: s,
+      text: normalize([s.context, s.stakes, s.action, s.result, s.reflection].filter(Boolean).join(" ")),
+    }));
+    const body: StoryIdeasOut = { ideas: [], used: [], skills: "ready" };
+    resume.roles.forEach((role, i) =>
+      role.achievements.forEach((line, j) => {
+        const text = line.trim();
+        if (!text) return;
+        const ref = `roles[${i}].achievements[${j}]`;
+        const used = stories.find((s) => s.text.includes(normalize(text)));
+        if (used) {
+          body.used.push({ achievement: text, resume_line_ref: ref, story_id: used.story.id, story_title: used.story.title });
+          return;
+        }
+        if (gone.has(normalize(text))) return;
+        body.ideas.push({
+          achievement: text,
+          role: `${role.title}, ${role.company}`,
+          resume_line_ref: ref,
+          skills: likelySkills(text),
+          missing_parts: missingParts(text),
+        });
+      }),
+    );
+    return body;
+  };
 
   return [
     http.post(`${API}/resumes/:resumeId/main`, ({ params }) => {
@@ -80,33 +112,17 @@ export function resumeHandlers(store: MockStore) {
       const r = live(params.resumeId);
       if (!r) return notFound();
       if (!r.resume) return reading();
-      const gone = new Set(dismissed()[r.id] ?? []);
-      const stories = mockStoryLibrary().map((s) => ({
-        story: s,
-        text: normalize([s.context, s.stakes, s.action, s.result, s.reflection].filter(Boolean).join(" ")),
-      }));
-      const body: StoryIdeasOut = { ideas: [], used: [], skills: "ready" };
-      r.resume.roles.forEach((role, i) =>
-        role.achievements.forEach((line, j) => {
-          const text = line.trim();
-          if (!text) return;
-          const ref = `roles[${i}].achievements[${j}]`;
-          const used = stories.find((s) => s.text.includes(normalize(text)));
-          if (used) {
-            body.used.push({ achievement: text, resume_line_ref: ref, story_id: used.story.id, story_title: used.story.title });
-            return;
-          }
-          if (gone.has(normalize(text))) return;
-          body.ideas.push({
-            achievement: text,
-            role: `${role.title}, ${role.company}`,
-            resume_line_ref: ref,
-            skills: likelySkills(text),
-            missing_parts: missingParts(text),
-          });
-        }),
-      );
-      return HttpResponse.json(body);
+      return HttpResponse.json(ideasFor(r));
+    }),
+
+    // RSD-16: every read resume's counts in one request, with the rules above.
+    http.get(`${API}/story-ideas/counts`, () => {
+      const out: StoryIdeaCount[] = store.db.resumes.filter((r) => !r.deleted && r.resume)
+        .map((r) => {
+          const found = ideasFor(r);
+          return { resume_id: r.id, ideas: found.ideas.length, used: found.used.length };
+        });
+      return HttpResponse.json(out);
     }),
 
     http.post(`${API}/resumes/:resumeId/story-ideas/dismiss`, async ({ params, request }) => {

@@ -77,6 +77,7 @@ from strong_core.db.models import AuditLog, Company, InterviewSession, JobTarget
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.library import (
+    NAME_MAX_CHARS,
     content_hash,
     default_job_name,
     default_resume_name,
@@ -173,6 +174,20 @@ def _resume_out(row: ResumeRow) -> ResumeOut:
         accepted_issues=[AcceptedIssue.model_validate(i) for i in row.accepted_issues or []],
         is_main=row.is_main and row.deleted_at is None,
     )
+
+
+def unique_name(name: str, taken: set[str]) -> str:
+    """RMAP-9: a default name no live resume of the user has, so two cards never share one:
+    "Resume 2026-11-03", then "Resume 2026-11-03 (2)", "(3)". Fits NAME_MAX_CHARS."""
+    if name not in taken:
+        return name
+    n = 2
+    while True:
+        suffix = f" ({n})"
+        candidate = f"{name[: NAME_MAX_CHARS - len(suffix)].rstrip()}{suffix}"
+        if candidate not in taken:
+            return candidate
+        n += 1
 
 
 def _live_resumes(me: Me):  # type: ignore[no-untyped-def]
@@ -564,10 +579,21 @@ async def create_resume(
         )
     )
     now = datetime.now(UTC)
+    taken = {
+        n
+        for n in await db.scalars(
+            select(ResumeRow.name).where(
+                ResumeRow.org_id == me.org_id,
+                ResumeRow.user_id == me.user_id,
+                ResumeRow.deleted_at.is_(None),
+            )
+        )
+        if n
+    }
     row = ResumeRow(
         org_id=me.org_id,
         user_id=me.user_id,
-        name=default_resume_name(filename if file is not None else None, now),
+        name=unique_name(default_resume_name(filename if file is not None else None, now), taken),
         content_hash=content_hash(data),
         is_main=not has_main,
         # Set here rather than by the database clock, so "newest" is exact (RM-2).

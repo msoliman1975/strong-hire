@@ -19,7 +19,7 @@ import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import { competencyLabel } from "../../labels";
 import { newCoachPath } from "../coach/paths";
-import { craftFromIdeaPath } from "../resumes/ResumeDetailPage";
+import { craftFromIdeaPath } from "../onboarding/check/StoriesStep";
 import {
   displayStatusLabel,
   filledParts,

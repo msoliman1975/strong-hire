@@ -3627,26 +3627,12 @@ dialog::backdrop {
   margin: 0 0 var(--space-3);
 }
 
-.cvc-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 400px);
-  gap: 24px;
-  align-items: start;
-  margin-top: var(--space-4);
-}
-
 .cvc-cv {
   display: flex;
   flex-direction: column;
   gap: 16px;
   min-width: 0;
   container-type: inline-size;
-}
-
-@media (max-width: 1439px) {
-  .cvc-grid {
-    grid-template-columns: minmax(0, 1fr) 360px;
-  }
 }
 
 .cvc-card {
@@ -3663,11 +3649,6 @@ dialog::backdrop {
   justify-content: space-between;
   align-items: baseline;
   gap: var(--space-3);
-}
-
-.cvc-panel__head h2 {
-  margin: 0;
-  font-size: 1.2rem;
 }
 
 .cvc-label {
@@ -4091,126 +4072,6 @@ dialog::backdrop {
   padding-left: 18px;
 }
 
-/* The issues panel grows with the page; only its summary (counts and filters) stays in view. */
-.cvc-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-
-.cvc-panel__list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cvc-panel__head {
-  position: sticky;
-  top: 16px;
-  z-index: 2;
-  padding: 18px 20px;
-  box-shadow: 0 6px 18px rgba(23, 22, 31, 0.06);
-}
-
-.cvc-panel__toggle {
-  display: none;
-}
-
-.cvc-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.cvc-filter {
-  font: inherit;
-  font-size: 0.8rem;
-  min-height: 32px;
-  padding: 0 12px;
-  border-radius: 999px;
-  border: 0;
-  background: var(--sh-sunken);
-  color: var(--sh-ink);
-  cursor: pointer;
-}
-
-.cvc-filter[aria-pressed="true"] {
-  background: var(--sh-ink);
-  color: var(--sh-surface);
-}
-
-.cvc-issue {
-  padding: 14px 18px;
-  border-left: 4px solid var(--sh-violet);
-}
-
-.cvc-issue[data-severity="high"] {
-  border-left-color: var(--sh-danger);
-}
-
-.cvc-issue[data-group="dates"]:not([data-severity="high"]) {
-  border-left-color: var(--sh-warn);
-}
-
-.cvc-issue summary {
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.cvc-issue summary::-webkit-details-marker {
-  display: none;
-}
-
-.cvc-issue__detail {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--sh-muted);
-  overflow-wrap: anywhere;
-}
-
-.cvc-issue__group {
-  flex: none;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--sh-violet);
-}
-
-.cvc-issue__group::after {
-  content: " ▸";
-}
-
-.cvc-issue[open] .cvc-issue__group::after {
-  content: " ▾";
-}
-
-.cvc-issue[data-severity="high"] .cvc-issue__group {
-  color: var(--sh-danger-ink);
-}
-
-.cvc-issue[data-group="dates"]:not([data-severity="high"]) .cvc-issue__group {
-  color: var(--sh-warn-ink);
-}
-
-.cvc-issue__why {
-  margin: 10px 0;
-  font-size: 0.875rem;
-}
-
-.cvc-issue__actions {
-  gap: 8px;
-}
-
-.cvc-issue .btn {
-  min-height: 36px;
-  padding: 0 14px;
-  font-size: 0.875rem;
-}
 
 .cvc-practice {
   font-size: 0.875rem;
@@ -4227,73 +4088,11 @@ dialog::backdrop {
   font-size: 0.875rem;
 }
 
-/* Issues shown from a section issue count: outlined and flashed, below the sticky panel head. */
-.cvc-panel__list > * {
-  scroll-margin-top: 200px;
-}
-
-.cvc-panel [data-highlight] {
-  outline: 3px solid var(--sh-violet);
-  outline-offset: 2px;
-  animation: cvc-flash 1.2s ease-out 2;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cvc-panel [data-highlight] {
-    animation: none;
-  }
-}
-
 .cvc-clear {
   margin: 0;
   max-width: none;
   color: var(--sh-muted);
   font-size: 0.875rem;
-}
-
-.cvc-checks {
-  padding: 16px 18px;
-  font-size: 0.875rem;
-}
-
-.cvc-checks summary {
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.cvc-checks ul {
-  margin: 6px 0 0;
-  padding-left: 18px;
-  color: var(--sh-muted);
-}
-
-.cvc-checks b {
-  color: var(--sh-ink);
-}
-
-@media (max-width: 979px) {
-  .cvc-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* On narrow screens the issues come first, folded to their summary, then the CV. */
-  .cvc-panel {
-    order: -1;
-  }
-
-  .cvc-panel__head {
-    position: static;
-    box-shadow: none;
-  }
-
-  .cvc-panel__toggle {
-    display: inline-block;
-    margin-top: 6px;
-  }
-
-  .cvc-panel[data-folded] .cvc-panel__list {
-    display: none;
-  }
 }
 
 @media (max-width: 599px) {
@@ -4370,4 +4169,121 @@ dialog::backdrop {
 
 .cvc-saved {
   margin-top: 4px;
+}
+
+/*
+ * RMAP-9 (RSD-7 to RSD-10, RSD-13): the guided check page. The header, the step list beside the
+ * step view (above it below 900 px), the journey timeline, one finding at a time and the career
+ * strip. Tokens only, as on the "Check C2: Guided, revised (v2)" board.
+ */
+.cvc-back { align-self: flex-start; margin-bottom: 4px; }
+.cvc-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.cvc-top__main { flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.cvc-top__title { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cvc-top__title h1 { margin: 0; font-size: 28px; line-height: 1.2; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.cvc-top__meta { margin: 0; }
+.cvc-top__intro { margin: 0; max-width: 68ch; color: var(--sh-ink-2); }
+.cvc-top__actions { gap: 8px; }
+.cvc-link--inline { display: inline; min-height: 0; padding: 0; text-decoration: underline; }
+
+.cvc-guided { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 12px; }
+.cvc-view { display: flex; flex-direction: column; gap: 16px; min-width: 0; container-type: inline-size; }
+.cvc-step-view { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.cvc-view-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.cvc-view-head h2 { margin: 0; font-size: 19px; }
+.cvc-view-head p { margin: 0; }
+
+.cvc-steps { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 16px; }
+.cvc-steps__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cvc-step { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; min-height: 56px; padding: 12px 14px; text-align: left; background: var(--sh-surface); border: 1px solid var(--sh-line); border-radius: 14px; font: inherit; color: var(--sh-ink); cursor: pointer; }
+.cvc-step:hover { border-color: var(--sh-line-strong); }
+.cvc-step[aria-current="step"] { border: 2px solid var(--sh-violet); background: var(--sh-violet-soft); padding: 11px 13px; }
+.cvc-step__dot { width: 32px; height: 32px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font: 600 13px var(--sh-font-mono); background: var(--sh-sunken); color: var(--sh-ink-2); }
+.cvc-step[aria-current="step"] .cvc-step__dot { background: var(--sh-violet); color: var(--sh-surface); }
+.cvc-step__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cvc-step__name { font-size: 14.5px; }
+.cvc-step__line { font-size: 12.5px; color: var(--sh-muted); }
+.cvc-step__tag { align-self: flex-start; font: 500 11px var(--sh-font-mono); letter-spacing: 0.04em; color: var(--sh-muted); background: var(--sh-ground); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+.cvc-step__num { font: 600 18px var(--sh-font-mono); font-variant-numeric: tabular-nums; }
+.cvc-step__num--go { color: var(--sh-muted); }
+.cvc-steps__foot { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px 18px; }
+.cvc-checks-list { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--sh-ink-2); display: flex; flex-direction: column; gap: 6px; }
+
+/* Step 1: the roles on a rail, newest first, with gaps drawn dashed in the warn colour. */
+.cvc-tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.cvc-tl__item { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 0 14px; }
+.cvc-tl__rail { display: flex; flex-direction: column; align-items: center; }
+.cvc-tl__pin { width: 14px; height: 14px; border-radius: 999px; background: var(--sh-violet); border: 3px solid var(--sh-violet-soft); margin-top: 22px; box-sizing: content-box; flex: none; }
+.cvc-tl__line { flex: 1; width: 2px; background: var(--sh-line); margin: 2px 0; }
+.cvc-tl__line--gap { background: repeating-linear-gradient(var(--sh-warn) 0 6px, transparent 6px 11px); }
+.cvc-tl__body { display: flex; flex-direction: column; gap: 6px; padding-bottom: 14px; min-width: 0; }
+.cvc-gap-link { align-self: flex-start; color: var(--sh-warn-ink); text-decoration: underline; }
+
+/* Step 2: one finding at a time. */
+.cvc-finding { display: flex; flex-direction: column; gap: 10px; border-left: 4px solid var(--sh-violet); }
+.cvc-finding[data-severity="high"] { border-left-color: var(--sh-danger); }
+.cvc-finding[data-group="dates"]:not([data-severity="high"]) { border-left-color: var(--sh-warn); }
+.cvc-finding__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.cvc-finding__top .cvc-label { margin: 0; }
+.cvc-finding__nav { display: flex; gap: 2px; }
+.cvc-finding__nav .sx-btn { min-width: 36px; font-size: 18px; }
+.cvc-finding__title { margin: 0; font-size: 19px; line-height: 1.3; }
+.cvc-finding__detail { margin: 0; color: var(--sh-ink-2); }
+.cvc-finding__actions { gap: 8px; }
+.cvc-recommends { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 12px; background: var(--sh-violet-soft); }
+.cvc-recommends .cvc-label { margin: 0; color: var(--sh-violet-ink); }
+.cvc-recommends p { margin: 0; }
+.cvc-fix-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cvc-recommends .field { margin: 0; }
+.cvc-recommends input, .cvc-recommends textarea { background: var(--sh-surface); }
+.cvc-next-findings { display: flex; flex-direction: column; gap: 8px; }
+.cvc-next-findings .cvc-label { margin: 4px 0 0; }
+.cvc-finding-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cvc-finding-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; text-align: left; font: inherit; color: var(--sh-ink); cursor: pointer; }
+.cvc-finding-row:hover { border-color: var(--sh-line-strong); }
+.cvc-accepted-list > summary { cursor: pointer; font-weight: 600; }
+.cvc-accepted-list .cvc-accepted { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--sh-line); }
+
+/* RSD-13: the compact strip under steps 2 to 4. */
+.cvc-strip { display: flex; flex-direction: column; gap: 10px; }
+.cvc-strip .cvc-label { margin: 0; }
+.cvc-strip__bar { position: relative; height: 34px; border-radius: 8px; background: var(--sh-ground); overflow: hidden; }
+.cvc-strip__seg { position: absolute; top: 4px; bottom: 4px; display: flex; align-items: center; padding: 0 8px; border-radius: 6px; font-size: 12px; white-space: nowrap; overflow: hidden; box-sizing: border-box; }
+.cvc-strip__seg--role { background: var(--sh-violet-soft); color: var(--sh-violet-ink); border: 1px solid var(--sh-surface); }
+.cvc-strip__seg--gap { background: repeating-linear-gradient(135deg, var(--sh-warn-soft) 0 5px, var(--sh-warn) 5px 7px); }
+.cvc-strip__seg[data-outlined] { outline: 2px solid var(--sh-violet); outline-offset: -2px; font-weight: 600; }
+.cvc-strip__axis { display: flex; justify-content: space-between; font: 500 11.5px var(--sh-font-mono); color: var(--sh-muted); }
+.cvc-placeholder { gap: 10px; }
+.cvc-placeholder h2 { margin: 0; font-size: 19px; }
+
+@media (max-width: 899px) {
+  .cvc-guided { grid-template-columns: minmax(0, 1fr); }
+  .cvc-steps { position: static; }
+}
+@media (max-width: 640px) {
+  .cvc-fix-fields { grid-template-columns: minmax(0, 1fr); }
+  .cvc-top__title h1 { font-size: 24px; }
+}
+
+/* RSD-14: a drawer is a modal sheet from the right, at most 460 px, full width on phones. */
+.cvc-drawer { inset: 0 0 0 auto; margin: 0; width: min(460px, 100%); max-width: 100%; height: 100dvh; max-height: none; padding: 0; border: 0; background: var(--sh-surface); color: var(--sh-ink); box-shadow: var(--sh-shadow-pop); }
+.cvc-drawer::backdrop { background: rgb(23 22 31 / 45%); }
+.cvc-drawer__panel { display: flex; flex-direction: column; height: 100%; }
+.cvc-drawer__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--sh-line); }
+.cvc-drawer__head h2 { margin: 0; font-size: 19px; }
+.cvc-drawer__body { flex: 1; overflow: auto; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.cvc-drawer__body > p { margin: 0; }
+.cvc-drawer__rows { list-style: none; margin: 0; padding: 0; width: 100%; }
+.cvc-drawer__row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--sh-line); flex-wrap: wrap; }
+.cvc-drawer__who { display: flex; flex-direction: column; min-width: 0; }
+.cvc-drawer .cvc-accepted { background: none; padding: 12px 0; }
+@media (max-width: 599px) {
+  .cvc-drawer { width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cvc-drawer[open] { animation: cvc-drawer-in 0.18s ease-out; }
+}
+@keyframes cvc-drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }

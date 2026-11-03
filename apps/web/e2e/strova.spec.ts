@@ -142,7 +142,7 @@ test("add a target role: three steps, then the role page", async ({ page }) => {
   await shot(page, "13-role");
 });
 
-test("RMAP-2: Resumes is one list; each row opens its breakdown and has Rename and Delete under More", async ({ page }) => {
+test("RMAP-2, RSD-1, RSD-3: Resumes is one list of cards; Show details opens the check page; Rename and Delete are in plain sight", async ({ page }) => {
   await firstUse(page, "resumes@example.com");
   await page.goto("/resumes");
   await expect(page.getByRole("heading", { level: 1, name: "Ana's Resumes" })).toBeVisible();
@@ -151,26 +151,19 @@ test("RMAP-2: Resumes is one list; each row opens its breakdown and has Rename a
   await expect(page.getByText("Rename or delete resumes")).toHaveCount(0);
   const row = list.getByRole("listitem").first();
   await expect(row).toContainText("Default");
-  await expect(row).toContainText(/\d+ issues? open/);
+  await expect(row.getByRole("term")).toHaveText(["roles", /^open issues?$/, /^story ideas?$/]);
   await expect(row).toContainText(/Added [A-Z][a-z]{2} \d+, \d{4}/);
   // RMAP-3: first use goes through the breakdown without the editor, so nothing says "Not checked yet".
   await expect(row).not.toContainText(/checked/i);
+  await expect(row.getByText(/More/)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /Add a resume.*slots left/ })).toBeVisible();
   await shot(page, "07-resumes");
-  await row.getByText("More ▾").click();
-  await expect(row.getByRole("button", { name: /^Rename / })).toBeVisible();
-  await shot(page, "08-resumes-more");
-  await page.keyboard.press("Escape");
-  await expect(row.getByRole("button", { name: /^Rename / })).toBeHidden();
-  await page.getByRole("heading", { level: 1 }).click();
-  await row.getByText("More ▾").click();
-  await page.getByRole("heading", { level: 1 }).click();
-  await expect(row.getByRole("button", { name: /^Rename / })).toBeHidden();
-  await row.getByText("More ▾").click();
   await row.getByRole("button", { name: /^Rename / }).click();
+  await shot(page, "08-resumes-rename");
   await row.getByLabel("New name").fill("Payments resume");
   await row.getByRole("button", { name: "Save name" }).click();
-  await expect(list.getByRole("link", { name: "Payments resume", exact: true })).toBeVisible();
-  await row.getByRole("link", { name: /^Open breakdown for / }).click();
+  await expect(list.getByRole("heading", { name: "Payments resume", exact: true })).toBeVisible();
+  await row.getByRole("link", { name: /^Show details/ }).click();
   await expect(page).toHaveURL(/\/resumes\/[^/]+\/check$/);
 });
 
@@ -216,8 +209,8 @@ test("RMAP-5: deleting a role's resume flags the role; Use this resume moves it"
   await page.goto("/resumes");
   const list = page.getByRole("list", { name: "Your resumes" });
   await expect(list.getByRole("listitem")).toHaveCount(2);
-  const used = list.getByRole("listitem").filter({ hasText: /Used by Stripe/ });
-  await used.getByText("More ▾").click();
+  // RSD-1: the resume the role uses has 1 in its roles tile.
+  const used = list.getByRole("listitem").filter({ has: page.getByRole("term").filter({ hasText: /^role$/ }) });
   await used.getByRole("button", { name: /^Delete / }).click();
   const dialog = used.getByRole("dialog", { name: "Delete this resume?" });
   await expect(dialog.getByTestId("delete-roles-note")).toContainText("uses this resume");
@@ -287,6 +280,7 @@ test("build a story: craft with Strova; write it yourself, review, accept an edi
 
   // Write it yourself, then ask Strova to review and accept one edit.
   await page.goto("/stories/new");
+  await page.getByRole("radio", { name: /Five free-text parts/ }).check(); // the classic form
   await page.getByLabel("Story title").fill("Pushback from platform");
   await page.getByLabel(/Context/).fill("The platform team refused to change an API my team needed for the new checkout.");
   await page.getByLabel(/Stakes/).fill("Without it, we would miss the holiday launch.");
@@ -304,6 +298,102 @@ test("build a story: craft with Strova; write it yourself, review, accept an edi
   await edit.getByRole("button", { name: "Accept" }).click();
   await expect(review.getByRole("status").filter({ hasText: `${part} updated.` })).toBeVisible();
   await shot(page, "35-review-accepted");
+});
+
+/** SC-1 to SC-18 (SC08): deep story crafting end to end, with axe on every screen. */
+test("deep crafting: CARL, section by section, Ready, hint, flag, inline edit, improve, switch, organize", async ({ page }) => {
+  await firstUse(page, "crafting@example.com");
+
+  // SC-1: pick CARL (Strova suggests it for a conflict story).
+  await page.goto("/coach/new?skill=conflict_handling");
+  await expect(page.getByTestId("style-suggestion")).toContainText("Strova suggests CARL");
+  await page.getByRole("radio", { name: /CARL/ }).check();
+  await shot(page, "50-style-picker");
+  await page.getByRole("button", { name: "Start crafting" }).click();
+  await expect(page.getByTestId("craft-panel")).toBeVisible();
+  const typeInstead = page.getByRole("button", { name: "Type instead" });
+  if (await typeInstead.isVisible()) await typeInstead.click(); // voice-first when the mic is open
+  await shot(page, "51-craft-empty");
+
+  // SC-4, SC-5, SC-7: section by section, with one skip.
+  const reply = page.getByRole("textbox", { name: "Your reply" });
+  const say = async (text: string) => {
+    await reply.fill(text);
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.getByRole("log", { name: "Conversation with your coach" })).toContainText(text.slice(0, 20));
+  };
+  await page.getByRole("button", { name: "Skip this" }).click();
+  const org = page.getByTestId("craft-slot").filter({ hasText: "Company and team" });
+  await expect(org).toContainText("Skipped");
+  await say("I was the tech lead for checkout.");
+  await say("A team of five, three teams depended on us.");
+  await say("Last year, for six weeks.");
+  await say("The payments migration was two weeks late.");
+  await page.getByRole("button", { name: "Move on" }).click(); // stakeholders left unasked
+  await expect(page.getByTestId("craft-section").filter({ hasText: "Action" })).toContainText("In progress");
+  await shot(page, "52-craft-midway");
+  await say("I split the rollout by **country**.");
+  await say("A full switch could not be rolled back fast.");
+  await say("Checkout errors dropped from 2% to 0.3%.");
+  await say("Cut big launches into small reversible steps.");
+
+  // SC-3, SC-8, SC-9: Ready; hints and flags arrive with it, and never block.
+  await expect(page.getByTestId("skill-hint").first()).toBeVisible();
+  await expect(page.getByTestId("flow-flag").first()).toBeVisible();
+  await shot(page, "53-craft-ready-hints-flags");
+  const hints = await page.getByTestId("skill-hint").count();
+  await page.getByRole("button", { name: /^Not now:/ }).first().click();
+  await expect(page.getByTestId("skill-hint")).toHaveCount(hints - 1);
+  await page.getByLabel("Story name").fill("Checkout migration");
+  await page.getByRole("button", { name: "Save and exit" }).click();
+  await expect(page).toHaveURL(/\/stories\/[^/]+$/, { timeout: 15_000 });
+  await expect(page.getByTestId("outline-story")).toBeVisible();
+  await expect(page.getByTestId("story-status")).toContainText("Ready");
+  await expect(page.getByTestId("flow-flag").first()).toBeVisible();
+  await shot(page, "54-story-ready-flags");
+  const flags = await page.getByTestId("flow-flag").count();
+  await page.getByRole("button", { name: /^Dismiss:/ }).first().click();
+  await expect(page.getByTestId("flow-flag")).toHaveCount(flags - 1);
+
+  // SC-10: an inline edit.
+  await page.getByRole("button", { name: "Edit The lesson" }).click();
+  await page.getByRole("textbox", { name: "The lesson" }).fill("Cut big launches into *small*, reversible steps.");
+  await shot(page, "55-inline-edit");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByTestId("outline-slot").filter({ hasText: "The lesson" }).locator("em")).toHaveText("small");
+
+  // SC-11: Improve with Strova, Accept.
+  await page.getByRole("group", { name: "Challenge" }).getByRole("button", { name: "Improve with Strova" }).click();
+  await page.getByRole("button", { name: "Improve Challenge" }).click();
+  const edit = page.getByRole("group", { name: /^Edit to / }).first();
+  await expect(edit).toBeVisible();
+  await shot(page, "56-improve");
+  await edit.getByRole("button", { name: "Accept" }).click();
+  await expect(page.getByRole("region", { name: "Improve Challenge with Strova" }).getByRole("status")).toContainText("up to date");
+
+  // SC-12: Switch to STAR.
+  await page.getByRole("button", { name: "Switch to STAR" }).click();
+  await expect(page.getByTestId("story-style")).toHaveText("STAR");
+  await shot(page, "57-switched-star");
+
+  // SC-13: a classic story, Organize with Strova, Accept.
+  await page.goto("/stories/new");
+  await page.getByRole("radio", { name: /Five free-text parts/ }).check(); // the classic form
+  await page.getByLabel("Story title").fill("Pushback from platform");
+  await page.getByLabel(/Context/).fill("The platform team refused to change an API my team needed.");
+  await page.getByLabel(/Stakes/).fill("Without it, we would miss the holiday launch.");
+  await page.getByRole("button", { name: "Save as a Draft" }).click();
+  await page.getByRole("link", { name: /Pushback from platform/ }).first().click();
+  await expect(page.getByRole("region", { name: "Organize with Strova" })).toBeVisible();
+  await shot(page, "58-classic");
+  await page.getByRole("button", { name: "Organize with Strova" }).click();
+  const preview = page.getByRole("region", { name: "Organized preview" });
+  await expect(preview).toBeVisible();
+  await shot(page, "59-organize-preview");
+  await preview.getByRole("button", { name: "Accept" }).click();
+  await expect(page.getByTestId("outline-story")).toBeVisible();
+  await expect(page.getByTestId("story-style")).toHaveText("STAR");
+  await shot(page, "60-organized");
 });
 
 test("returning: Home plan items open the interview, the story work and the resume", async ({ page }) => {
@@ -334,7 +424,8 @@ test("returning: Home plan items open the interview, the story work and the resu
 
   await home();
   await (await group("resume", "Resume gaps and issues")).getByRole("link").first().click();
-  await expect(page).toHaveURL(/\/resumes\/[^/]+$/);
+  // RSD-6: the plan's /resumes/{id} link lands on the check page, the one resume page.
+  await expect(page).toHaveURL(/\/resumes\/[^/]+\/check$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await shot(page, "41-resume");
 });

@@ -1,14 +1,15 @@
 /**
- * U05: the first run (ON-1 to ON-6) and the resume pages (RM-1, RM-3), with v2 on, against the
- * MSW mocks.
+ * U05: the first run (ON-1 to ON-6) and the Resumes page (RM-1), with v2 on, against the MSW
+ * mocks. RM-3, RM-4 and SG-6 moved to the check page with the detail page (RSD-6):
+ * onboarding/check/absorb.test.tsx.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { jobTargetsApi, resumesApi } from "../../api/inputs";
+import { resumesApi } from "../../api/inputs";
 import { AppRoutes, createQueryClient } from "../../App";
 import { mockStore } from "../../mocks/node";
 import { setFeatureOverrides } from "../../theme/features";
@@ -210,66 +211,18 @@ describe("resume pages", () => {
     else mockStore.db.profiles[EMAIL] = { ...(await import("../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
     const user = renderApp("/resumes");
     expect(await screen.findByRole("heading", { level: 1, name: "Ana's Resumes" })).toBeInTheDocument();
-    const card = (await screen.findByText("Default")).closest(".sx-card") as HTMLElement;
-    expect(within(card).getAllByRole("link", { name: /^Open (?!breakdown)/ })).toHaveLength(2);
-    // RMAP-2: one list only, each row with its breakdown.
-    expect(within(card).getAllByRole("link", { name: /^Open breakdown for / })).toHaveLength(2);
+    const list = await screen.findByRole("list", { name: "Your resumes" });
+    // RMAP-2: one list only, each card with Show details to the check page (RSD-3, D-1).
+    expect(within(list).getAllByRole("link", { name: /^Show details/ })).toHaveLength(2);
+    expect(within(list).queryAllByRole("link", { name: /^Open/ })).toHaveLength(0);
     expect(screen.queryByRole("list", { name: "Saved resumes" })).not.toBeInTheDocument();
     const main = screen.getByText("Default");
-    expect(main.closest(".sx-list-row")).toHaveTextContent(first.name ?? "");
-    expect(await within(main.closest(".sx-list-row") as HTMLElement).findByText(/Not used by a role/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Make default" }));
-    await waitFor(() => expect(screen.getByText("Default").closest(".sx-list-row")).toHaveTextContent(second.name ?? ""));
-  });
-
-  it("RM-3: the resume page has breakdown and issues first, then Strova's story ideas, closed with their counts", async () => {
-    const resume = await addResume();
-    mockStore.db.profiles[EMAIL] = { ...(await import("../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
-    const user = renderApp(`/resumes/${resume.id}`);
-    expect(await screen.findByRole("heading", { level: 1, name: resume.name ?? "" })).toBeInTheDocument();
-    expect(screen.getByText("Default resume")).toBeInTheDocument();
-    const ideas = await screen.findByRole("group", { name: "Story ideas from this resume" });
-    const breakdown = screen.getByRole("region", { name: "Breakdown" });
-    const issuesCard = screen.getByRole("region", { name: "Resume issues" });
-    // The fix and accept actions are real buttons (filled or outlined), not plain text.
-    const accept = await within(issuesCard).findAllByRole("button", { name: "Accept as it is" });
-    expect(accept[0]).toHaveClass("sx-btn", "ghost");
-    expect(within(issuesCard).getAllByRole("link")[0]).toHaveClass("sx-btn");
-    expect(within(issuesCard).getAllByRole("link")[0]).not.toHaveClass("quiet");
-    expect(breakdown.compareDocumentPosition(ideas) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(ideas).not.toHaveAttribute("open");
-    expect(ideas).toHaveTextContent(/Strova's findings/);
-    await waitFor(() => expect(within(ideas).getByTestId("ideas-counts")).toHaveTextContent(/^\d+ ideas?/));
-    await user.click(within(ideas).getByText("Story ideas from this resume"));
-    expect(ideas).toHaveAttribute("open");
-    const craft = await within(ideas).findAllByRole("link", { name: "Craft with Strova" });
-    expect(craft[0].getAttribute("href")).toMatch(/^\/coach\/new\?resume=/);
-    const before = craft.length;
-    await user.click(within(ideas).getAllByRole("button", { name: "Not a story" })[0]);
-    await waitFor(() => expect(within(ideas).queryAllByRole("link", { name: "Craft with Strova" })).toHaveLength(before - 1));
-    await act(async () => undefined);
-  });
-
-  it("RM-3, SG-6: the resume page says which roles use it, and Strova's resume-line rewrite adds, undoes and dismisses", async () => {
-    const resume = await addResume();
-    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
-    const job = await jobTargetsApi.get(created.id);
-    await fetch(`${location.origin}/api/roles/${job.id}/interviews`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ interview_types: ["behavioral"] }),
-    });
-    const user = renderApp(`/resumes/${resume.id}`);
-    await screen.findByRole("heading", { level: 1, name: resume.name ?? "" });
-    const usedBy = await screen.findByText(/^Used by/);
-    expect(within(usedBy).getByRole("link")).toHaveAttribute("href", `/roles/${job.id}`);
-    const card = await screen.findByRole("region", { name: "Strova suggests a resume line" });
-    expect(card).toHaveTextContent("Strova suggests · from your stories");
-    expect(card.querySelector("ins")?.textContent).toMatch(/zero failed payments/);
-    await user.click(within(card).getByRole("button", { name: "Add to resume" }));
-    expect(await within(card).findByText("Added to your resume.")).toBeInTheDocument();
-    await user.click(within(card).getByRole("button", { name: "Undo" }));
-    await user.click(await within(card).findByRole("button", { name: "Dismiss" }));
-    await waitFor(() => expect(screen.queryByRole("region", { name: "Strova suggests a resume line" })).toBeNull());
+    const mainCard = main.closest("section") as HTMLElement;
+    expect(mainCard).toHaveTextContent(first.name ?? "");
+    // No role uses it: the roles tile is 0 (RSD-1).
+    await waitFor(() => expect(within(mainCard).getAllByRole("definition")[0]).toHaveTextContent("0"));
+    expect(within(mainCard).queryByRole("button", { name: /as default$/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: `Set ${second.name ?? ""} as default` }));
+    await waitFor(() => expect(screen.getByText("Default").closest("section")).toHaveTextContent(second.name ?? ""));
   });
 });

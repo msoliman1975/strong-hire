@@ -173,7 +173,7 @@ that opens Profile. Left rail, exactly these five items in this order:
 5. **Career Stories with Strova**
 
 There is no separate "Ask Strova" nav button: Ask Strova lives on the Career Stories page. The
-question bank and Progress are not in the v2 nav. Their routes keep working for old links.
+question bank and Progress are not in the v2 nav. Their routes keep working for old links. Reports is the last nav item (NV-4); `/reports` is the Reports page.
 On phones the rail becomes a horizontal scrolling strip.
 
 ## 6. Screens

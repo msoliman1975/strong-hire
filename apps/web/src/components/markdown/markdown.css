@@ -1,0 +1,43 @@
+/* SC-18: the formatting toolbar and the rendered Markdown subset. */
+.md-toolbar {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.md-toolbar__btn {
+  min-width: 32px;
+  height: 32px;
+  border: 1px solid var(--sh-line-strong);
+  border-radius: 8px;
+  background: var(--sh-surface);
+  color: var(--sh-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.md-toolbar__btn:hover {
+  background: var(--sh-violet-soft);
+}
+
+.md-toolbar__btn:focus-visible {
+  outline: 2px solid var(--sh-violet);
+  outline-offset: 2px;
+}
+
+.md > * {
+  margin: 0;
+}
+
+.md > * + * {
+  margin-top: 6px;
+}
+
+.md .md-list {
+  padding-left: 1.25rem;
+}
+
+.md .md-list li + li {
+  margin-top: 2px;
+}

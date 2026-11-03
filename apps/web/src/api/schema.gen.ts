@@ -339,6 +339,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/story-ideas/counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Story Idea Counts
+         * @description RSD-16: the story-idea counts of every resume that has been read, in one request.
+         */
+        get: operations["story_idea_counts_story_ideas_counts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/resumes/{resume_id}/story-ideas/dismiss": {
         parameters: {
             query?: never;
@@ -955,7 +975,9 @@ export interface paths {
         put?: never;
         /**
          * Create Story
-         * @description ST-1: create a draft story.
+         * @description ST-1: create a draft story. SC-1, SC-10: with `style`, the story is written in STAR or
+         *     CARL: it starts with an outline holding the typed slots, and its five parts are rendered from
+         *     it (SC-14).
          */
         post: operations["create_story_stories_post"];
         delete?: never;
@@ -11443,6 +11465,27 @@ export interface components {
              */
             missing_parts?: components["schemas"]["StoryPart"][];
         };
+        /**
+         * StoryIdeaCount
+         * @description RSD-16: one resume's story ideas, counted with the rules of GET .../story-ideas.
+         */
+        StoryIdeaCount: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /**
+             * Ideas
+             * @description Open ideas: not used by a story and not dismissed.
+             */
+            ideas: number;
+            /**
+             * Used
+             * @description Achievements a story already tells.
+             */
+            used: number;
+        };
         /** StoryIdeaOut */
         StoryIdeaOut: {
             /** Achievement */
@@ -11548,6 +11591,13 @@ export interface components {
              * @enum {string}
              */
             source: "manual" | "coach";
+            /** @description SC-1, SC-10: write it yourself in STAR or CARL. The story starts with an outline holding `slots`, as typed (no model call); the five parts are rendered from it, so they are not sent. Null writes a classic five-part story. */
+            style?: components["schemas"]["StoryStyle"] | null;
+            /**
+             * Slots
+             * @description With `style`: the user's text for each slot (as PATCH /stories/{id}/outline).
+             */
+            slots?: components["schemas"]["SlotEditIn"][];
         };
         /**
          * StoryNote
@@ -13152,6 +13202,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    story_idea_counts_story_ideas_counts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryIdeaCount"][];
                 };
             };
         };

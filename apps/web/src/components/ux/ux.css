@@ -150,6 +150,43 @@ a.sx-card, a.sx-card:hover { color: inherit; text-decoration: none; }
 .sx-menu__list button:hover, .sx-menu__list button:focus-visible { background: var(--sh-sunken); }
 .sx-rows { list-style: none; margin: 0; padding: 0; }
 
+/*
+ * RSD-5: the shared card shell (SummaryCard) for the Resumes list and Target roles. Tokens only.
+ * A grid of these cards is `.sx-grid2.stretch`, so the cards in a row have the same height and
+ * their footers line up.
+ */
+.sx-grid2.stretch { align-items: stretch; }
+/* Two columns only while each card is at least 400 px wide, so a card's footer stays on one line. */
+.sx-grid2.stretch { grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); }
+.sx-summary { background: var(--sh-surface); border: 1px solid var(--sh-line); border-radius: var(--sh-radius); padding: 20px 22px 14px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.sx-summary__head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sx-summary__head h2 { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.2; min-width: 0; overflow-wrap: anywhere; }
+.sx-summary__stats { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sx-stat { background: var(--sh-ground); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column-reverse; justify-content: flex-end; min-width: 0; }
+.sx-stat dt { font-size: 12.5px; color: var(--sh-muted); }
+.sx-stat dd { margin: 0; display: flex; align-items: center; gap: 6px; font: 600 26px/1.1 var(--sh-font-mono); font-variant-numeric: tabular-nums; color: var(--sh-ink); }
+.sx-stat dd.is-unknown { color: var(--sh-muted); }
+.sx-stat--warn { background: var(--sh-warn-soft); }
+.sx-stat--warn dt, .sx-stat--warn dd { color: var(--sh-warn-ink); }
+.sx-stat__mark { flex: none; color: var(--sh-warn); }
+.sx-stat--teal { background: var(--sh-teal-soft); }
+.sx-stat--teal dt, .sx-stat--teal dd { color: var(--sh-teal); }
+.sx-stat--empty { height: 62px; padding: 0; }
+.sx-summary__meta { margin: 0; font-size: 13.5px; color: var(--sh-muted); }
+.sx-summary__foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--sh-line); padding-top: 12px; margin-top: auto; }
+.sx-summary__actions { display: flex; gap: 2px; flex-wrap: wrap; margin-left: auto; }
+.sx-summary__actions .sx-btn.quiet { padding: 0 8px; gap: 4px; }
+.sx-summary__actions .sx-btn svg { width: 14px; height: 14px; }
+.sx-summary__actions .sx-btn.quiet.danger:hover { background: var(--sh-danger-soft); color: var(--sh-danger-ink); }
+.sx-summary-add { border: 1px dashed var(--sh-line-strong); border-radius: var(--sh-radius); padding: 20px 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 200px; color: var(--sh-muted); text-decoration: none; text-align: center; }
+.sx-summary-add:hover { border-color: var(--sh-violet); background: var(--sh-violet-soft); color: var(--sh-muted); text-decoration: none; }
+.sx-summary-add strong { color: var(--sh-ink); }
+.sx-summary-add__plus { font-size: 28px; line-height: 1; color: var(--sh-violet); }
+@media (max-width: 760px) {
+  .sx-summary__stats { gap: 6px; }
+  .sx-summary { padding: 16px 16px 12px; }
+}
+
 /* SV-11: the readiness ring. Teal below the goal, green at or above it, an empty track before the first take. */
 .sx-ring { flex: none; display: block; }
 .sx-ring-track { stroke: var(--sh-sunken); }

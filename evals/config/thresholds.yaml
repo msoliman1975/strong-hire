@@ -51,6 +51,15 @@ coach_dropped_updates:
   source: "Information. Part updates the engine dropped because the quotes did not match (CO-3)"
 coach_cost_per_session_usd:
   source: "Information. Coach minutes are not priced yet"
+crafting_invented_facts:
+  max: 0
+  source: "Spec SC-15: crafting turns, improve, organize and rewrite add no fact (numbers, names, tools, hedges). Each case must be kept or dropped as expected"
+crafting_depth_violations:
+  max: 0
+  source: "Spec SC-4, SC-5: every context slot is asked, a skipped slot never returns, move on ends a section"
+crafting_flow_recall:
+  min: 1
+  source: "Spec SC-9: each seeded flag type is found and a coherent story gets none. On the fake profile the flags are the case's, checked through the product's filter"
 suggestions_invented_facts:
   max: 0
   source: "Spec SG-7: tune, new story, improve resume line and review use only the user's words. On the fake profile, each case's reply must be kept or rejected as expected"

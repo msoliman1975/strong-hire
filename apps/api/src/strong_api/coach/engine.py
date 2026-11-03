@@ -37,6 +37,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.coach.schemas import AskFor
+from strong_api.markdown import strip_markdown
 from strong_core.db.models import CoachSession, CoachTurn
 from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import Message, ModelGateway, Role, usage_context
@@ -206,7 +207,8 @@ def opener(
 
 
 def _normal(text: str) -> str:
-    text = text.translate(_TYPOGRAPHIC)
+    # SC-18: quotes are matched on plain text, so bold, italic and list marks never matter.
+    text = strip_markdown(text).translate(_TYPOGRAPHIC)
     return " ".join(re.sub(r"[^\w%$'.,-]+", " ", text.lower()).split())
 
 

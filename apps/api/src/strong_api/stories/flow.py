@@ -24,6 +24,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.coach import craft, engine
+from strong_api.coach.facts import new_facts
 from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.plan.story_fit import queue_story_fits_for_user
 from strong_api.stories.outline import load_outline, ready, strip_markdown
@@ -117,8 +118,9 @@ async def _said(db: AsyncSession, row: StoryRow, outline: StoryOutline) -> str:
 
 
 def _invents(text: str, said: str) -> bool:
-    """D-9: a question never suggests a fact. A number the user never gave is one."""
-    return any(n not in said for n in engine.NUMBER.findall(text))
+    """D-9, SC-15: a question or hint never suggests a fact: a number, name or tool the user
+    never gave."""
+    return bool(new_facts(text, said))
 
 
 def checked_flags(outline: StoryOutline, check: FlowCheck, said: str) -> list[FlowFlag]:

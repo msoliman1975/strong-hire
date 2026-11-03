@@ -33,6 +33,7 @@ from datetime import UTC, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.coach import engine
+from strong_api.coach.facts import new_facts
 from strong_api.stories.outline import ready, save_outline, strip_markdown
 from strong_core.db.models import CoachSession, CoachTurn
 from strong_core.db.models import Story as StoryRow
@@ -56,6 +57,7 @@ from strong_core.schemas import (
     OutlineSection,
     OutlineSlot,
     ResultMetric,
+    SessionChannel,
     SlotRef,
     SlotStatus,
     SlotUpdate,
@@ -187,7 +189,7 @@ def _filled(slot: OutlineSlot | None) -> bool:
     return slot is not None and slot.status == SlotStatus.FILLED
 
 
-def asks(outline: StoryOutline, section: StorySection) -> list[SlotRef]:
+def asks(outline: StoryOutline, section: StorySection, *, voice: bool = False) -> list[SlotRef]:
     """D-5, D-7: the required and context slots of `section` that are still empty (not filled,
     not skipped), in the spec table's order. Optional slots are filled only from the section's
     open question; they are never asked about one by one."""
@@ -209,8 +211,8 @@ def asks(outline: StoryOutline, section: StorySection) -> list[SlotRef]:
     for key in keys:
         if key == METRIC_SLOT and section != StorySection.RESULT:
             continue
-        if key not in CORE_SLOTS and key not in CONTEXT_SLOTS:
-            continue
+        if key not in CORE_SLOTS and (voice or key not in CONTEXT_SLOTS):
+            continue  # SC-16, D-13: a voice session follows up on the required slots only
         if sec.slot(key).status == SlotStatus.EMPTY:
             out.append(SlotRef(section=section, slot=key))
     return out
@@ -220,10 +222,10 @@ def _is_skipped(slot: OutlineSlot | None) -> bool:
     return slot is not None and slot.status == SlotStatus.SKIPPED
 
 
-def has_room(outline: StoryOutline, section: StorySection) -> bool:
+def has_room(outline: StoryOutline, section: StorySection, *, voice: bool = False) -> bool:
     """A section is worth opening when it has a slot to ask about, or (outside Action) any
     optional slot still empty for its open question to fill."""
-    if asks(outline, section):
+    if asks(outline, section, voice=voice):
         return True
     if section == StorySection.ACTION:
         return False
@@ -234,12 +236,14 @@ def has_room(outline: StoryOutline, section: StorySection) -> bool:
     return section == StorySection.RESULT and sec.slot(METRIC_SLOT).status == SlotStatus.EMPTY
 
 
-def next_section(outline: StoryOutline, after: StorySection | None) -> StorySection | None:
+def next_section(
+    outline: StoryOutline, after: StorySection | None, *, voice: bool = False
+) -> StorySection | None:
     """SC-4: the first section after `after` (or the first one) with room, in the style's order.
     Sections only move forward within a session; None means every section is done."""
     order = STYLE_SECTIONS[outline.style]
     start = 0 if after is None else order.index(after) + 1
-    return next((s for s in order[start:] if has_room(outline, s)), None)
+    return next((s for s in order[start:] if has_room(outline, s, voice=voice)), None)
 
 
 @dataclass(frozen=True)
@@ -250,11 +254,11 @@ class Ask:
     slots: list[SlotRef]
 
 
-def next_ask(outline: StoryOutline, section: StorySection | None) -> Ask:
+def next_ask(outline: StoryOutline, section: StorySection | None, *, voice: bool = False) -> Ask:
     """SC-4: the section in progress and its empty slots, in the D-7 order."""
     if section is None:
         return Ask(section=None, slots=[])
-    return Ask(section=section, slots=asks(outline, section))
+    return Ask(section=section, slots=asks(outline, section, voice=voice))
 
 
 def opener(
@@ -342,6 +346,9 @@ def _backed(update: SlotUpdate, said: str) -> str | None:
     for number in engine.NUMBER.findall(numbers):
         if number not in quoted:
             return f"number not in the quotes: {number}"
+    invented = new_facts(numbers, said)  # SC-15: facts, not wording
+    if invented:
+        return f"new fact: {invented[0]}"
     return None
 
 
@@ -571,7 +578,8 @@ async def run_craft_turn(
     """One candidate turn on a styled story and Strova's reply. Saves both turns, the outline and
     the legacy columns; the caller commits."""
     asked = next((t.text for t in reversed(turns) if t.speaker == CoachSpeaker.COACH), "")
-    ask = next_ask(outline, session.section)
+    voice = session.channel == SessionChannel.VOICE  # SC-16: the lighter flow
+    ask = next_ask(outline, session.section, voice=voice)
     messages = craft_messages(session, story, outline, turns, text, ask)
     candidate = engine.add_turn(db, session, turns, CoachSpeaker.CANDIDATE, text)
     await db.flush()
@@ -629,17 +637,18 @@ async def run_craft_turn(
 
     section = session.section
     advanced = False
-    if section is not None and (moved_on or not asks(new_outline, section)):
-        session.section = next_section(new_outline, section)
+    if section is not None and (moved_on or not asks(new_outline, section, voice=voice)):
+        session.section = next_section(new_outline, section, voice=voice)
         advanced = True
-    following = next_ask(new_outline, session.section)
+    following = next_ask(new_outline, session.section, voice=voice)
 
     if raw is None or (advanced and not (raw is not None and raw.section_done)):
         # No model reply, or the engine moved on where the model did not: the fixed line for
         # what comes next, so Strova never asks about a section that is done.
         message = _fixed_after(following, advanced)
     else:
-        message = engine.styled(engine.one_question(raw.message), session.style)
+        # SC-18: Strova's line is plain text; it is shown, stored and spoken (TTS) as it is.
+        message = engine.styled(engine.one_question(strip_markdown(raw.message)), session.style)
         if not message:
             message = fixed_line(following)
     coach = engine.add_turn(db, session, turns, CoachSpeaker.COACH, message)

@@ -177,7 +177,19 @@ const LEGACY: Record<Exclude<Part, "action">, [StorySection[], string][]> = {
   result: [[["result"], "metric"], [["result"], "impact"], [["result"], "evidence"]],
   reflection: [[["learning"], "lesson"], [["learning"], "differently"], [["learning"], "since"]],
 };
-const sentence = (t: string) => (/[.!?…:]$/.test(t.trim()) ? t.trim() : `${t.trim()}.`);
+/** As strong_api.markdown.strip_markdown (SC-18): bold, italic and list marks go. */
+const stripMd = (t: string) =>
+  t
+    .replace(/^\s*(?:[-*+]|\d+[.)])\s+/gm, "")
+    .replace(/(\*\*|__)(.+?)\1/g, "$2")
+    .replace(/(?<![\w*])([*_])(?!\s)(.+?)(?<!\s)\1(?![\w*])/g, "$2")
+    .split(/\s+/)
+    .join(" ")
+    .trim();
+const sentence = (t: string) => {
+  const plain = stripMd(t);
+  return /[.!?…:]$/.test(plain) ? plain : `${plain}.`;
+};
 
 /** As strong_api.stories.outline.render_legacy (SC-14), without the Markdown details. */
 export function renderLegacy(o: StoryOutline): Record<Part, string | null> {

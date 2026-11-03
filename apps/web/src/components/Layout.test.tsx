@@ -1,4 +1,4 @@
-/** UI-2, NV-1, NV-3, SV-7: the left rail nav and the top bar. The v2 items show only when `v2_enabled` is on. */
+/** UI-2, NV-1, NV-3, NV-4, SV-7: the left rail nav and the top bar. The v2 items show only when `v2_enabled` is on. */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -48,7 +48,7 @@ describe("UI-2 left rail nav", () => {
     expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
   });
 
-  it("NV-1: shows exactly Home, {First name}'s Resumes, Target roles, Rehearsals with Strova and Career Stories with Strova, in that order", async () => {
+  it("NV-1, NV-4: shows exactly Home, {First name}'s Resumes, Target roles, Rehearsals with Strova, Career Stories with Strova and Reports, in that order", async () => {
     setFeatureOverrides({ v2_enabled: true });
     signIn("Ana Lopez");
     const nav = renderNav();
@@ -56,7 +56,15 @@ describe("UI-2 left rail nav", () => {
     const labels = within(nav)
       .getAllByRole("link")
       .map((a) => a.textContent);
-    expect(labels).toEqual(["Home", "Ana's Resumes", "Target roles", "Rehearsals with Strova", "Career Stories with Strova"]);
+    expect(labels).toEqual([
+      "Home",
+      "Ana's Resumes",
+      "Target roles",
+      "Rehearsals with Strova",
+      "Career Stories with Strova",
+      "Reports",
+    ]);
+    expect(within(nav).getByRole("link", { name: "Reports" })).toHaveAttribute("href", "/reports");
     expect(within(nav).getByRole("link", { name: "Target roles" })).toHaveAttribute("href", "/roles");
     expect(within(nav).getByRole("link", { name: "Rehearsals with Strova" })).toHaveAttribute("href", "/rehearsals");
     expect(within(nav).getByRole("link", { name: "Career Stories with Strova" })).toHaveAttribute("href", "/stories");
@@ -74,6 +82,13 @@ describe("UI-2 left rail nav", () => {
     expect(await within(nav).findByRole("link", { name: "Your resumes" })).toHaveAttribute("href", "/resumes");
     expect(resumesLabel("  Sara  Ali ")).toBe("Sara's Resumes");
     expect(resumesLabel("")).toBe("Your resumes");
+  });
+
+  it("NV-4: marks Reports current on the Reports page", () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const nav = renderNav("/reports?type=gap_report");
+    expect(within(nav).getByRole("link", { name: "Reports" })).toHaveAttribute("aria-current", "page");
+    expect(within(nav).getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
   });
 
   it("NV-3: Question bank and Progress are not in the v2 rail", () => {
@@ -190,19 +205,21 @@ describe("SV-7, NV-3 v2 top bar and old routes", () => {
       ["Profile", "/account/profile"],
       ["Account", "/account"],
       ["Plan and billing", "/account#plan"],
-      ["Reports", "/reports"],
+      ["Help and how it works", "/help"],
     ]);
+    // NV-4: Reports moved to the rail.
+    expect(within(menu).queryByRole("link", { name: "Reports" })).toBeNull();
     expect(within(menu).getByRole("button", { name: "Sign out" })).toBeInTheDocument();
     await user.click(within(menu).getByRole("link", { name: "Profile" }));
     expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("NV-3: the Question bank and Progress routes still render with v2 on", async () => {
+  it("NV-3, NV-4: the Question bank route still renders with v2 on, and /reports is the Reports page", async () => {
     renderShell(true, "/questions");
     expect(await screen.findByRole("heading", { level: 1, name: "Question bank" })).toBeInTheDocument();
     cleanup();
     renderShell(true, "/reports");
-    expect(await screen.findByRole("heading", { level: 1, name: "Progress" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Reports" })).toBeInTheDocument();
   });
 
   it("FL-1: v1 keeps its rail footer, with no coach button", async () => {

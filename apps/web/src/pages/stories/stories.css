@@ -899,3 +899,106 @@
 .flow-hints .sx-stack > li + li {
   margin-top: 0;
 }
+
+/* --- SC-1, SC-10: write it yourself in STAR or CARL ------------------------------------------- */
+
+.write-shape {
+  margin-bottom: 8px;
+}
+
+.write-outline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.write-section {
+  border: 1px solid var(--sh-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.write-section__legend {
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.write-slot__label {
+  font-weight: 600;
+}
+
+.write-slot__need {
+  font-weight: 400;
+  color: var(--sh-muted);
+  font-size: 0.8125rem;
+}
+
+.write-slot textarea {
+  width: 100%;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.write-slot__numbers label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8125rem;
+}
+
+.write-slot__numbers input {
+  width: 8rem;
+}
+
+.write-step {
+  border-left: 3px solid var(--sh-violet-light);
+  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.write-more > summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--sh-muted);
+}
+
+.write-more[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* --- ST-11 (A, B): Review with Strova, done and Edit ------------------------------------------- */
+
+.review-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-editor textarea {
+  width: 100%;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.review-editor__label {
+  font-weight: 700;
+}
+
+.review-note {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-heading {
+  font-size: 1.125rem;
+  margin: 0;
+}

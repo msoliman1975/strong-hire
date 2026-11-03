@@ -7,6 +7,7 @@ import { Link } from "react-router";
 import { useResumes, useStoryIdeas } from "../../api/hooks";
 import { Strova } from "../../components/strova";
 import "../../components/ux/ux.css";
+import { resumeCheckPath } from "../../paths";
 
 export const ADD_ROLE_PATH = "/roles/new";
 export const CRAFT_PATH = "/coach/new";
@@ -60,7 +61,7 @@ export function WhatFirstPage() {
         </Link>
       </div>
       <p className="sx-muted sx-small">
-        Or <Link to={main ? `/resumes/${main.id}` : "/resumes"}>fix my resume first</Link>, or <Link to="/">go to Home</Link>.
+        Or <Link to={main ? resumeCheckPath(main.id) : "/resumes"}>fix my resume first</Link>, or <Link to="/">go to Home</Link>.
       </p>
     </div>
   );

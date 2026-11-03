@@ -1,6 +1,6 @@
 # Strong Hire: Product & Technical Spec v1 and v2.0
 
-Updated Nov 2, 2026 · Mo Soliman
+Updated Nov 3, 2026 · Mo Soliman
 
 v1 launches on December 14, 2026. v2.0 follows as one release, planned for June 2027, built in three parts (Part 1: Journey B reshaped, Part 2: story library, Part 3: AI coach). Text marked "v2" describes v2.0; everything else describes v1 as it ships. The build plan for v2.0 is `docs/v2/execution-plan.md`; its decisions and risks are in the [v2 plan doc](https://claude.ai/artifact/BSjZFLreXzRgqapKdqz87V), and its UX in the [App UX canvas](https://claude.ai/artifact/VspB7PtbLJzFMkrEjaRrKj).
 
@@ -264,9 +264,10 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 
 | ID | Requirement | Priority |
 | --- | --- | --- |
-| NV-1 | The v2 nav has exactly: Home, {First name}'s Resumes, Target roles, Rehearsals with Strova, Career Stories with Strova. | P0 |
+| NV-1 | The v2 nav has exactly: Home, {First name}'s Resumes, Target roles, Rehearsals with Strova, Career Stories with Strova, Reports (NV-4). | P0 |
 | NV-2 | User-facing copy says resume (never CV), take, Practice mode and Strova as in `ux-spec.md` section 3. | P0 |
-| NV-3 | Question bank and Progress are not in the v2 nav; their routes still work. | P0 |
+| NV-3 | Question bank and Progress are not in the v2 nav; their routes still work. Progress is now the Reports page (NV-4). | P0 |
+| NV-4 | Reports is the last v2 nav item and leaves the avatar menu. The v2 Reports page uses the shared card shell (RSD-5): one card per target role, the role with the newest report first, with the date of its latest report, tiles for the latest match, gap reports and debriefs ("—" when unknown), the resume line, the role's reports newest first (three, then **Show all**) and **Open target role** (hidden for a deleted role). The Target role and Type filters stay. The stories that need work (ST-3) follow the reports. | P0 |
 
 **Strova**
 
@@ -302,7 +303,7 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 | --- | --- | --- |
 | RM-1 | The resumes page is titled with the user's first name and lists resumes with the main one marked. | P0 |
 | RM-2 | One main resume per user; the first resume is main; the main resume is preselected for new roles. | P0 |
-| RM-3 | The resume page shows story ideas, breakdown, issues and resume-line suggestions. | P0 |
+| RM-3 | The resume check page shows story ideas, the breakdown, issues and resume-line suggestions (RMAP-9). | P0 |
 | RM-4 | Story ideas list each achievement not used by a story, with likely skills, Craft with Strova and Not a story; dismissals persist. | P0 |
 | RM-5 | The rule-based resume check runs in the API with the same results as the web check (shared fixtures). | P0 |
 
@@ -405,6 +406,29 @@ Strova now crafts stories in a chosen style, STAR (with Learning) or CARL, as an
 | SC-16 | Voice sessions fill the same slots with a lighter flow (D-13). | P1 |
 | SC-17 | The session screen has a wide layout and a reply box that grows with the text, with **Expand** (RMAP-7). | P0 |
 | SC-18 | The reply box and slot editors support bold, italic, bullet and numbered lists (Markdown, toolbar, Ctrl+B and Ctrl+I). Formatting is stripped for voice, scoring, word counts and quotes (RMAP-7). | P1 |
+
+### Resume screens redesign (RMAP-9)
+
+The Resumes list and Target roles move to one shared card shell with three stat tiles, and the resume detail page is retired: Check your resume absorbs it as a guided page with four steps (career journey, Strova's findings, stories to tell in interviews, stronger resume lines), with less-used details in drawers. The build is web only, with no API or migration change. The gap report, decisions D-1 to D-10 and the approved mockups are in `docs/resume-screens/spec.md`; the build plan is `docs/resume-screens/execution-plan.md`.
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| RSD-1 | The Resumes list shows one card per resume in two columns, and one column below 760 px. Each card shows the name, the Default chip on the default resume, three stat tiles (roles using it, open issues, story ideas) and "Added {date} · Edited {date}". The tiles are not interactive. The page no longer names the companies that use a resume. | P0 |
+| RSD-2 | The open issues tile turns amber, with a ▲ mark and the spoken label "Includes high-severity issues", when at least one open issue is high. It has no sub-text. Singular labels are used for 1 ("role"). | P0 |
+| RSD-3 | The card footer has **Show details** (to the check page) and, on the right, **Set as default** (only on a resume that is not the default), **Rename** (inline, as today) and **Delete** (today's dialog with the RMAP-5 roles note). There is no Open button and no More menu. A resume still being read shows empty tiles, "Strova is reading this resume" and only Rename and Delete. While under `MAX_RESUMES`, a dashed "Add a resume" card ends the grid. | P0 |
+| RSD-4 | The Target roles cards use the same shell: the role title and today's date chip; tiles for match, interviews and days left ("—" when unknown); the resume line; the readiness bars (TG-1); and a footer with Show details. "Pick a resume for this role" stays. The card is not a link. | P0 |
+| RSD-5 | The shared card shell is one component, used by both pages, with tokens from `theme/tokens.css` and no new colours. | P0 |
+| RSD-6 | `/resumes/:id` redirects to `/resumes/:id/check` with its query. `ResumeDetailPage` is removed and its tests move to the check page (RM-3, RM-4, SG-6 keep coverage). Every web link to a resume points to the check path. | P0 |
+| RSD-7 | The check page header shows the resume name, then the Default chip or a **Set as default** button. Under it: "Added {date} · Last saved {date} · Used by N roles". The roles link opens the roles drawer and is hidden at 0. Actions: **Upload a new version** and today's primary action (Use for an interview, or Continue to your interview plan in onboarding). | P0 |
+| RSD-8 | A step list sits beside the step view at 1280 and above it below 900 px. Each step shows its name, a count and one line. There is no readiness bar. The steps are: <br>1. **Your career journey**: "{n} roles · {y} years · {a} achievements". <br>2. **Strova's findings**: "and the fixes she recommends · {h} high", count of open findings. <br>3. **Stories to tell in interviews**: tag "Resume → Interview", count of open ideas. <br>4. **Stronger resume lines**: tag "Your stories → Resume", count of rewrites. <br>The step is in `?step=journey\|findings\|stories\|lines`. Without it the page opens on findings when one is open, else on journey (D-9 for onboarding). The current step has `aria-current="step"`. | P0 |
+| RSD-9 | Step 1 is the editable resume drawn as a timeline, newest first. It keeps all of today's editing: summary; roles add, edit, remove and reorder; moving an achievement; skills; education; certifications; Save. A gap over 3 months shows as a dashed amber segment and a link "{n}-month gap · {from} to {to} · see the fix" that opens that finding in step 2. A role with findings shows a "{n} finding(s)" chip. | P0 |
+| RSD-10 | Step 2 shows one finding at a time: "Finding {i} of {n} · {severity}", previous and next, the title, the detail, and a **Strova recommends** box with the fix in place. Date findings show the date fields of the roles involved; achievement findings show that achievement's field; skills findings show "Add {skills}". It keeps every accept reason (IN-12), the gap practice link and Save. "Next findings" lists the rest. Each one opens on click. Fixing or accepting moves to the next finding. | P0 |
+| RSD-11 | Step 3 shows one story idea at a time, with its skills, "Still needs: ...", **Craft with Strova** and **Not a story** (persists, RM-4). Under it: "Already crafted · {n}", linking each story. | P0 |
+| RSD-12 | Step 4 shows one resume-line rewrite at a time, with the source story's title, the before and after diff, and **Add to resume** (then Undo) and **Dismiss** (SG-6). With none, it says "No rewrites yet. Strova suggests one when a story has a result your resume leaves out." | P0 |
+| RSD-13 | On steps 2 to 4, a compact career strip sits under the step view: roles as segments sized by duration, gaps hatched in amber, and the role of the current finding outlined. "Open and edit" goes to step 1. It is drawn with `role="img"` and a spoken summary. | P0 |
+| RSD-14 | Three drawers open from the step list's footer links and the header: <br>• **Used by {n} roles**: company, title and stage chip for each role, with Open, plus "Add a target role with this resume". <br>• **Findings you accepted · {n}**: each with its reason and Undo. <br>• **What Strova checks**: today's list. <br>A drawer is a modal dialog from the right, at most 460 px and full width on phones. It traps focus, closes on Esc and on the backdrop, and returns focus to its opener. | P0 |
+| RSD-15 | All three screens pass axe with no violations and have no horizontal scroll at 390 px. | P0 |
+| RSD-16 | The open-issues and story-ideas counts on the Resumes list load without one request per card for story ideas. A batched read is allowed only if it needs no backend change; otherwise this stays as it is today and is logged. | P1 |
 
 ## Interviewer and scoring design
 

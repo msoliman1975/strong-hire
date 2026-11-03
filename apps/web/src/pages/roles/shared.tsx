@@ -5,6 +5,8 @@ import { interviewTypeLabel } from "../../labels";
 
 export const rolesPath = "/roles";
 export const addRolePath = "/roles/new";
+/** Add a target role measured against this resume (the check page's roles drawer). */
+export const addRoleWithResumePath = (resumeId: string) => `${addRolePath}?resume=${encodeURIComponent(resumeId)}`;
 export const rolePath = (jobId: string) => `/roles/${jobId}`;
 /** A take's default length in minutes: the mini interview every plan can run. */
 export const DEFAULT_TAKE_MINUTES = 10;

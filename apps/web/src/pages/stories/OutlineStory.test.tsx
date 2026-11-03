@@ -244,3 +244,16 @@ describe("Review with Strova on a styled story", () => {
     ]);
   });
 });
+
+describe("SC-18: formatting in the slot editor", () => {
+  it("SC-18: a slot editor has the formatting toolbar, and the saved slot renders formatted", async () => {
+    renderStory("s1");
+    await screen.findByTestId("outline-story");
+    const user = userEvent.setup();
+    await user.click(within(slot("slot-learning-lesson-x")).getByRole("button", { name: "Add The lesson" }));
+    expect(screen.getByRole("toolbar", { name: "Format The lesson" })).toBeInTheDocument();
+    await user.type(screen.getByLabelText("The lesson"), "Ship in **small** steps.");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(slot("slot-learning-lesson-x").querySelector("strong")).toHaveTextContent("small"));
+  });
+});
