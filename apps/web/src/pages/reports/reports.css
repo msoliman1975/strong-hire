@@ -1,0 +1,22 @@
+/*
+ * NV-4: the Reports page's lists. One row per gap report, debrief or story; the whole row is the
+ * link. Tokens only.
+ */
+.rp-views { display: flex; gap: 6px; flex-wrap: wrap; }
+.rp-list { list-style: none; margin: 0; padding: 0; background: var(--sh-surface); border: 1px solid var(--sh-line); border-radius: var(--sh-radius); overflow: hidden; }
+.rp-list > li + li { border-top: 1px solid var(--sh-line); }
+.rp-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; color: var(--sh-ink); text-decoration: none; flex-wrap: wrap; }
+.rp-row:hover { background: var(--sh-ground); color: var(--sh-ink); text-decoration: none; }
+.rp-row:focus-visible { outline: 2px solid var(--sh-violet); outline-offset: -2px; }
+.rp-row__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 260px; }
+.rp-row__title { overflow-wrap: anywhere; }
+.rp-row:hover .rp-row__title { color: var(--sh-violet-ink); text-decoration: underline; }
+.rp-row__meta { font-size: 13.5px; color: var(--sh-muted); overflow-wrap: anywhere; }
+.rp-row__aside { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.rp-row__date { font-size: 13.5px; color: var(--sh-muted); white-space: nowrap; min-width: 6.5em; text-align: right; }
+.rp-score { font-family: var(--sh-font-mono); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .rp-row { padding: 12px 14px; }
+  .rp-row__date { min-width: 0; }
+}
+.rp-filter { width: min(100%, 320px); }
