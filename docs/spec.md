@@ -264,9 +264,10 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 
 | ID | Requirement | Priority |
 | --- | --- | --- |
-| NV-1 | The v2 nav has exactly: Home, {First name}'s Resumes, Target roles, Rehearsals with Strova, Career Stories with Strova. | P0 |
+| NV-1 | The v2 nav has exactly: Home, {First name}'s Resumes, Target roles, Rehearsals with Strova, Career Stories with Strova, Reports (NV-4). | P0 |
 | NV-2 | User-facing copy says resume (never CV), take, Practice mode and Strova as in `ux-spec.md` section 3. | P0 |
-| NV-3 | Question bank and Progress are not in the v2 nav; their routes still work. | P0 |
+| NV-3 | Question bank and Progress are not in the v2 nav; their routes still work. Progress is now the Reports page (NV-4). | P0 |
+| NV-4 | Reports is the last v2 nav item and leaves the avatar menu. The v2 Reports page uses the shared card shell (RSD-5): one card per target role, the role with the newest report first, with the date of its latest report, tiles for the latest match, gap reports and debriefs ("—" when unknown), the resume line, the role's reports newest first (three, then **Show all**) and **Open target role** (hidden for a deleted role). The Target role and Type filters stay. The stories that need work (ST-3) follow the reports. | P0 |
 
 **Strova**
 
