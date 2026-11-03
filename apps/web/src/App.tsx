@@ -41,7 +41,7 @@ import { NewStoryPage } from "./pages/stories/NewStoryPage";
 import { StoriesPage } from "./pages/stories/StoriesPage";
 import { ReviewPage } from "./pages/stories/ReviewPage";
 import { StoryWorkbenchPage } from "./pages/stories/StoryWorkbenchPage";
-import { ResumeDetailPage } from "./pages/resumes/ResumeDetailPage";
+import { ResumeRedirect } from "./pages/resumes/ResumeRedirect";
 import { ResumesListPage } from "./pages/resumes/ResumesListPage";
 import { BreakdownPage } from "./pages/start/BreakdownPage";
 import { PlanStylePage } from "./pages/start/PlanStylePage";
@@ -128,9 +128,9 @@ export function AppRoutes() {
           <Route path="/roles/:jobId" element={<V2Only><RolePage /></V2Only>} />
           <Route path="/rehearsals" element={<V2Only><RehearsalsPage /></V2Only>} />
           <Route path="/interviews/:interviewId" element={<V2Only><InterviewPage /></V2Only>} />
-          {/* RM-1, RM-3: the v2 resume pages; v1 keeps its Resumes page. */}
+          {/* RM-1, RM-3: the v2 resume pages; v1 keeps its Resumes page. RSD-6: one resume page. */}
           <Route path="/resumes" element={<ResumesRoute />} />
-          <Route path="/resumes/:resumeId" element={<V2Only><ResumeDetailPage /></V2Only>} />
+          <Route path="/resumes/:resumeId" element={<V2Only><ResumeRedirect /></V2Only>} />
           <Route path="/resumes/:resumeId/check" element={<CheckResumePage />} />
           <Route path="/jobs/new" element={<AddRoleRoute />} />
           <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />

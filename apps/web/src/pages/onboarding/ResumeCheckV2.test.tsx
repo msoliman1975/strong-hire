@@ -80,6 +80,11 @@ async function openFinding(user: ReturnType<typeof userEvent.setup>, title: stri
   expect(within(finding()).getByRole("heading", { name: title })).toBeInTheDocument();
   return finding();
 }
+/** RSD-14: opens the "Findings you accepted" drawer from the step list footer. */
+async function acceptedDrawer(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: /^Findings you accepted · \d+ ›$/ }));
+  return screen.getByRole("dialog", { name: /^Findings you accepted/ });
+}
 /** The open count on the findings step. */
 const openCount = () => Number(screen.getByRole("button", { name: /Strova's findings/ }).querySelector(".cvc-step__num")?.textContent);
 
@@ -164,7 +169,8 @@ describe("v2 Check your CV", () => {
     const before = openCount();
     const card = await openFinding(user, "A skill missing from Skills");
     await user.click(within(card).getByRole("button", { name: "Accept as it is" }));
-    const list = within(findingsView()).getByText("Findings you accepted · 1").closest("details") as HTMLElement;
+    const list = await acceptedDrawer(user);
+    expect(list).toHaveAccessibleName("Findings you accepted · 1");
     expect(within(list).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
     expect(openCount()).toBe(before - 1);
     expect(within(findingsView()).queryByRole("heading", { name: "A skill missing from Skills" })).not.toBeInTheDocument();
@@ -357,7 +363,8 @@ describe("v2 Check your CV", () => {
 
     await user.click(within(card).getByRole("button", { name: "Accept: Left out on purpose (age bias)" }));
     expect(within(findingsView()).queryByRole("heading", { name: "No start date on Invoicely" })).not.toBeInTheDocument();
-    expect(within(findingsView()).getByText(/✓ Accepted: No start date on Invoicely/)).toHaveTextContent(
+    const drawer = await acceptedDrawer(user);
+    expect(within(drawer).getByText(/✓ Accepted: No start date on Invoicely/)).toHaveTextContent(
       "Left out on purpose (age bias)",
     );
     expect(openCount()).toBe(before - 1);
@@ -365,8 +372,9 @@ describe("v2 Check your CV", () => {
     await waitFor(() => expect(stored()).toEqual(["dates.missing-start:invoicely/software-engineer|why=on-purpose"]));
 
     // Changing the reason replaces the stored key; the finding stays accepted after a reload.
-    await user.click(within(findingsView()).getByRole("button", { name: "Undo accepting No start date on Invoicely" }));
+    await user.click(within(drawer).getByRole("button", { name: "Undo accepting No start date on Invoicely" }));
     await waitFor(() => expect(stored()).toEqual([]));
+    await user.click(within(drawer).getByRole("button", { name: "Close" }));
     const again = await openFinding(user, "No start date on Invoicely");
     await user.click(within(again).getByRole("button", { name: "Accept: I don't remember" }));
     await waitFor(() => expect(stored()).toEqual(["dates.missing-start:invoicely/software-engineer|why=dont-remember"]));
@@ -377,10 +385,11 @@ describe("v2 Check your CV", () => {
     mockStore.db.resumes[0].accepted_issues = [
       { key: "consistency.skills-missing:celery", accepted_at: "2026-10-28T10:00:00Z" },
     ];
-    renderAt(`/resumes/${resume.id}/check`);
+    const user = renderAt(`/resumes/${resume.id}/check`);
     await ready();
-    expect(within(findingsView()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
-    expect(within(findingsView()).getByText("Findings you accepted · 1")).toBeInTheDocument();
+    const drawer = await acceptedDrawer(user);
+    expect(within(drawer).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    expect(drawer).toHaveAccessibleName("Findings you accepted · 1");
   });
 
   it("IN-3: a new CV says where the user is, and ends in one next step, at the top and the bottom", async () => {
@@ -425,7 +434,7 @@ describe("v2 coming back to a saved CV", () => {
   };
   const expectSameBreakdown = async () => {
     await ready();
-    expect(within(findingsView()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Findings you accepted · 1 ›" })).toBeInTheDocument();
     expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
     expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/^Added [A-Z][a-z]{2} \d+(, \d{4})? · Last saved Oct 28(, 2026)?$/);
     expect(screen.getByRole("button", { name: "Use this resume for an interview" })).toBeInTheDocument();

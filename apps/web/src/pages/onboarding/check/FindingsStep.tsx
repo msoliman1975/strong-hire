@@ -86,8 +86,6 @@ export function achievementSlot(issue: ResumeIssue, role: CvRole | undefined): n
 export interface FindingsStepProps {
   /** Open findings, in order (`orderFindings`). */
   findings: ResumeIssue[];
-  /** Accepted findings, for the list under the step. */
-  acceptedFindings: ResumeIssue[];
   current: number;
   onSelect: (index: number) => void;
   /** The roles as the user sees them (open editors included). */
@@ -109,8 +107,6 @@ export interface FindingsStepProps {
   /** A finding with no fix in place: open its field on step 1. */
   onFixElsewhere: (issue: ResumeIssue) => void;
   onOpenJourney: () => void;
-  acceptedOpen: boolean;
-  onAcceptedOpen: (open: boolean) => void;
 }
 
 export function FindingsStep(props: FindingsStepProps) {
@@ -213,37 +209,35 @@ export function FindingsStep(props: FindingsStepProps) {
         </div>
       )}
 
-      {props.acceptedFindings.length > 0 && (
-        <details
-          className="cvc-card cvc-accepted-list"
-          open={props.acceptedOpen}
-          onToggle={(e) => props.onAcceptedOpen((e.target as HTMLDetailsElement).open)}
-        >
-          <summary>Findings you accepted · {props.acceptedFindings.length}</summary>
-          <ul className="cvc-plain">
-            {props.acceptedFindings.map((issue) => {
-              const why = acceptedReason(issue, props.accepted.reasons.get(issue.key));
-              return (
-                <li key={issue.key} className="cvc-accepted">
-                  <span>
-                    ✓ Accepted: {issue.title}
-                    {why && <span className="cvc-accepted__why"> · {why}</span>}
-                  </span>
-                  <button
-                    type="button"
-                    className="cvc-link"
-                    onClick={() => props.accepted.undo(issue.key)}
-                    aria-label={`Undo accepting ${issue.title}`}
-                  >
-                    Undo
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </details>
-      )}
     </section>
+  );
+}
+
+/** RSD-14: the findings the user accepted, each with its reason and Undo (IN-12). */
+export function AcceptedList({ findings, accepted }: { findings: ResumeIssue[]; accepted: AcceptedIssues }) {
+  if (findings.length === 0) return <p className="muted">Nothing accepted yet.</p>;
+  return (
+    <ul className="cvc-drawer__rows" aria-label="Findings you accepted">
+      {findings.map((issue) => {
+        const why = acceptedReason(issue, accepted.reasons.get(issue.key));
+        return (
+          <li key={issue.key} className="cvc-drawer__row cvc-accepted">
+            <span>
+              ✓ Accepted: {issue.title}
+              {why && <span className="cvc-accepted__why"> · {why}</span>}
+            </span>
+            <button
+              type="button"
+              className="cvc-link"
+              onClick={() => accepted.undo(issue.key)}
+              aria-label={`Undo accepting ${issue.title}`}
+            >
+              Undo
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
