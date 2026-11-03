@@ -11,7 +11,7 @@ import { Link } from "react-router";
 
 import { resumesApi } from "../../api/inputs";
 import { rolesApi } from "../../api/roles";
-import { useAuth, useResumes, useStoryIdeas } from "../../api/hooks";
+import { useAuth, useResumes, useStoryIdeaCounts } from "../../api/hooks";
 import type { ResumeOut, RoleOut } from "../../api/types";
 import { resumesLabel } from "../../components/Layout";
 import { NAME_MAX, useLibraryRefresh, validateName } from "../../components/LibrarySection";
@@ -112,11 +112,9 @@ function Icon({ d }: { d: string }) {
   );
 }
 
-function ResumeCard({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | undefined }) {
+function ResumeCard({ resume, roles, ideas }: { resume: ResumeOut; roles: RoleOut[] | undefined; ideas: number | null }) {
   const ready = resume.status === "extracted";
   const label = resume.name ?? "Resume";
-  // RSD-16: one story-ideas request per card. There is no batched read without a backend change (D-8).
-  const ideas = useStoryIdeas(ready ? resume.id : null);
   const queryClient = useQueryClient();
   const refresh = useLibraryRefresh();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -160,7 +158,7 @@ function ResumeCard({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | u
   };
 
   const counts = ready ? resumeIssueCounts(resume) : null;
-  const stats = resumeStats(usingRoleCount(roles, resume.id), counts, ideas.data ? ideas.data.ideas.length : null);
+  const stats = resumeStats(usingRoleCount(roles, resume.id), counts, ideas);
   const meta = ready
     ? [`Added ${formatDate(resume.uploaded_at)}`, editedLabel(resume)].filter(Boolean).join(" · ")
     : "Strova is reading this resume. The numbers show when she is done.";
@@ -296,6 +294,14 @@ export function ResumesListPage() {
   const auth = useAuth();
   const resumes = useResumes();
   const roles = useQuery({ queryKey: ["roles"], queryFn: rolesApi.list });
+  // RSD-16: every card's story-idea count in one request (GET /story-ideas/counts).
+  const ideaCounts = useStoryIdeaCounts(
+    (resumes.data ?? []).filter((r) => !r.deleted && r.status === "extracted").map((r) => r.id),
+  );
+  const ideasOf = (id: string) => {
+    if (!ideaCounts.data) return null;
+    return ideaCounts.data.find((c) => c.resume_id === id)?.ideas ?? null;
+  };
   const live = (resumes.data ?? []).filter((r) => !r.deleted);
   const full = live.length >= MAX_RESUMES;
   const title = resumesLabel(auth.data?.user?.full_name);
@@ -339,7 +345,7 @@ export function ResumesListPage() {
           {/* The list keeps its semantics; its items sit in the page grid (display: contents). */}
           <ul role="list" aria-label="Your resumes" style={{ display: "contents" }}>
             {live.map((r) => (
-              <ResumeCard key={r.id} resume={r} roles={roles.data} />
+              <ResumeCard key={r.id} resume={r} roles={roles.data} ideas={ideasOf(r.id)} />
             ))}
           </ul>
           {!full && (

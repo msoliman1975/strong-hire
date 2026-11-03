@@ -35,6 +35,7 @@ export type ResumeAccepted = DeepRequired<S["ResumeAccepted"]>;
 export type ResumeIssues = DeepRequired<S["ResumeIssues"]>;
 /** RM-4: story ideas from a resume (GET /resumes/{id}/story-ideas). */
 export type StoryIdeasOut = DeepRequired<S["StoryIdeasOut"]>;
+export type StoryIdeaCount = DeepRequired<S["StoryIdeaCount"]>;
 export type StoryIdeaOut = DeepRequired<S["StoryIdeaOut"]>;
 /** PS-2, PS-6: PATCH /account/profile. */
 export type PlanSettingsIn = S["PlanSettingsIn"];

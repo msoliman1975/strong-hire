@@ -197,3 +197,39 @@ def test_rm4_api_and_worker_story_idea_rules_are_identical() -> None:
     ]
     item = api.achievements(resume)[0]
     assert api.idea_reason(item) == worker.idea_reason(worker.achievements(resume)[0])
+
+
+async def test_rsd16_counts_for_every_resume_in_one_read(
+    client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    """RSD-16: GET /story-ideas/counts gives each read resume's open and used ideas, the same
+    numbers as GET /resumes/{id}/story-ideas, so the Resumes list needs one request."""
+    await sign_in(client)
+    set_extractor_output(fake_fixtures, "StoryIdeas", SKILLS)
+    first = await add_resume(client, fake_fixtures)
+    second = await add_resume(client, fake_fixtures, filename="Platform CV.txt")
+    dismissed = await client.post(
+        f"/resumes/{second['id']}/story-ideas/dismiss",
+        json={"resume_line_ref": "roles[0].achievements[0]"},
+    )
+    assert dismissed.status_code == 204, dismissed.text
+
+    resp = await client.get("/story-ideas/counts")
+    assert resp.status_code == 200, resp.text
+    counts = {c["resume_id"]: c for c in resp.json()}
+    assert set(counts) == {first["id"], second["id"]}
+    for resume in (first, second):
+        one = await ideas(client, resume["id"])
+        assert counts[resume["id"]]["ideas"] == len(one["ideas"])
+        assert counts[resume["id"]]["used"] == len(one["used"])
+    assert counts[second["id"]]["ideas"] == counts[first["id"]]["ideas"] - 1
+
+
+async def test_rsd16_counts_skip_a_resume_still_being_read(client: httpx.AsyncClient) -> None:
+    """RSD-16: a resume not read yet has no counts (the list shows it as being read)."""
+    await sign_in(client)
+    resp = await client.post("/resumes", data={"text": "Backend engineer, Python and Go."})
+    assert resp.status_code == 202, resp.text
+    counts = await client.get("/story-ideas/counts")
+    assert counts.status_code == 200, counts.text
+    assert all(c["resume_id"] != resp.json()["resume"]["id"] for c in counts.json())

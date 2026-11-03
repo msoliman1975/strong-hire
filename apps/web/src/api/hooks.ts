@@ -52,6 +52,8 @@ export const keys = {
   resumeTask: (id: string, taskId: string) => ["resumes", id, "task", taskId] as const,
   resumeIssues: (id: string, jobId: string) => ["resumes", id, "issues", jobId] as const,
   storyIdeas: (id: string) => ["resumes", id, "story-ideas"] as const,
+  /** Under "resumes", so every resume change (and a dismissed idea) refreshes the counts. */
+  storyIdeaCounts: ["resumes", "story-idea-counts"] as const,
   session: (id: string) => ["sessions", id] as const,
   debrief: (id: string) => ["sessions", id, "debrief"] as const,
 };
@@ -129,6 +131,17 @@ export const useStoryIdeas = (resumeId: string | null) =>
     queryFn: () => resumesApi.storyIdeas(resumeId ?? ""),
     enabled: Boolean(resumeId),
     refetchInterval: (q) => (q.state.data?.skills === "pending" && q.state.dataUpdateCount < 10 ? POLL_MS : false),
+  });
+
+/**
+ * RSD-16: the Resumes list's story-idea counts, one request for every card. Keyed by the resumes
+ * that have been read, so a resume that finishes reading gets its count.
+ */
+export const useStoryIdeaCounts = (readIds: readonly string[]) =>
+  useQuery({
+    queryKey: [...keys.storyIdeaCounts, [...readIds].sort().join(",")],
+    queryFn: () => resumesApi.storyIdeaCounts(),
+    enabled: readIds.length > 0,
   });
 
 export const useResumeTask = (resumeId: string | null, taskId: string | null) =>

@@ -251,23 +251,34 @@ describe("RSD-3: the footer", () => {
 });
 
 describe("RSD-16: story ideas on the list", () => {
-  it("RSD-16: one story-ideas read per ready resume and none for one being read (no batched endpoint, D-8)", async () => {
-    await addResume("Senior SWE resume");
+  it("RSD-16: one counts request for every card, no per-card story-ideas request, and the same numbers", async () => {
+    const senior = await addResume("Senior SWE resume");
     await addResume("Platform lead resume");
     const reading = await addResume("Data engineering resume");
     Object.assign(reading, { status: "pending", resume: null, confirmed_at: null });
-    const reads: string[] = [];
+    // One idea set aside on the first resume, so the counts differ.
+    const first = (await (await fetch(`${location.origin}/api/resumes/${senior.id}/story-ideas`)).json()) as {
+      ideas: { resume_line_ref: string }[];
+    };
+    await resumesApi.dismissIdea(senior.id, first.ideas[0].resume_line_ref);
+    const perCard: string[] = [];
+    const counts: string[] = [];
     const onStart = ({ request }: { request: Request }) => {
-      const m = /\/resumes\/([^/]+)\/story-ideas$/.exec(new URL(request.url).pathname);
-      if (m && request.method === "GET") reads.push(m[1]);
+      if (request.method !== "GET") return;
+      const path = new URL(request.url).pathname;
+      if (/\/resumes\/[^/]+\/story-ideas$/.test(path)) perCard.push(path);
+      if (path.endsWith("/story-ideas/counts")) counts.push(path);
     };
     server.events.on("request:start", onStart);
     try {
       renderApp();
-      const card = await cardOf("Platform lead resume");
-      await waitFor(() => expect(tiles(card)[2]).toMatch(/story ideas?$/));
-      await waitFor(() => expect(new Set(reads).size).toBe(2));
-      expect(reads).not.toContain(reading.id);
+      const card = await cardOf("Senior SWE resume");
+      await waitFor(() => expect(tiles(card)[2]).toMatch(/^\d+ story ideas?$/));
+      expect(tiles(card)[2]).toMatch(new RegExp(`^${first.ideas.length - 1} `));
+      const reader = await cardOf("Data engineering resume");
+      expect(within(reader).queryAllByRole("term")).toHaveLength(0);
+      expect(counts).toHaveLength(1);
+      expect(perCard).toEqual([]);
     } finally {
       server.events.removeListener("request:start", onStart);
     }

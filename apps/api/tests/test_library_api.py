@@ -593,3 +593,24 @@ async def test_pr3_a_session_records_its_cv_and_reports_filter_by_cv(
     }
     other = (await client.get("/reports", params={**params, "resume_id": second["id"]})).json()
     assert [r["type"] for r in other] == ["gap_report"]
+
+
+async def test_same_default_name_gets_a_number(
+    client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    """RMAP-9: two resumes never share a default name; the second gets " (2)", then " (3)"."""
+    await sign_in(client)
+    names = [(await add_resume(client, fake_fixtures))["name"] for _ in range(3)]
+    assert names == ["Ana Lopez CV", "Ana Lopez CV (2)", "Ana Lopez CV (3)"]
+
+
+def test_unique_name_fits_the_limit() -> None:
+    """RMAP-9: the number never pushes a name past NAME_MAX_CHARS."""
+    from strong_api.inputs.router import unique_name
+    from strong_core.library import NAME_MAX_CHARS
+
+    long = "x" * NAME_MAX_CHARS
+    assert unique_name("Resume 2026-11-03", set()) == "Resume 2026-11-03"
+    assert unique_name("Resume 2026-11-03", {"Resume 2026-11-03"}) == "Resume 2026-11-03 (2)"
+    got = unique_name(long, {long})
+    assert len(got) <= NAME_MAX_CHARS and got.endswith(" (2)")
