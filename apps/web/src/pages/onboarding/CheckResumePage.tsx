@@ -116,6 +116,7 @@ export function CheckResumePage() {
         fresh={fresh}
         confirmedAt={record.data.confirmed_at ?? null}
         uploadedAt={record.data.uploaded_at}
+        isMain={record.data.is_main}
       />
     );
   }

@@ -1,6 +1,7 @@
 /**
- * IN-3, IN-12: the v2 "Check your resume" page (behind v2_enabled). The CV as cards, the "What we
- * found" panel, Fix and Accept. Runs against the MSW mock of PUT /resumes/{id}.
+ * IN-3, IN-12, RSD-7 to RSD-10: the v2 "Check your resume" page (behind v2_enabled). The guided
+ * steps: the career journey (the resume as cards), Strova's findings one at a time with the fix in
+ * place, Accept and its reasons. Runs against the MSW mock of PUT /resumes/{id}.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor, within } from "@testing-library/react";
@@ -66,8 +67,21 @@ function recordPutBodies(): { resume: Resume }[] {
   return bodies;
 }
 
-const panel = () => screen.getByRole("complementary", { name: "What we found" });
-const issueCard = (title: string) => within(panel()).getByText(title).closest("details") as HTMLElement;
+/** The page is ready when its step list shows. */
+const ready = () => screen.findByRole("navigation", { name: "Steps" });
+/** Step 2, Strova's findings. */
+const findingsView = () => screen.getByTestId("findings-step");
+/** The finding in view. */
+const finding = () => within(findingsView()).getByRole("article");
+/** Opens a finding by its title, from "Next findings" when it is not the one in view. */
+async function openFinding(user: ReturnType<typeof userEvent.setup>, title: string) {
+  if (within(finding()).queryByRole("heading", { name: title })) return finding();
+  await user.click(within(within(findingsView()).getByRole("list", { name: "Next findings" })).getByRole("button", { name: new RegExp(title) }));
+  expect(within(finding()).getByRole("heading", { name: title })).toBeInTheDocument();
+  return finding();
+}
+/** The open count on the findings step. */
+const openCount = () => Number(screen.getByRole("button", { name: /Strova's findings/ }).querySelector(".cvc-step__num")?.textContent);
 
 describe("toCvDraft and cvDraftToResume", () => {
   it("IN-3: keeps every part of the contract and sorts roles newest first", () => {
@@ -82,9 +96,10 @@ describe("toCvDraft and cvDraftToResume", () => {
 describe("v2 Check your CV", () => {
   it("IN-3: shows the CV as cards: summary, roles with dates and length, skills and education", async () => {
     const { resume } = await seed();
-    renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    expect(screen.getByRole("heading", { name: "Check your resume" })).toBeInTheDocument();
+    renderAt(`/resumes/${resume.id}/check?step=journey`);
+    await ready();
+    expect(screen.getByRole("heading", { level: 1, name: mockStore.db.resumes[0].name ?? "" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Your career journey" })).toBeInTheDocument();
     expect(screen.getByText(fixtureResume.summary!)).toBeInTheDocument();
     const shoply = screen.getByRole("region", { name: "Software Engineer II · Shoply" });
     expect(within(shoply).getByText(/^Mar 2021 to now · /)).toBeInTheDocument();
@@ -96,68 +111,78 @@ describe("v2 Check your CV", () => {
     expect(screen.queryByRole("button", { name: "Confirm and continue" })).not.toBeInTheDocument();
   });
 
-  it("IN-12: lists what it found; Fix opens the role and focuses the field, and the issue goes when fixed", async () => {
+  it("IN-12, RSD-10: lists what it found, one at a time; the fix in place saves and the next finding shows", async () => {
     const { resume } = await seed();
+    const puts = recordPutBodies();
     const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    expect(within(panel()).getByText("One achievement on Invoicely")).toBeInTheDocument();
-    expect(within(panel()).getByText("A skill missing from Skills")).toBeInTheDocument();
+    await ready();
+    const before = openCount();
+    const next = within(findingsView()).getByRole("list", { name: "Next findings" });
+    expect(within(next).getByRole("button", { name: /A skill missing from Skills/ })).toBeInTheDocument();
 
-    await user.click(within(issueCard("One achievement on Invoicely")).getByRole("button", { name: "Add an achievement" }));
-    const editor = screen.getByRole("group", { name: "Editing · Software Engineer · Invoicely" });
-    const added = within(editor).getByLabelText("Achievement 2 at Software Engineer · Invoicely");
-    expect(added).toHaveFocus();
-    await user.type(added, "Cut invoice errors 30% for 2,000 customers");
-    expect(within(panel()).queryByText("One achievement on Invoicely")).not.toBeInTheDocument();
-    await user.click(within(editor).getByRole("button", { name: "Save role" }));
-    expect(screen.getByText("Cut invoice errors 30% for 2,000 customers")).toBeInTheDocument();
+    const card = await openFinding(user, "One achievement on Invoicely");
+    const box = within(card).getByText("Strova recommends").parentElement as HTMLElement;
+    await user.type(within(box).getByLabelText("A new achievement at Invoicely"), "Cut invoice errors 30% for 2,000 customers");
+    await user.click(within(box).getByRole("button", { name: "Save achievement" }));
+    await waitFor(() => expect(puts).toHaveLength(1));
+    expect(puts[0].resume.roles[1].achievements).toContain("Cut invoice errors 30% for 2,000 customers");
+    await waitFor(() => expect(within(findingsView()).queryByRole("heading", { name: "One achievement on Invoicely" })).not.toBeInTheDocument());
+    expect(openCount()).toBe(before - 1);
+    // The next finding takes its place.
+    expect(within(finding()).getByTestId("finding-position")).toHaveTextContent(/^Finding \d+ of \d+ · (high|medium|low)$/);
   });
 
-  it("IN-12: Fix on a date issue highlights the field with a note on the role card", async () => {
+  it("IN-12, RSD-10: a date finding shows the date fields of the roles involved, in place", async () => {
     const { resume } = await seed();
     mockStore.db.resumes[0].resume!.roles[1].end = "2021-09"; // overlaps Shoply from 2021-03
     const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    await user.click(within(issueCard("Overlapping roles")).getByRole("button", { name: "Fix the date" }));
-    const end = screen.getByLabelText("End (Empty if current)");
-    expect(end).toHaveFocus();
+    await ready();
+    const card = await openFinding(user, "Overlapping roles");
+    const end = within(card).getByLabelText("Invoicely ended");
     expect(end).toHaveValue("2021-09");
-    expect(screen.getByText("Overlaps Shoply by 6 months")).toBeInTheDocument();
+    expect(within(card).getByLabelText("Shoply started")).toHaveValue("2021-03");
     await user.clear(end);
     await user.type(end, "2021-02");
-    expect(within(panel()).queryByText("Overlapping roles")).not.toBeInTheDocument();
+    await user.click(within(card).getByRole("button", { name: "Save dates" }));
+    await waitFor(() => expect(within(findingsView()).queryByRole("heading", { name: "Overlapping roles" })).not.toBeInTheDocument());
+    expect(within(findingsView()).queryByRole("button", { name: /Overlapping roles/ })).not.toBeInTheDocument();
   });
 
-  it("IN-12: Accept moves an issue to Accepted, the filters count it, and Undo brings it back", async () => {
+  it("IN-12: a finding with no fix in place opens its field on the journey, with a note on the role", async () => {
+    const { resume } = await seed();
+    mockStore.db.resumes[0].resume!.roles[1].end = "2021-09";
+    const user = renderAt(`/resumes/${resume.id}/check?step=journey`);
+    await ready();
+    await user.click(screen.getByRole("button", { name: "Edit Software Engineer · Invoicely" }));
+    expect(screen.getByText("Overlaps Shoply by 6 months")).toBeInTheDocument();
+  });
+
+  it("IN-12: Accept moves a finding to the accepted list, and Undo brings it back", async () => {
     const { resume } = await seed();
     const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    const card = issueCard("A skill missing from Skills");
-    await user.click(within(card).getByText("A skill missing from Skills"));
+    await ready();
+    const before = openCount();
+    const card = await openFinding(user, "A skill missing from Skills");
     await user.click(within(card).getByRole("button", { name: "Accept as it is" }));
-    expect(within(panel()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
-    expect(within(panel()).getByRole("button", { name: "Accepted 1" })).toBeInTheDocument();
-
-    await user.click(within(panel()).getByRole("button", { name: "Detail 2" }));
-    expect(within(panel()).queryByText("✓ Accepted: A skill missing from Skills")).not.toBeInTheDocument();
-    expect(within(panel()).getByText("One achievement on Invoicely")).toBeInTheDocument();
+    const list = within(findingsView()).getByText("Findings you accepted · 1").closest("details") as HTMLElement;
+    expect(within(list).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    expect(openCount()).toBe(before - 1);
+    expect(within(findingsView()).queryByRole("heading", { name: "A skill missing from Skills" })).not.toBeInTheDocument();
 
     // Part 2: the key is stored on the resume.
     const stored = () => (mockStore.db.resumes[0].accepted_issues ?? []).map((i) => i.key);
     expect(stored()).toEqual(["consistency.skills-missing:celery"]);
 
-    await user.click(within(panel()).getByRole("button", { name: "Accepted 1" }));
-    await user.click(within(panel()).getByRole("button", { name: "Undo accepting A skill missing from Skills" }));
+    await user.click(within(list).getByRole("button", { name: "Undo accepting A skill missing from Skills" }));
     await waitFor(() => expect(stored()).toEqual([]));
-    await user.click(within(panel()).getByRole("button", { name: "All" }));
-    expect(within(panel()).getByText("A skill missing from Skills")).toBeInTheDocument();
+    expect(openCount()).toBe(before);
   });
 
   it("IN-3: edits the summary and certifications, saves the full contract, then continues to the context step", async () => {
     const { job, resume } = await seed();
     const puts = recordPutBodies();
     const user = renderAt(`/jobs/${job.id}/resume/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
+    await ready();
 
     await user.click(screen.getByRole("button", { name: "Edit the summary" }));
     const summary = screen.getByRole("textbox", { name: "Summary" });
@@ -185,8 +210,8 @@ describe("v2 Check your CV", () => {
   it("IN-3: adds, reorders and removes roles, and blocks saving an incomplete role", async () => {
     const { resume } = await seed();
     const puts = recordPutBodies();
-    const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
+    const user = renderAt(`/resumes/${resume.id}/check?step=journey`);
+    await ready();
 
     await user.click(screen.getByRole("button", { name: "+ Add a role" }));
     const added = screen.getByRole("group", { name: "Editing · New role" });
@@ -206,7 +231,7 @@ describe("v2 Check your CV", () => {
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply" }));
     await user.click(screen.getByRole("button", { name: "Remove the role Software Engineer II · Shoply" }));
 
-    await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[1]);
+    await user.click(screen.getByRole("button", { name: "Save and go back to resumes" }));
     expect(await screen.findByRole("heading", { level: 1, name: /Resumes$/i })).toBeInTheDocument();
     expect(puts[0].resume.roles.map((r) => r.company)).toEqual(["Northwind Labs", "Invoicely"]);
   });
@@ -214,8 +239,8 @@ describe("v2 Check your CV", () => {
   it("IN-3 regression: editing a role updates that role, and never adds one", async () => {
     const { resume } = await seed();
     const puts = recordPutBodies();
-    const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
+    const user = renderAt(`/resumes/${resume.id}/check?step=journey`);
+    await ready();
 
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer · Invoicely" }));
     const editor = screen.getByRole("group", { name: "Editing · Software Engineer · Invoicely" });
@@ -262,7 +287,8 @@ describe("v2 Check your CV", () => {
     const user = renderAt("/resumes");
     const list = await screen.findByRole("list", { name: "Your resumes" });
     await user.click(within(list).getAllByRole("link", { name: /^Show details/ })[0]);
-    await screen.findByRole("complementary", { name: "What we found" });
+    await ready();
+    await user.click(screen.getByRole("button", { name: /Your career journey/ }));
 
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply" }));
     const editor = screen.getByRole("group", { name: "Editing · Software Engineer II · Shoply" });
@@ -281,7 +307,8 @@ describe("v2 Check your CV", () => {
 
     // Opened again from Resumes and edited again: still two roles.
     await user.click(within(await screen.findByRole("list", { name: "Your resumes" })).getAllByRole("link", { name: /^Show details/ })[0]);
-    await screen.findByRole("complementary", { name: "What we found" });
+    await ready();
+    await user.click(screen.getByRole("button", { name: /Your career journey/ }));
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply Inc" }));
     const again = screen.getByRole("group", { name: "Editing · Software Engineer II · Shoply Inc" });
     await user.type(within(again).getByLabelText("Title"), " (Payments)");
@@ -294,55 +321,54 @@ describe("v2 Check your CV", () => {
     ]);
   });
 
-  it("IN-12: a section's issue count shows and highlights its issues in the panel", async () => {
+  it("IN-12, RSD-9: a role's finding chip opens that finding on step 2", async () => {
+    const { resume } = await seed();
+    const user = renderAt(`/resumes/${resume.id}/check?step=journey`);
+    await ready();
+    await user.click(screen.getByRole("button", { name: /^Show the \d+ findings? for Software Engineer · Invoicely$/ }));
+    expect(screen.getByRole("button", { name: /Strova's findings/ })).toHaveAttribute("aria-current", "step");
+    // The finding in view is about that role: the career strip outlines it (RSD-13).
+    const strip = screen.getByRole("region", { name: "Career journey at a glance" });
+    expect(strip.querySelector("[data-outlined]")).toHaveTextContent(/Invoicely|^$/);
+    expect(strip.querySelectorAll("[data-outlined]")).not.toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: /Your career journey/ }));
+    await user.click(screen.getByRole("button", { name: "Show the 1 finding for Skills" }));
+    expect(within(finding()).getByRole("heading", { name: "A skill missing from Skills" })).toBeInTheDocument();
+  });
+
+  it("IN-12: What Strova checks opens from the step list footer", async () => {
     const { resume } = await seed();
     const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    // Another filter first: the click shows every issue again.
-    await user.click(within(panel()).getByRole("button", { name: /^Dates/ }));
-    expect(within(panel()).queryByText("One achievement on Invoicely")).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /^Show the \d+ issues? for Software Engineer · Invoicely$/ }));
-    const card = issueCard("One achievement on Invoicely");
-    expect(card).toHaveAttribute("data-highlight", "true");
-    expect(card).toHaveAttribute("open");
-    expect(issueCard("A skill missing from Skills")).not.toHaveAttribute("data-highlight");
-
-    await user.click(screen.getByRole("button", { name: "Show the 1 issue for Skills" }));
-    expect(issueCard("A skill missing from Skills")).toHaveAttribute("data-highlight", "true");
+    await ready();
+    expect(screen.queryByText(/gaps over 3 months/)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "What Strova checks ›" }));
+    expect(screen.getByText(/gaps over 3 months/)).toBeInTheDocument();
   });
 
-  it("IN-12: What we check sits at the top of the issues column, folded", async () => {
-    const { resume } = await seed();
-    renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    const checks = within(panel()).getByText("What we check").closest("details")!;
-    expect(panel().firstElementChild).toBe(checks);
-    expect(checks).not.toHaveAttribute("open");
-  });
-
-  it("IN-12: a missing date can be accepted with a reason, and stops counting as an issue", async () => {
+  it("IN-12: a missing date can be accepted with a reason, and stops counting as a finding", async () => {
     const { resume } = await seed();
     mockStore.db.resumes[0].resume!.roles[1].start = null;
     const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    const card = issueCard("No start date on Invoicely");
+    await ready();
+    const card = await openFinding(user, "No start date on Invoicely");
     expect(within(card).getByText(/Leaving old dates off on purpose is fine/)).toBeInTheDocument();
-    const before = Number(/(\d+) open/.exec(within(panel()).getByText(/open ·/).textContent!)![1]);
+    const before = openCount();
 
     await user.click(within(card).getByRole("button", { name: "Accept: Left out on purpose (age bias)" }));
-    expect(within(panel()).queryByText("No start date on Invoicely")).not.toBeInTheDocument();
-    expect(within(panel()).getByText(/✓ Accepted: No start date on Invoicely/)).toHaveTextContent(
+    expect(within(findingsView()).queryByRole("heading", { name: "No start date on Invoicely" })).not.toBeInTheDocument();
+    expect(within(findingsView()).getByText(/✓ Accepted: No start date on Invoicely/)).toHaveTextContent(
       "Left out on purpose (age bias)",
     );
-    expect(within(panel()).getByText(/open ·/)).toHaveTextContent(`${before - 1} open · 1 accepted`);
+    expect(openCount()).toBe(before - 1);
     const stored = () => (mockStore.db.resumes[0].accepted_issues ?? []).map((i) => i.key);
     await waitFor(() => expect(stored()).toEqual(["dates.missing-start:invoicely/software-engineer|why=on-purpose"]));
 
-    // Changing the reason replaces the stored key; the issue stays accepted after a reload.
-    await user.click(within(panel()).getByRole("button", { name: "Undo accepting No start date on Invoicely" }));
+    // Changing the reason replaces the stored key; the finding stays accepted after a reload.
+    await user.click(within(findingsView()).getByRole("button", { name: "Undo accepting No start date on Invoicely" }));
     await waitFor(() => expect(stored()).toEqual([]));
-    await user.click(within(issueCard("No start date on Invoicely")).getByRole("button", { name: "Accept: I don't remember" }));
+    const again = await openFinding(user, "No start date on Invoicely");
+    await user.click(within(again).getByRole("button", { name: "Accept: I don't remember" }));
     await waitFor(() => expect(stored()).toEqual(["dates.missing-start:invoicely/software-engineer|why=dont-remember"]));
   });
 
@@ -352,21 +378,23 @@ describe("v2 Check your CV", () => {
       { key: "consistency.skills-missing:celery", accepted_at: "2026-10-28T10:00:00Z" },
     ];
     renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
-    expect(within(panel()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
-    expect(within(panel()).getByText(/1 accepted/)).toBeInTheDocument();
+    await ready();
+    expect(within(findingsView()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    expect(within(findingsView()).getByText("Findings you accepted · 1")).toBeInTheDocument();
   });
 
   it("IN-3: a new CV says where the user is, and ends in one next step, at the top and the bottom", async () => {
     const { resume, task } = await seed();
     const puts = recordPutBodies();
     // A new upload from the Resumes page brings its reading job.
-    const user = renderAt(`/resumes/${resume.id}/check?task=${task?.id ?? ""}`);
-    await screen.findByRole("complementary", { name: "What we found" });
+    const user = renderAt(`/resumes/${resume.id}/check?task=${task?.id ?? ""}&step=journey`);
+    await ready();
     expect(screen.getByRole("status")).toHaveTextContent("We read your resume. Check it, then continue.");
     const next = screen.getAllByRole("button", { name: "Add a job description to practice for" });
     expect(next).toHaveLength(2);
-    expect(within(screen.getByRole("region", { name: "Next step" })).getByRole("button", { name: "Back to resumes" })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "Next step" })).getByRole("button", { name: "Save and go back to resumes" }),
+    ).toBeInTheDocument();
     await user.click(next[1]);
     expect(await screen.findByRole("heading", { level: 1, name: "Add a target role" })).toBeInTheDocument();
     expect(puts).toHaveLength(1);
@@ -376,7 +404,7 @@ describe("v2 Check your CV", () => {
     const { job, resume } = await seed();
     mockStore.db.resumes[0].confirmed_at = "2026-10-28T10:00:00Z";
     renderAt(`/jobs/${job.id}/resume/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
+    await ready();
     expect(screen.getAllByRole("button", { name: "Continue to your interview plan" })).toHaveLength(2);
     expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
   });
@@ -386,7 +414,7 @@ describe("v2 Check your CV", () => {
     const { resume } = await seed();
     renderAt(`/resumes/${resume.id}/check`);
     expect(await screen.findByRole("button", { name: "Confirm and continue" })).toBeInTheDocument();
-    expect(screen.queryByRole("complementary", { name: "What we found" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Steps" })).not.toBeInTheDocument();
   });
 });
 
@@ -396,12 +424,12 @@ describe("v2 coming back to a saved CV", () => {
     Object.assign(mockStore.db.resumes[0], { confirmed_at: "2026-10-28T10:00:00Z", accepted_issues: [ACCEPTED] });
   };
   const expectSameBreakdown = async () => {
-    await screen.findByRole("complementary", { name: "What we found" });
-    expect(within(panel()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    await ready();
+    expect(within(findingsView()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
     expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
-    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/^Last saved Oct 28(, 2026)? · \d+ issues? open$/);
-    expect(screen.getAllByRole("button", { name: "Use this resume for an interview" })).toHaveLength(2);
-    expect(screen.getAllByRole("button", { name: "Back to resumes" })).toHaveLength(2);
+    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/^Added [A-Z][a-z]{2} \d+(, \d{4})? · Last saved Oct 28(, 2026)?$/);
+    expect(screen.getByRole("button", { name: "Use this resume for an interview" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Back to resumes" })).toBeInTheDocument();
   };
 
   it("IN-12, RMAP-2, RSD-1: the resume card shows the same open issues as the breakdown, and Show details opens it", async () => {
@@ -419,7 +447,7 @@ describe("v2 coming back to a saved CV", () => {
     await user.click(details);
     await expectSameBreakdown();
     // D-4: the list and the check page count open issues the same way.
-    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(new RegExp(`· ${open} issues? open$`));
+    expect(openCount()).toBe(open);
   });
 
   it("RMAP-2, RSD-3: one list; Rename and Delete sit in the card footer, with no More menu", async () => {
@@ -469,9 +497,9 @@ describe("v2 coming back to a saved CV", () => {
     const { resume } = await seed();
     const puts = recordPutBodies();
     const user = renderAt(`/resumes/${resume.id}/check`);
-    await screen.findByRole("complementary", { name: "What we found" });
+    await ready();
     expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
-    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/Not saved yet · \d+ issues? open/);
+    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/Not saved yet$/);
     await user.click(screen.getAllByRole("button", { name: "Use this resume for an interview" })[0]);
     expect(await screen.findByRole("heading", { level: 1, name: "Add a target role" })).toBeInTheDocument();
     expect(puts).toHaveLength(1);
