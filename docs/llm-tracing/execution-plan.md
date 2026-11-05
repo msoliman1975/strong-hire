@@ -34,5 +34,6 @@ Phase 1 is done when LT06 has merged and its PR description lists:
 - every requirement ID LT-1 to LT-15, with the test that covers it (LT-16 is the phase 2 item);
 - one sim suite run on the main server, with a link to its MLflow run, showing the params,
   metrics, turn spans and judge assessments;
-- the measured MLflow memory use on the main server under a voice sim;
+- the measured MLflow memory use on the main server under a voice sim (or, if the server is not
+  reachable from the build, the owner steps to measure it);
 - every decision taken during the build.

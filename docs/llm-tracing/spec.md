@@ -165,6 +165,30 @@ so the UI groups a session's turns and jobs together.
   stays under 2 ms p95 per call (LT-5).
 - A test proves that a redacted span holds no message text (LT-4).
 
+## How to compare two prompt versions
+
+1. Make sure tracing is on (`docs/hosting.md`, "LLM tracing (MLflow)") and
+   `STRONGHIRE_MLFLOW_PASSWORD` is set on your PC.
+2. Run a suite on the current prompts: `./infra/sim/sim-run.ps1 -Suite text-smoke`.
+3. Deploy the prompt change (a new `prompts/<role>/<name>.v<N+1>.txt`), then run the same suite
+   again. Use the same suite and the same scenarios, so the runs differ only in the change.
+4. Open `https://mlflow.getstronghire.com`, experiment `sim`, tick both runs, and click
+   **Compare**.
+   - **Params** show what changed: `<role>.prompt_refs`, `<role>.alias`, `<role>.tier`,
+     `model_profile`, `git_sha`.
+   - **Metrics** show the effect:
+     - `judge_<rule>_pass_rate`: quality, from the judge;
+     - `turn_latency_p50_ms` and `turn_latency_p95_ms`, `<role>_ttft_p50_ms`: speed;
+     - `server_cost_per_session_usd`: cost;
+     - `structured_retries`, `validation_failures`, `gateway_errors`: failures.
+5. To see why a number moved, open the **Traces** tab and filter by `tags.sim_run_id = '<run>'`
+   or by `tags.scenario`. A session's turns and jobs group under its session id; the judge's
+   reasons are the assessments on its `judge` trace.
+
+A model comparison works the same way: change the role's alias in `config/models.<profile>.yaml`
+instead of the prompt. Runs are small (a suite is a handful of sessions), so treat a single
+difference as a lead, and run the suite twice before you act on it.
+
 ## Phase 2: production (not built now)
 
 Before any real user's call is traced, a separate design must decide:
