@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-SpanKind = Literal["CHAT_MODEL", "LLM", "CHAIN", "TASK", "AGENT", "UNKNOWN"]
+SpanKind = Literal["CHAT_MODEL", "LLM", "CHAIN", "TASK", "AGENT", "EVALUATOR", "UNKNOWN"]
 SpanStatus = Literal["OK", "ERROR"]
 ERROR_MESSAGE_CHARS = 300
 
