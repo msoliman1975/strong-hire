@@ -9,6 +9,7 @@ dependencies = [
     "httpx>=0.27",
     "livekit>=1.0",
     "pyyaml>=6.0",
+    "mlflow-skinny==3.17.2",  # LT-8: the same version as strong-core and the MLflow server
 ]
 
 [project.scripts]
