@@ -8,7 +8,7 @@ text-to-speech (Kokoro) run on the server CPU.
 | --- | --- |
 | Server | `stronghire-test`, type cx43 (8 vCPU shared, 16 GB, 160 GB disk), Nuremberg (nbg1) |
 | Cost | $18.49 per month, billed by the hour while the server exists |
-| Address | `https://app.getstronghire.com` (web and `/api`; sign-in, Google and email links return here. `https://getstronghire.com` serves the same app until the marketing site takes it), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit), `https://www.getstronghire.com` (marketing site preview, L04) |
+| Address | `https://app.getstronghire.com` (web and `/api`; sign-in, Google and email links return here. `https://getstronghire.com` serves the same app until the marketing site takes it), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit), `https://www.getstronghire.com` (marketing site preview, L04), `https://mlflow.getstronghire.com` (LLM traces, basic auth, only with `LLM_TRACING=on`) |
 | Firewall | Hetzner firewall `stronghire-fw`: 22, 80, 443/tcp, 443/udp, 7881/tcp, 7882/udp |
 | Repo on the server | `/opt/stronghire/strong-hire`, read-only deploy key |
 | Anthropic key | `/etc/stronghire/anthropic.key`, readable by root only, never in the repo or `.env` |
@@ -158,6 +158,48 @@ checkout with the Stripe test card `4242 4242 4242 4242`.
   Also set a monthly limit in the Anthropic Console. It is the hard limit.
 - To pay nothing between test rounds, take a snapshot of the server in the Hetzner console, then
   delete the server. Hetzner bills a server that is powered off.
+
+## LLM tracing (MLflow)
+
+The MLflow trace server (LT-12, `docs/llm-tracing/spec.md`) records sim sessions' model calls, so
+prompt and model versions can be compared run by run. It traces sim users only (LT-3); real users
+are never traced. It is off until you turn it on.
+
+**Turn it on.**
+
+1. Add a DNS record: `mlflow.getstronghire.com`, type A, to the server's IP (as for `admin.`).
+2. Choose a password without `$` or quotes, and hash it:
+   `docker run --rm caddy:2.10-alpine caddy hash-password --plaintext '<password>'`
+3. In `/opt/stronghire/strong-hire/.env`, set:
+
+   ```
+   LLM_TRACING=on
+   MLFLOW_EXPERIMENT=sim
+   MLFLOW_BASIC_AUTH_USER=mlflow
+   MLFLOW_BASIC_AUTH_HASH='<the hash, in single quotes>'
+   ```
+
+4. Deploy (`./scripts/dev.ps1 deploy`). `profile.ps1` adds the `obs` profile when
+   `LLM_TRACING=on`. The `mlflow` service creates its own `mlflow` database in the stack's
+   Postgres on first start, and keeps artifacts in a volume.
+5. Open `https://mlflow.getstronghire.com` and sign in as `mlflow` with the password.
+6. On your PC, set the user environment variable `STRONGHIRE_MLFLOW_PASSWORD` to the same
+   password. `sim-run.ps1` then logs each suite run to the server's MLflow (LT-13). Without it,
+   suites run as before and log nothing to MLflow.
+
+**Turn it off.** Set `LLM_TRACING=off` and deploy. The service stops; its database and volume stay.
+
+**Rotate the password.** Make a new hash (step 2), replace `MLFLOW_BASIC_AUTH_HASH`, restart Caddy
+(`docker compose ... up -d caddy`), and update `STRONGHIRE_MLFLOW_PASSWORD` on your PC.
+
+**Capacity.** The service has `mem_limit: 1g`, and MLflow with 2 workers normally needs 300 to
+600 MB. The cx43 has 16 GB. Check it under a voice sim with `docker stats strong-hire-mlflow-1`
+and write the result here. Not measured yet (LT06).
+
+**Locally.** `./scripts/dev.ps1 up -Profile obs` starts core plus MLflow on
+`http://localhost:5000` and deletes dev traces older than 30 days (LT-11). Tracing stays off until
+`.env` has `LLM_TRACING=on`; `LLM_TRACING_DEV=on` also traces your own local sessions, always
+redacted. The server forces `LLM_TRACING_DEV` off.
 
 ## Re-read stored CVs
 

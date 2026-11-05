@@ -88,6 +88,8 @@ function Get-ComposeArgs([string]$ModelProfile, [bool]$WithVoice) {
     if (Test-Server) { $files += @('-f', (Join-Path $Root 'infra/compose.server.yaml')) }
     $files += @('--env-file', $EnvFile, '--profile', 'core', '--profile', 'models')
     if ($WithVoice) { $files += @('--profile', 'voice') }
+    # LT-12: the MLflow trace server runs on the server only while LLM_TRACING=on in .env.
+    if ((Test-Server) -and ((Get-EnvValues)['LLM_TRACING'] -eq 'on')) { $files += @('--profile', 'obs') }
     return $files
 }
 
