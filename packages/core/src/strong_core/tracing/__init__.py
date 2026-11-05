@@ -158,6 +158,23 @@ def _active_exporter() -> Exporter | None:
     return _exporter
 
 
+def flush(timeout_s: float = 10.0) -> bool:
+    """Wait until finished traces have been sent (or dropped). True when nothing is left.
+
+    For a process about to read its own traces back, like the sim at the end of a run (LT-9).
+    Never raises.
+    """
+    exporter = _override or _exporter
+    wait = getattr(exporter, "flush", None)
+    if wait is None:
+        return True
+    try:
+        return bool(wait(timeout_s))
+    except Exception:
+        warn_once("tracing: flush failed")
+        return False
+
+
 def is_active() -> bool:
     """LLM_TRACING=on, a tracking URI, and not the fake profile (LT-1). Tests may override."""
     if _override is not None:
@@ -508,6 +525,7 @@ __all__ = [
     "content_of",
     "current_trace_tags",
     "digest",
+    "flush",
     "is_active",
     "messages_of",
     "set_exporter_override",
