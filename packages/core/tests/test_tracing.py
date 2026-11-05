@@ -642,3 +642,31 @@ def test_lt6_collector_is_none_without_a_trace_context(trace_capture: InMemoryEx
     with collect_turns() as collector:
         assert collector is None
     assert trace_capture.traces == []
+
+
+async def test_lt6_collector_outlives_its_block_when_asked(
+    fake: ModelGateway, trace_capture: InMemoryExporter
+) -> None:
+    """LT-6: with flush_on_exit=False, tasks started in the block keep feeding the collector."""
+    import asyncio
+
+    from strong_core.tracing import collect_turns
+
+    started = asyncio.Event()
+    go = asyncio.Event()
+
+    async def later_call() -> None:
+        started.set()
+        await go.wait()
+        await fake.transcribe(_wav(0.5))
+
+    with trace_context(FULL), collect_turns(flush_on_exit=False) as collector:
+        assert collector is not None
+        task = asyncio.create_task(later_call())
+        await started.wait()
+    assert trace_capture.traces == []  # nothing flushed when the block ended
+    go.set()
+    await task
+    collector.cut("voice", 1, {"e2e_ms": 500.0})
+    (turn,) = trace_capture.traces
+    assert [c.name for c in turn.root.children] == ["gateway.stt"]

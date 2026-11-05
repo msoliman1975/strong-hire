@@ -409,9 +409,13 @@ class TurnCollector:
 
 
 @contextmanager
-def collect_turns() -> Iterator[TurnCollector | None]:
+def collect_turns(*, flush_on_exit: bool = True) -> Iterator[TurnCollector | None]:
     """Make a TurnCollector the parent of every gateway span started in this block (and in the
-    tasks it starts). Yields None, and does nothing, when nothing is recorded."""
+    tasks it starts). Yields None, and does nothing, when nothing is recorded.
+
+    Tasks started in the block keep the collector after the block ends. When the session outlives
+    the block (a LiveKit entrypoint returns once the session starts), pass flush_on_exit=False
+    and call `flush()` when the session really ends."""
     tags = _recording()
     if tags is None:
         yield None
@@ -422,7 +426,8 @@ def collect_turns() -> Iterator[TurnCollector | None]:
         yield collector
     finally:
         _current.reset(token)
-        collector.flush()
+        if flush_on_exit:
+            collector.flush()
 
 
 # --- content (LT-4) ---------------------------------------------------------------------------
