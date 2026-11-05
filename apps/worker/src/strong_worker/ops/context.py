@@ -5,6 +5,9 @@
 
 Inside the job every gateway call writes a usage_events row for `org_id` (and the session,
 when the job has one), and log lines carry the Arq job id as request_id and the session id.
+
+A job with a session is also one LLM trace named after the job (LT-7), but only when tracing is on
+and the session is the sim user's (or a local dev session with LLM_TRACING_DEV=on; LT-3).
 """
 
 from __future__ import annotations
@@ -18,6 +21,8 @@ from typing import Any, TypeVar
 
 from strong_core.gateway import usage_context
 from strong_core.ops.logs import log_context
+from strong_core.tracing import span
+from strong_core.tracing.sessions import maybe_trace, trace_tags_for
 
 F = TypeVar("F", bound=Callable[..., Awaitable[Any]])
 
@@ -45,12 +50,17 @@ def job_context(*, org_arg: str = "org_id", session_arg: str | None = None) -> C
             org_id = _uuid(bound.get(org_arg))
             session_id = _uuid(bound.get(session_arg)) if session_arg else None
             job_id = ctx.get("job_id") if isinstance(ctx, dict) else None
+            tags = None
+            if org_id is not None and session_id is not None:  # LT-3, LT-7
+                tags = await trace_tags_for(org_id=org_id, session_id=session_id, service="worker")
             with ExitStack() as stack:
                 stack.enter_context(
                     log_context(request_id=str(job_id) if job_id else None, session_id=session_id)
                 )
                 if org_id is not None:
                     stack.enter_context(usage_context(org_id, session_id=session_id))
+                stack.enter_context(maybe_trace(tags))
+                stack.enter_context(span(fn.__name__, "TASK", {"job_id": job_id}))
                 return await fn(*args, **kwargs)
 
         return wrapper  # type: ignore[return-value]
