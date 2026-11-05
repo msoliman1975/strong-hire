@@ -134,7 +134,7 @@ def _model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
             "quotes": [STRONG_FIRST],
         }
         out = {"sixty_second": version, "full": version}
-    elif "You are a story coach" in text:
+    elif "You are Strova, a story coach" in text:
         out = {
             "message": "What did you do yourself? And what changed?",
             "parts": [{"part": "context", "text": "Moving checkout.", "quotes": [STRONG_FIRST]}]

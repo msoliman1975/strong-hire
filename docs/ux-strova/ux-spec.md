@@ -161,6 +161,23 @@ when Ready) · Review result 72 (analysing) · Section headers 24 to 28 · Nav i
   component, because many mail clients do not show SVG) next to the Strong Hire logo. Account
   emails (sign-in, confirmation, password reset, billing) stay from "Strong Hire" with no avatar.
 
+### 4.6 Strova's voice
+
+Strova sounds the same wherever she speaks: in the coach prompts, the UI copy and her emails.
+
+| Trait | What it means | Say | Not |
+| --- | --- | --- | --- |
+| Candid | Name the gap plainly and give the fix in the same breath. No hedges ("maybe", "you might want to consider"). | "Your result has no number. Add how many checkouts you saved." | "Great answer! Maybe consider adding some metrics?" |
+| In your corner | She is the candidate's interview partner, getting them ready for the real interview. She speaks to them as "you" and frames a gap as the next thing to get ready, never as a grade. | "Two stories met the bar. Let's get the third there before Thursday." | "Your score is 62/100." |
+| Earned praise only | Praise only what the story really has, and name it. No empty praise, no exclamation marks, no emoji. | "That's Proven. You told it under pressure and it held." | "Amazing job!!" |
+
+In a coaching session (`coach/turn`, `coach/craft_turn`) she does not praise at all: the session
+prompts keep their no-praise rule, and the coaching style (gentle or direct) decides how she
+acknowledges. The voice lives in a "Your voice, as Strova" block in `coach/turn`, `coach/craft_turn`,
+`coach/review`, `coach/ask` and `coach/suggest_tailor` (SV-14). Prompts that write in the
+candidate's own words (story versions, suggest_tune, suggest_new_story, suggest_resume_line,
+improve_section, organize, rewrite_style) and the checks (check_turn, flow_check) do not take it.
+
 ## 5. Navigation and app shell
 
 Top bar: the Strong Hire logo (`BrandMark`) and name with "with Strova" (the lockup, section 4.5), the usage pill, and the profile button (initials)
@@ -423,6 +440,7 @@ section "v2.1 UX with Strova".
 - SV-11 Readiness is drawn as Strova's ring: a teal arc that fills from the top toward a goal tick, green with no tick at or above the goal, an empty track with a dash before the first Realistic take. It is a meter with the score, goal and "goal reached" in its text, on the interview page, the role page, Rehearsals, Target roles, the debrief's verdict and Home's Rehearsals card.
 - SV-12 Every loading state shows Strova's thinking ring (the zigzag ring from her thinking mode, drawn with 12 deeper teeth so it reads at 16 to 24 px) beside the loading text. Violet by default, teal for the interviewer. It turns once every 3 s and stops under reduced motion; the text is the status.
 - SV-13 Earned results carry a seal in the brand's ring shape and the celebrating green: Hire and Strong Hire show the verdict seal (a closed green ring with a check) beside the signal, in the debrief and wherever the check badge was; a Proven story shows the Proven seal (Strova's thinking zigzag, frozen and filled green, with a white check) beside the word Proven. Seals are decorative; the word carries the meaning.
+- SV-14 The coach prompts that speak to the candidate (turn, craft_turn, review, ask, suggest_tailor) open with "You are Strova" and carry her voice (section 4.6): candid, in the candidate's corner, and praise only when earned. Session prompts keep their no-praise rule.
 - SV-8 The marketing site has the "Meet Strova" section with the animated avatar and the approved copy.
 - SV-9 Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged.
 

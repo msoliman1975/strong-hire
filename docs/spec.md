@@ -286,6 +286,7 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 | SV-11 | Readiness is drawn as Strova's ring: a teal arc that fills from the top toward a goal tick, green with no tick at or above the goal, an empty track with a dash before the first Realistic take. It is a meter with the score, goal and "goal reached" in its text, on the interview page, the role page, Rehearsals, Target roles, the debrief's verdict and Home's Rehearsals card. | P1 |
 | SV-12 | Every loading state shows Strova's thinking ring (the zigzag ring from her thinking mode, drawn with 12 deeper teeth so it reads at 16 to 24 px) beside the loading text. Violet by default, teal for the interviewer. It turns once every 3 s and stops under reduced motion; the text is the status. | P1 |
 | SV-13 | Earned results carry a seal in the brand's ring shape and the celebrating green: Hire and Strong Hire show the verdict seal (a closed green ring with a check) beside the signal, in the debrief and wherever the check badge was; a Proven story shows the Proven seal (Strova's thinking zigzag, frozen and filled green, with a white check) beside the word Proven. Seals are decorative; the word carries the meaning. | P1 |
+| SV-14 | The coach prompts that speak to the candidate (turn, craft_turn, review, ask, suggest_tailor) open with "You are Strova" and carry her voice (ux-spec section 4.6): candid, in the candidate's corner, and praise only when earned. Session prompts keep their no-praise rule. | P1 |
 
 **Onboarding**
 
