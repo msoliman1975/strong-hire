@@ -78,3 +78,24 @@ www.{$DOMAIN} {
 rtc.{$DOMAIN} {
 	reverse_proxy livekit:7880
 }
+
+# LLM traces (LT-12, docs/llm-tracing/spec.md): the MLflow UI and API, for admins and the sim
+# server. Basic auth on every request; the mlflow service runs only with LLM_TRACING=on (the obs
+# profile), so otherwise this answers 502 after the password check. Not linked from any app.
+mlflow.{$DOMAIN} {
+	encode gzip
+	header {
+		X-Frame-Options DENY
+		Referrer-Policy no-referrer
+		X-Content-Type-Options nosniff
+		Strict-Transport-Security "max-age=31536000"
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+	basic_auth {
+		# The default hash matches no known password: the site stays closed until .env sets
+		# MLFLOW_BASIC_AUTH_HASH (docs/hosting.md, "LLM tracing (MLflow)").
+		{$MLFLOW_BASIC_AUTH_USER:mlflow} {$MLFLOW_BASIC_AUTH_HASH:$2a$14$J7HH7DBOgeL.lQ5zAC..3eODGvqinN54HMqgcEpsXv3IF2pKyIlr.}
+	}
+	reverse_proxy mlflow:5000
+}
