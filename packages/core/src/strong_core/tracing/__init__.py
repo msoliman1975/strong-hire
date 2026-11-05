@@ -358,6 +358,73 @@ def start_gateway_call(name: str, kind: SpanKind, attributes: dict[str, Any]) ->
         return NO_CALL
 
 
+# --- turns assembled after the fact (voice, LT-6) --------------------------------------------
+
+
+class TurnCollector:
+    """Groups the gateway spans of a voice session into one trace per turn (LT-6).
+
+    LiveKit runs STT, the interviewer and TTS in tasks of its own, so no single block of code
+    can open a turn span around them. Instead the collector is the parent of every gateway span
+    in the session (set before the room connects, so every task inherits it), and the voice agent
+    calls `cut()` when a turn's metrics arrive: the spans that have finished since the last cut
+    become the children of one `turn` trace. A span still running waits for the next cut.
+    """
+
+    def __init__(self, tags: TraceTags) -> None:
+        self.tags = tags
+        self.record = _new_span("voice.session", "CHAIN", None)
+
+    def cut(self, kind: Literal["voice", "text"], index: int, attributes: dict[str, Any]) -> None:
+        """Send the finished spans as turn `index`, with `attributes`. Never raises."""
+        try:
+            done = [c for c in self.record.children if c.end_ns is not None]
+            if not done and not attributes:
+                return
+            self.record.children = [c for c in self.record.children if c.end_ns is None]
+            now = time.time_ns()
+            start = min((c.start_ns for c in done), default=now)
+            turn = SpanRecord(
+                name="turn",
+                kind="CHAIN",
+                start_ns=start,
+                end_ns=now,
+                attributes={"turn.kind": kind, "turn.index": index},
+                children=done,
+            )
+            turn.attributes.update({k: v for k, v in attributes.items() if v is not None})
+            turn.attributes.setdefault("duration_ms", round((now - start) / 1e6, 1))
+            _emit(self.tags, turn)
+        except Exception:
+            warn_once("tracing: cutting a turn failed")
+
+    def flush(self) -> None:
+        """Send what is left when the session ends (the greeting, a last unanswered turn)."""
+        try:
+            done = [c for c in self.record.children if c.end_ns is not None]
+            if done:
+                self.cut("voice", -1, {"turn.rest": True})
+        except Exception:
+            warn_once("tracing: flushing turns failed")
+
+
+@contextmanager
+def collect_turns() -> Iterator[TurnCollector | None]:
+    """Make a TurnCollector the parent of every gateway span started in this block (and in the
+    tasks it starts). Yields None, and does nothing, when nothing is recorded."""
+    tags = _recording()
+    if tags is None:
+        yield None
+        return
+    collector = TurnCollector(tags)
+    token = _current.set(collector.record)
+    try:
+        yield collector
+    finally:
+        _current.reset(token)
+        collector.flush()
+
+
 # --- content (LT-4) ---------------------------------------------------------------------------
 
 
@@ -431,6 +498,8 @@ __all__ = [
     "SpanRecord",
     "TraceRecord",
     "TraceTags",
+    "TurnCollector",
+    "collect_turns",
     "content_of",
     "current_trace_tags",
     "digest",

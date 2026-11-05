@@ -584,3 +584,61 @@ def test_lt14_sessions_have_a_trace_json_column() -> None:
 
     column = InterviewSession.__table__.c.trace_json
     assert column.nullable
+
+
+# --- LT-6: turns cut after the fact (voice) ------------------------------------------------------
+
+
+async def test_lt6_collector_groups_spans_from_other_tasks_into_turns(
+    fake: ModelGateway, trace_capture: InMemoryExporter
+) -> None:
+    """LT-6: calls made in tasks started inside collect_turns() become the next cut's children."""
+    import asyncio
+
+    from strong_core.tracing import collect_turns
+
+    with trace_context(FULL), collect_turns() as collector:
+        assert collector is not None
+        greeting = asyncio.create_task(fake.synthesize("Hello."))  # another task, like LiveKit
+        await greeting
+        collector.cut("voice", 0, {"e2e_ms": None})
+        stt = asyncio.create_task(fake.transcribe(_wav(0.5)))
+        await stt
+        reply = asyncio.create_task(fake.complete(Role.INTERVIEWER, MESSAGES))
+        await reply
+        collector.cut("voice", 1, {"e2e_ms": 640.0, "llm_ttft_ms": 210.0})
+    first, second = trace_capture.traces
+    assert first.root.attributes["turn.index"] == 0
+    assert [c.name for c in first.root.children] == ["gateway.tts"]
+    assert "e2e_ms" not in first.root.attributes  # None values are left out
+    assert second.root.attributes["turn.kind"] == "voice"
+    assert [c.name for c in second.root.children] == ["gateway.stt", "gateway.interviewer"]
+    assert second.root.attributes["e2e_ms"] == 640.0
+    assert second.root.start_ns == second.root.children[0].start_ns
+    assert second.tags is FULL
+
+
+async def test_lt6_collector_keeps_running_spans_for_the_next_turn(
+    trace_capture: InMemoryExporter,
+) -> None:
+    """LT-6: a span still running at a cut waits; the rest is flushed when the session ends."""
+    from strong_core.tracing import collect_turns
+
+    with trace_context(FULL), collect_turns() as collector:
+        assert collector is not None
+        running = start_gateway_call("gateway.tts", "LLM", {"role": "tts"})
+        collector.cut("voice", 1, {"e2e_ms": 700.0})
+        running.finish({"audio_bytes": 10})
+    cut, rest = trace_capture.traces
+    assert cut.root.children == []
+    assert [c.name for c in rest.root.children] == ["gateway.tts"]
+    assert rest.root.attributes["turn.rest"] is True and rest.root.attributes["turn.index"] == -1
+
+
+def test_lt6_collector_is_none_without_a_trace_context(trace_capture: InMemoryExporter) -> None:
+    """LT-3: no trace context, no collector."""
+    from strong_core.tracing import collect_turns
+
+    with collect_turns() as collector:
+        assert collector is None
+    assert trace_capture.traces == []
