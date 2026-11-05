@@ -670,3 +670,34 @@ async def test_lt6_collector_outlives_its_block_when_asked(
     collector.cut("voice", 1, {"e2e_ms": 500.0})
     (turn,) = trace_capture.traces
     assert [c.name for c in turn.root.children] == ["gateway.stt"]
+
+
+def test_lt9_flush_waits_for_the_exporter_and_never_raises() -> None:
+    """LT-9: a process can wait for its traces to be sent before it reads them back."""
+    from strong_core.tracing import flush
+
+    class Slow:
+        def __init__(self) -> None:
+            self.waited: list[float] = []
+
+        def submit(self, trace: TraceRecord) -> None:
+            return None
+
+        def flush(self, timeout_s: float) -> bool:
+            self.waited.append(timeout_s)
+            return True
+
+    class Broken(Slow):
+        def flush(self, timeout_s: float) -> bool:
+            raise RuntimeError("down")
+
+    slow = Slow()
+    previous = set_exporter_override(slow)
+    try:
+        assert flush(3.0) is True and slow.waited == [3.0]
+        set_exporter_override(Broken())
+        assert flush() is False
+        set_exporter_override(InMemoryExporter())  # no flush method: nothing to wait for
+        assert flush() is True
+    finally:
+        set_exporter_override(previous)
