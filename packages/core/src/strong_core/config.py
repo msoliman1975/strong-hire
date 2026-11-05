@@ -48,6 +48,16 @@ class Settings(BaseSettings):
     sim_email: str = "sim@getstronghire.com"
     sim_litellm_key: SecretStr | None = None
 
+    # LLM tracing to MLflow (LT-1, strong_core.tracing). Off unless LLM_TRACING=on and a tracking
+    # URI is set; never with MODEL_PROFILE=fake. MLflow reads MLFLOW_TRACKING_USERNAME and
+    # MLFLOW_TRACKING_PASSWORD from the environment itself.
+    llm_tracing: bool = Field(default=False, description="LT-1: on to send traces to MLflow.")
+    llm_tracing_dev: bool = Field(
+        default=False, description="LT-1: on to trace local dev sessions (always redacted)."
+    )
+    mlflow_tracking_uri: str | None = None
+    mlflow_experiment: str = Field(default="dev", description="sim on the servers, dev locally.")
+
     # Outgoing email (strong_core.email). Same variables as the API's sign-in emails. Without
     # SMTP_HOST, emails are logged instead of sent.
     smtp_host: str | None = None

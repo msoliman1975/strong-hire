@@ -10612,6 +10612,28 @@ export interface components {
          * @enum {string}
          */
         SessionStatus: "created" | "in_progress" | "interrupted" | "scoring" | "completed" | "failed";
+        /**
+         * SessionTraceSettings
+         * @description Stored in sessions.trace_json for a sim user's session. NULL for every other session.
+         */
+        SessionTraceSettings: {
+            /**
+             * Sim Run Id
+             * @default null
+             */
+            sim_run_id: string | null;
+            /**
+             * Scenario
+             * @default null
+             */
+            scenario: string | null;
+            /**
+             * Content
+             * @default redacted
+             * @enum {string}
+             */
+            content: "full" | "redacted";
+        };
         /** SettingIn */
         SettingIn: {
             /**
