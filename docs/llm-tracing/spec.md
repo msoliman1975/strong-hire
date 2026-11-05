@@ -90,8 +90,8 @@ end times.
 Only the sim knows whether a scenario uses a fixture persona and which suite run a session belongs
 to. It tells the server when it creates the session:
 
-- headers `X-Sim-Run: <run id>` and `X-Sim-Trace-Content: full|redacted` on `POST /sessions`
-  (and on any other route that starts a sim session);
+- headers `X-Sim-Run: <run id>`, `X-Sim-Scenario: <scenario id>` and
+  `X-Sim-Trace-Content: full|redacted` on `POST /sessions`, the one route that creates a session;
 - the API honours them only for a sim user, and stores them on the session in a new nullable
   `interview_sessions.trace_json` column (contract `SessionTraceSettings`: `sim_run_id`,
   `scenario`, `content`). A missing or invalid value means `content="redacted"`;
