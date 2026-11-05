@@ -108,6 +108,7 @@ class MlflowExporter:
         # A down server should cost a few seconds per trace here, not minutes of retries.
         os.environ.setdefault("MLFLOW_HTTP_REQUEST_MAX_RETRIES", "2")
         os.environ.setdefault("MLFLOW_HTTP_REQUEST_TIMEOUT", "10")
+        os.environ.setdefault("MLFLOW_DISABLE_AGENT_HINT", "1")  # no assistant hint in our logs
         import mlflow
 
         mlflow.set_tracking_uri(self.tracking_uri)

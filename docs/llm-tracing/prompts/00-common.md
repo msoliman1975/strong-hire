@@ -32,7 +32,7 @@ under "Decisions" in your PR and carry on.
   reads cost back from MLflow except the sim's run metrics.
 - **No real model, MLflow server or network in any test.** Tests use `MODEL_PROFILE=fake` and the
   in-memory exporter fixture from LT01 (`strong_core.tracing.testing`).
-- **Pin versions.** `mlflow-tracing`, `mlflow-skinny` and the MLflow server image use one exact,
+- **Pin versions.** `mlflow-skinny` (core and sim) and the MLflow server image use one exact,
   matching version.
 
 ## Checks before every push
