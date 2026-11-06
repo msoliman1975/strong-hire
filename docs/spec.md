@@ -432,6 +432,29 @@ The Resumes list and Target roles move to one shared card shell with three stat 
 | RSD-15 | All three screens pass axe with no violations and have no horizontal scroll at 390 px. | P0 |
 | RSD-16 | The open-issues and story-ideas counts on the Resumes list load without one request per card for story ideas. A batched read is allowed only if it needs no backend change; otherwise this stays as it is today and is logged. | P1 |
 
+### LLM tracing with MLflow (LT)
+
+Every model call can be recorded as an MLflow trace. The goal is to compare prompt and model versions on the same sim scenarios, with latency and failures alongside. Phase 1 traces sim and dev traffic only; real users' traffic is never traced until phase 2 has its own consent, redaction, retention and deletion design. Spans copy the cost numbers of `usage_events`, which stays the source of truth for cost. The decisions D-1 to D-10 and the technical design are in `docs/llm-tracing/spec.md`; the build plan is `docs/llm-tracing/execution-plan.md`.
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| LT-1 | Tracing is off by default. It is active only with `LLM_TRACING=on`, a `MLFLOW_TRACKING_URI`, and a `MODEL_PROFILE` other than `fake`. Otherwise `strong_core.tracing` does nothing, and no test needs MLflow or a network. | P0 |
+| LT-2 | The gateway opens one span for each `complete`, `stream`, `transcribe`, `synthesize` and `synthesize_stream` call, so no caller can skip it. The span holds role, alias, tier, prompt refs, output type, whether the structured output needed the retry, input and output tokens, cost (the same values as the `usage_events` row), duration, first-token time for streams, and the error type on failure. It never holds a model name written in code. | P0 |
+| LT-3 | Only calls inside a `trace_context` are traced. The api, worker and voice set it only for a sim user's session (`is_sim_user`). A test proves that a real user's call makes no span. | P0 |
+| LT-4 | A span stores message content only when its trace context says `content="full"`: a sim session on a fixture persona. A pasted resume or job (SM-17, SM-18), dev traffic, and an unknown mode store a SHA-256 hash and the length of each message instead. A test proves a redacted span holds no message text. | P0 |
+| LT-5 | Tracing never slows or breaks a call. Export is asynchronous and batched. An unreachable or failing tracking server raises nothing on the call path, and span bookkeeping stays under 2 ms p95 per call. | P0 |
+| LT-6 | Each interviewer turn has a `turn` parent span with the gateway calls as children. Voice turns carry `e2e_ms`, `turn_detection_ms`, `stt_ms`, `llm_ttft_ms`, `tts_ttfb_ms` and `other_ms`, from the same metrics as OB-3. Text turns carry the turn's duration. | P0 |
+| LT-7 | Every trace is tagged with `service`, `release`, `model_profile` and `session_id`, and sim traces with `sim_run_id` and `scenario`. MLflow's session metadata is the `session_id`, so a session's turns and worker jobs group together. Each worker job (scoring, debrief, brief) is one trace named after the job. | P0 |
+| LT-8 | Each sim suite run is one MLflow run in the `sim` experiment. Params: suite, source, model profile, each role's alias and tier, the prompt refs seen for each role, git SHA, scenario count. Metrics: sessions done and failed, cost per session, p50 and p95 turn latency, p50 and p95 first-token time for each role, retries, validation failures, gateway errors. The HTML report and a per-session table are artifacts. | P0 |
+| LT-9 | The judge's verdict for each session is attached to that session's judge trace as one assessment per rule (pass, fail or not_applicable, rationale, rubric prompt ref). Each rule's pass rate is a run metric. No new model call. | P0 |
+| LT-10 | A single admin sim (SM) is also an MLflow run in the `sim` experiment, with one scenario and source `admin`. | P1 |
+| LT-11 | Traces in the local `dev` experiment are deleted after 30 days (configurable). `./scripts/dev.ps1 up -Profile obs` runs the prune, and it can also run on its own. | P1 |
+| LT-12 | An `mlflow` service runs locally (compose profile `obs`) and on the main server. Its backend is a separate `mlflow` database in the existing Postgres, with a volume for artifacts. On the server, it has a 1 GB memory limit and is reached only at `mlflow.{$DOMAIN}` through Caddy with basic auth. | P0 |
+| LT-13 | The short-lived sim server sends its runs, traces and assessments to the main server's MLflow over HTTPS, with credentials from `infra/sim/.env`. A failing MLflow server never fails a sim run. | P0 |
+| LT-14 | The sim marks a session with `X-Sim-Run`, `X-Sim-Scenario` and `X-Sim-Trace-Content` when it creates it. The API honours them only for a sim user and stores them in `interview_sessions.trace_json` (contract `SessionTraceSettings`). A missing or invalid value means redacted. | P0 |
+| LT-15 | MLflow is imported only in `strong_core.tracing` and `strong_sim`. The gateway-rule test enforces it. | P0 |
+| LT-16 | Open item, not built in phase 1: tracing real users' traffic, behind a flag, after a design for consent, redaction, retention and deletion on account deletion (Law 25, CCPA). | P2 |
+
 ## Interviewer and scoring design
 
 The interviewer and the scorer are separate components. The interviewer runs the conversation in real time; the scorer judges the full transcript afterward, the way a debrief panel reads interview notes. Keeping them apart stops the live model from softening its judgment mid-conversation and lets the scorer use a stronger, slower model.
@@ -554,7 +577,7 @@ The voice agent is the latency-critical path. Background workers do all slow wor
 | Auth | Email and password (Argon2id hashes), email magic links, Google OAuth (Authlib, off by config); local dev login bypass | Password is the familiar default; magic links stay for users who prefer no password |
 | Billing | Stripe Checkout, Customer Portal, webhooks (test mode until launch) | Fastest path to subscriptions with usage caps |
 | Deploy | Docker Compose locally (Docker Desktop with WSL2), same compose files on Hetzner later; Caddy for TLS; GitHub Actions | One stack definition for both environments |
-| Observability | Sentry, Prometheus + Grafana, PostHog, OpenTelemetry traces from Pydantic AI | Errors, latency, cost and product analytics |
+| Observability | Sentry, Prometheus + Grafana, PostHog; LLM traces in MLflow, sim and dev only in phase 1 (LT) | Errors, latency, cost and product analytics; prompt and model comparison |
 
 **Voice latency budget (target p50 under 800 ms).**
 

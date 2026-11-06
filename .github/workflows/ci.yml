@@ -165,7 +165,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: All profiles parse
-        run: docker compose -f infra/compose.yaml --env-file .env.example --profile core --profile models --profile voice config --quiet
+        run: docker compose -f infra/compose.yaml --env-file .env.example --profile core --profile models --profile voice --profile obs config --quiet
       - name: Start core profile
         run: |
           cp .env.example .env
@@ -179,9 +179,17 @@ jobs:
         run: |
           curl -sf http://localhost:5180/api/health | tee health.json
           grep -q '"status":"ok"' health.json
+      - name: MLflow trace server starts and creates its database (LT-12)
+        run: |
+          C="docker compose -f infra/compose.yaml --env-file .env --profile core --profile obs"
+          $C up -d --build --wait mlflow
+          curl -sf http://localhost:5000/health
+          curl -sf "http://localhost:5000/api/2.0/mlflow/experiments/get-by-name?experiment_name=Default"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: evil.example' 'http://localhost:5000/api/2.0/mlflow/experiments/get-by-name?experiment_name=Default')" = 403
+          $C exec -T postgres psql -U strong -d mlflow -tAc 'select 1' | grep -q 1
       - name: Logs on failure
         if: failure()
-        run: docker compose -f infra/compose.yaml --env-file .env --profile core logs --tail 100
+        run: docker compose -f infra/compose.yaml --env-file .env --profile core --profile obs logs --tail 100
 
   models-voice:
     name: Local models (smoke test all six roles)

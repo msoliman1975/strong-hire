@@ -1,0 +1,47 @@
+{
+  "$id": "https://strong-hire.local/schemas/session_trace_settings.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Stored in sessions.trace_json for a sim user's session. NULL for every other session.",
+  "properties": {
+    "content": {
+      "default": "redacted",
+      "enum": [
+        "full",
+        "redacted"
+      ],
+      "title": "Content",
+      "type": "string"
+    },
+    "scenario": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9._:-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scenario"
+    },
+    "sim_run_id": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9._:-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sim Run Id"
+    }
+  },
+  "title": "SessionTraceSettings",
+  "type": "object"
+}

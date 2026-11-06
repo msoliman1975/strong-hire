@@ -621,6 +621,9 @@ class InterviewSession(Base):
     custom_json: Mapped[dict[str, Any] | None] = mapped_column(
         comment="CU-1: schemas.CustomSessionSpec. NULL for the four standard types"
     )
+    trace_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="LT-14: schemas.SessionTraceSettings for a sim user's session; NULL otherwise"
+    )
     model_profile: Mapped[str | None] = mapped_column(
         String(20), comment="PL-6: MODEL_PROFILE the session ran on"
     )
