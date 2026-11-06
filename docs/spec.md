@@ -450,7 +450,7 @@ Every model call can be recorded as an MLflow trace. The goal is to compare prom
 | LT-11 | Traces in the local `dev` experiment are deleted after 30 days (configurable). `./scripts/dev.ps1 up -Profile obs` runs the prune, and it can also run on its own. | P1 |
 | LT-12 | An `mlflow` service runs locally (compose profile `obs`) and on the main server. Its backend is a separate `mlflow` database in the existing Postgres, with a volume for artifacts. On the server, it has a 1 GB memory limit and is reached only at `mlflow.{$DOMAIN}` through Caddy with basic auth. | P0 |
 | LT-13 | The short-lived sim server sends its runs, traces and assessments to the main server's MLflow over HTTPS, with credentials from `infra/sim/.env`. A failing MLflow server never fails a sim run. | P0 |
-| LT-14 | The sim marks a session with `X-Sim-Run` and `X-Sim-Trace-Content` when it creates it. The API honours them only for a sim user and stores them in `interview_sessions.trace_json` (contract `SessionTraceSettings`). A missing or invalid value means redacted. | P0 |
+| LT-14 | The sim marks a session with `X-Sim-Run`, `X-Sim-Scenario` and `X-Sim-Trace-Content` when it creates it. The API honours them only for a sim user and stores them in `interview_sessions.trace_json` (contract `SessionTraceSettings`). A missing or invalid value means redacted. | P0 |
 | LT-15 | MLflow is imported only in `strong_core.tracing` and `strong_sim`. The gateway-rule test enforces it. | P0 |
 | LT-16 | Open item, not built in phase 1: tracing real users' traffic, behind a flag, after a design for consent, redaction, retention and deletion on account deletion (Law 25, CCPA). | P2 |
 
