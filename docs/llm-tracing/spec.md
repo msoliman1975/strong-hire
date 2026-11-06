@@ -189,14 +189,98 @@ A model comparison works the same way: change the role's alias in `config/models
 instead of the prompt. Runs are small (a suite is a handful of sessions), so treat a single
 difference as a lead, and run the suite twice before you act on it.
 
-## Phase 2: production (not built now)
+## Phase 2: production tracing (LT-16 to LT-31)
 
-Before any real user's call is traced, a separate design must decide:
+Phase 2 traces real users' sessions. It splits into two risk levels:
 
-- the consent basis and the setting that controls it;
-- the redaction rules (resumes, transcripts, names, emails);
-- a retention period (90 days like `voice_turn_timings` is the starting point);
-- deletion of a user's traces when the account is deleted (AC rules, Law 25);
-- whether MLflow stays on the main server or moves.
+- **Metadata for every session** (when switched on): timings, tokens, cost, roles, aliases, tiers,
+  prompt refs, retries and errors. No message text and no hashes.
+- **Content only for users who opt in** with a new, separate consent, and then only the
+  interview turns: what the interviewer said and what the candidate said, scrubbed.
 
-LT-16 records this as an open item.
+The requirements are LT-16 to LT-31 in `docs/spec.md`. The build plan is
+`docs/llm-tracing/phase2-plan.md`. The legal gates are `docs/llm-tracing/phase2-gates.md`.
+
+### Phase 2 decisions
+
+The owner agreed these on Nov 6, 2026. Do not reopen them in a task.
+
+| ID | Decision |
+| --- | --- |
+| D-11 | **Scope.** Metadata for every real user's session; full content only with a new, separate, unticked consent (Law 25: consent specific to each purpose). `training_consent` is a different purpose and is not reused. |
+| D-12 | **Consent.** An account toggle beside the training-data toggle (AC-2), off by default, for all future sessions. Turning it off stops content capture from the next turn and deletes the user's past content traces within 24 hours; their metadata traces stay. Every change is written to the audit log. |
+| D-13 | **What content is.** The live interview turns only: the interviewer's reply and the candidate's answer (text, or the transcript of speech), scrubbed. Never the prompt messages (they carry the brief, which is built from the resume), and never the worker jobs (extraction, gap analysis, brief, scoring), which stay metadata-only even with consent. Scrubbing is `strong_core.ops.errors.scrub_text` (emails, phone numbers, URL queries) plus the user's own name and the companies in their resumes and job targets. |
+| D-14 | **Retention.** Production content traces 30 days, production metadata traces 90 days, deleted by a daily job. MLflow's database follows the 30-day backup rotation. |
+| D-15 | **Access.** People reach MLflow only through the admin app: at `admin.{$DOMAIN}/mlflow/`, where Caddy's `forward_auth` asks the API to check the admin session (AA-3, AA-4). Each read of a production trace is written to the audit log (AA-6). Production traces live in their own `prod` experiment. |
+| D-16 | **Volume.** Every session is traced, with a per-session sample rate (`LLM_TRACING_SAMPLE`, default 1.0; a session is traced whole or not at all) and an off switch on the admin Controls page (a runtime setting, no deploy). |
+| D-17 | **Gates.** Two flags, both off by default. `LLM_TRACING_PROD` (metadata) goes on once the privacy policy and the retention schedule describe it. `LLM_TRACING_PROD_CONTENT` (the consent toggle and content capture) goes on only after the privacy lawyer approves the consent wording and the PIA update. The toggle is not shown while that flag is off. |
+| D-18 | **Deletion.** Account deletion and consent withdrawal queue a `delete_traces` worker job. Arq retries it; if it has not succeeded 12 hours after it was asked for, an alert goes to `ALERT_EMAIL`. Its completion is written to the audit log. Every production trace carries `org_id` so one query finds a user's traces even after their rows are gone. |
+
+### Phase 2 design
+
+**Content in its own trace (LT-23).** MLflow cannot strip the text from a stored trace, but
+withdrawal (D-12) and retention (D-14) must remove content and keep metadata. So a consenting
+user's turn writes two traces:
+
+- the metadata `turn` trace, as for everyone;
+- a `turn.content` trace with the same tags plus `content=turns`, holding the interviewer's reply
+  and the candidate's answer for that turn, scrubbed.
+
+Withdrawal and the 30-day retention delete only `turn.content` traces; the metadata stays.
+
+**Content modes.** Phase 1 has `full` and `redacted` (a SHA-256 and a length). Phase 2 adds
+`metadata`: message counts and lengths only, no hash, no error message. Every real user's span is
+`metadata`, consent or not; content goes only into `turn.content` (D-13).
+
+**Who is traced (LT-16, LT-19).** `strong_core.tracing.sessions.trace_tags_for()` gains a
+production branch for a real user's session, in this order:
+
+1. phase 1 rules first: a sim session is traced as before;
+2. `LLM_TRACING_PROD` off, or the runtime setting `llm_tracing_paused` on: not traced;
+3. the session falls outside `LLM_TRACING_SAMPLE` (a stable hash of the session id): not traced;
+4. otherwise metadata tags: experiment `prod`, `org_id`, `session_id`, service, release,
+   model profile, content `metadata`, and `turn_content=on` when `LLM_TRACING_PROD_CONTENT` is on
+   and the user's `tracing_consent` is on at the start of the turn.
+
+Any lookup failure means not traced (fail closed).
+
+**Where the turn text comes from.** The API's text turns and the voice agent already hold the
+candidate's answer and the interviewer's reply as `Turn` rows. The content trace is written from
+those, after scrubbing, not from the gateway's prompt messages.
+
+**Scrubbing (LT-22).** `strong_core.tracing.scrub` builds a scrubber per session from the user's
+profile name and the company names in their resumes and job targets, and applies it after
+`scrub_text`. Names become `[name]`, companies `[company]`. Matching is case-insensitive on word
+boundaries. It is best effort: a nickname or a colleague's name can survive, which the consent
+wording says plainly.
+
+**Access path (LT-28, LT-29).**
+
+- The admin cookie `sh_admin` is host-only on `admin.` and `SameSite=Strict` (AA-3), so the
+  browser never sends it to `mlflow.{$DOMAIN}`. The MLflow UI therefore moves under the admin
+  host: `admin.{$DOMAIN}/mlflow/*`, with the server's `--static-prefix /mlflow`.
+- Caddy calls `GET /api/admin/mlflow-auth` with `forward_auth` for every `/mlflow/*` request. The
+  API answers 200 for a live admin session, else 401.
+- The MLflow UI needs inline scripts, so the strict admin CSP (AA-9) is relaxed for `/mlflow/*`
+  only, to what the UI needs and no more.
+- When the forwarded request reads a trace (the trace-get and search endpoints), the API writes
+  `admin.trace_viewed` to the audit log with the admin and the trace or search, as AA-6 does for
+  the existing trace views.
+- `mlflow.{$DOMAIN}` stays for the sim server only, and its basic auth is replaced by a machine
+  token (`MLFLOW_SIM_TOKEN`) checked by the same `forward_auth` endpoint.
+
+**Deletion (LT-24 to LT-26).** `delete_traces(org_id, scope)` searches the `prod` experiment by
+`tags.org_id` (and `content=turns` for a withdrawal) and deletes the trace ids in batches. Account
+deletion asks for scope `all`; withdrawal asks for scope `content`. The job records
+`tracing.traces_deleted` with the count when it succeeds. A check in the existing alert engine
+fires when a request is older than 12 hours and still not done.
+
+**Retention (LT-27).** The existing daily retention job (`strong_worker.retention`) gains a step:
+delete `prod` traces with `content=turns` older than 30 days, and all other `prod` traces older
+than 90 days.
+
+### Phase 2 open items
+
+- The consent wording, approved by the privacy lawyer (gate 2).
+- The privacy policy and retention schedule text (gate 1), and the PIA update (gate 2).
+- Measured MLflow memory use under production volume.
