@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,8 @@ from arq import Retry
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+import strong_core.db.engine as engine_module
+import strong_core.sim as sim_module
 from strong_core.config import get_settings
 from strong_core.db.models import (
     Company,
@@ -38,6 +41,7 @@ from strong_core.schemas import (
     SessionStatus,
     SubscriptionStatus,
 )
+from strong_core.tracing.testing import InMemoryExporter, trace_capture
 from strong_worker.gap import jobs
 from strong_worker.gap.brief import BriefError
 from strong_worker.gap.jobs import CTX_KEY, GapContext, context_notes
@@ -548,3 +552,112 @@ async def test_cu1_brief_job_fails_a_custom_session_without_a_valid_setup(
     async with sessionmaker() as db:
         stored = await db.get(InterviewSession, session_id)
         assert stored is not None and stored.status == SessionStatus.FAILED
+
+
+# --- LLM tracing (LT-3, LT-7): one trace per session job, sim sessions only ---------------
+
+
+@pytest.fixture
+def db_for_lookup(
+    sessionmaker: async_sessionmaker[AsyncSession], monkeypatch: pytest.MonkeyPatch
+) -> Iterator[None]:
+    """The trace lookup opens its own session; point it at the test database."""
+    monkeypatch.setattr(engine_module, "get_sessionmaker", lambda: sessionmaker)
+    sim_module._sim_orgs.clear()
+    yield
+    sim_module._sim_orgs.clear()
+    get_settings.cache_clear()
+
+
+def _sim(monkeypatch: pytest.MonkeyPatch, on: bool) -> None:
+    monkeypatch.setenv("SIM_ENABLED", "true" if on else "false")
+    monkeypatch.setenv("SIM_EMAIL", "user@example.com")  # the account fixture's user
+    get_settings.cache_clear()
+
+
+async def _brief_session(
+    maker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    trace_json: dict[str, str] | None,
+) -> uuid.UUID:
+    target_id, _, _ = await _setup(maker, account)
+    async with maker() as db:
+        row = InterviewSession(
+            org_id=account[0],
+            job_target_id=target_id,
+            type=InterviewType.BEHAVIORAL,
+            difficulty=Difficulty.TOUGH,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+            trace_json=trace_json,
+        )
+        db.add(row)
+        await db.commit()
+        return row.id
+
+
+async def test_lt7_sim_session_job_is_one_trace_named_after_the_job(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    db_for_lookup: None,
+    trace_capture: InMemoryExporter,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """LT-7: the brief job of a sim session is one trace, its model calls as children."""
+    _sim(monkeypatch, on=True)
+    stored = {"sim_run_id": "run-7", "scenario": "backend-senior", "content": "full"}
+    sid = await _brief_session(sessionmaker, account, stored)
+    org_id = account[0]
+    trace_capture.clear()
+    ctx = _ctx(sessionmaker, gateway) | {"job_id": "job-1"}
+    assert (await jobs.build_interviewer_brief(ctx, str(sid), str(org_id)))["outcome"] == "ready"
+    (trace,) = trace_capture.traces
+    assert trace.root.name == "build_interviewer_brief" and trace.root.kind == "TASK"
+    assert trace.root.attributes["job_id"] == "job-1"
+    assert trace.root.children and all(c.name.startswith("gateway.") for c in trace.root.children)
+    tags = trace.tags
+    assert (tags.session_id, tags.sim_run_id, tags.scenario) == (
+        str(sid),
+        "run-7",
+        "backend-senior",
+    )
+    assert tags.service == "worker" and tags.content == "full"
+
+
+async def test_lt3_real_users_job_is_not_traced(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    db_for_lookup: None,
+    trace_capture: InMemoryExporter,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """LT-3: a real user's session job makes no trace, even with sim settings stored."""
+    _sim(monkeypatch, on=False)
+    sid = await _brief_session(sessionmaker, account, {"content": "full", "sim_run_id": "x"})
+    trace_capture.clear()
+    ctx = _ctx(sessionmaker, gateway)
+    assert (await jobs.build_interviewer_brief(ctx, str(sid), str(account[0])))["outcome"] == (
+        "ready"
+    )
+    assert trace_capture.traces == []
+
+
+async def test_lt3_jobs_without_a_session_are_not_traced(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    db_for_lookup: None,
+    trace_capture: InMemoryExporter,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """LT-7: only session jobs are traces; a gap analysis of the sim org is not."""
+    _sim(monkeypatch, on=True)
+    _, _, gap_id = await _setup(sessionmaker, account)
+    trace_capture.clear()
+    await jobs.run_gap_analysis_job(_ctx(sessionmaker, gateway), str(gap_id), str(account[0]))
+    assert trace_capture.traces == []
+
+
+__all__ = ["trace_capture"]  # the fixture, imported for pytest

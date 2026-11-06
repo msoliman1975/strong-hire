@@ -91,6 +91,12 @@ from strong_api.sessions.settings import (
     get_text_session_settings,
     get_voice_session_settings,
 )
+from strong_api.sessions.tracing import (
+    forget_turns,
+    next_turn_index,
+    sim_trace_settings,
+    traced_text_turn,
+)
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import InterviewSession, JobTarget, Org
 from strong_core.db.models import Turn as TurnRow
@@ -292,6 +298,7 @@ async def create_session(
         model_profile=get_gateway().profile,
         custom_json=config.custom.model_dump(mode="json") if config.custom else None,
         tone=config.tone,  # TN-1: as_company when an old client sends none
+        trace_json=await sim_trace_settings(request, db, me.org_id),  # LT-14: sim sessions only
     )
     db.add(session)
     await db.commit()
@@ -404,6 +411,7 @@ async def end_session(
     """End the session. Started sessions are billed and scored (FB-3); safe to call twice."""
     session = await _owned_session(db, me, session_id)
     runner = _runners(request).pop(session.id, None)
+    forget_turns(request, session.id)
     if runner is not None:
         log.info(
             "end %s: text runner found, busy=%s, stage=%s", session.id, runner.busy, runner.stage
@@ -531,7 +539,10 @@ async def open_text_session(
     runners[session.id] = runner
     steps.step("session_started")
     try:
-        async with asyncio.timeout(settings.text_turn_timeout_s):
+        async with (
+            asyncio.timeout(settings.text_turn_timeout_s),
+            traced_text_turn(db, session, next_turn_index(request, session.id)),  # LT-6
+        ):
             with usage_context(session.org_id, session.id):  # OB-2
                 turns = await runner.open()
     except TimeoutError:
@@ -591,7 +602,10 @@ async def text_turn(
         log.warning("text/turn %s: refused, still replying (stage %s)", session.id, runner.stage)
         raise HTTPException(status.HTTP_409_CONFLICT, "The interviewer is still replying.")
     try:
-        async with asyncio.timeout(settings.text_turn_timeout_s):
+        async with (
+            asyncio.timeout(settings.text_turn_timeout_s),
+            traced_text_turn(db, session, next_turn_index(request, session.id)),  # LT-6
+        ):
             with usage_context(session.org_id, session.id):  # OB-2
                 turns = await runner.respond(body.text, on_stage=steps.step)
     except TimeoutError:
@@ -616,6 +630,7 @@ async def text_turn(
     steps.step("traces_flushed")
     if runner.ended:
         _runners(request).pop(session.id, None)
+        forget_turns(request, session.id)
         await _end(db, queue, session, runner)
         steps.step("session_ended")
     out = TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
@@ -637,8 +652,9 @@ async def coach(
         elif body.command == "resume":
             runner.resume()
         else:
-            with usage_context(session.org_id, session.id):  # OB-2
-                turns = await runner.coach(body.command)
+            async with traced_text_turn(db, session, next_turn_index(request, session.id)):
+                with usage_context(session.org_id, session.id):  # OB-2
+                    turns = await runner.coach(body.command)
             await _flush_traces(runner)  # the text channel answers after its traces are saved
     except CoachNotAllowedError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
