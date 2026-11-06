@@ -20,6 +20,7 @@ export const MOCK_DEFAULTS: RuntimeSettings = {
   sim_max_live_sessions: 3,
   custom_interview_access: "everyone",
   v2_enabled: false,
+  llm_tracing_paused: false, // LT-19: the Controls switch itself comes with PT05
 };
 
 const KEYS = Object.keys(MOCK_DEFAULTS) as SettingKey[];
