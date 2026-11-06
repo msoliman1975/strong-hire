@@ -57,6 +57,20 @@ class Settings(BaseSettings):
     )
     mlflow_tracking_uri: str | None = None
     mlflow_experiment: str = Field(default="dev", description="sim on the servers, dev locally.")
+    # Phase 2, real users (LT-16 to LT-31). Both off until their gates in
+    # docs/llm-tracing/phase2-gates.md are met; LLM_TRACING=on is needed as well.
+    llm_tracing_prod: bool = Field(
+        default=False, description="LT-16: metadata traces for every real user's session."
+    )
+    llm_tracing_prod_content: bool = Field(
+        default=False, description="LT-20: the consent toggle and turn content for opt-ins."
+    )
+    llm_tracing_sample: float = Field(
+        default=1.0, ge=0.0, le=1.0, description="LT-19: share of real sessions traced."
+    )
+    mlflow_prod_experiment: str = Field(
+        default="prod", description="LT-16: the experiment for real users' traces."
+    )
 
     # Outgoing email (strong_core.email). Same variables as the API's sign-in emails. Without
     # SMTP_HOST, emails are logged instead of sent.

@@ -26249,6 +26249,12 @@
             "title": "V2 Enabled",
             "description": "FL-1: show the v2 screens that replace v1 screens. Off until launch.",
             "default": false
+          },
+          "llm_tracing_paused": {
+            "type": "boolean",
+            "title": "Llm Tracing Paused",
+            "description": "LT-19: stop tracing real users' sessions now. Sim tracing goes on.",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -27282,7 +27288,8 @@
           "sim_paused",
           "sim_max_live_sessions",
           "custom_interview_access",
-          "v2_enabled"
+          "v2_enabled",
+          "llm_tracing_paused"
         ],
         "title": "SettingKey"
       },

@@ -25,18 +25,22 @@ import logging
 import sys
 import time
 import uuid
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any, Literal, Protocol
 
-from strong_core.schemas.tracing import TraceContent
-
 if TYPE_CHECKING:
     from strong_core.gateway.types import Message
 
 log = logging.getLogger(__name__)
+
+SpanContent = Literal["full", "redacted", "metadata"]
+"""How much of a message a span keeps.
+
+full: the text (sim fixture personas only). redacted: a SHA-256 and a length (sim pasted input,
+dev). metadata: a length only, no hash (every real user, LT-17)."""
 
 SpanKind = Literal["CHAT_MODEL", "LLM", "CHAIN", "TASK", "AGENT", "EVALUATOR", "UNKNOWN"]
 SpanStatus = Literal["OK", "ERROR"]
@@ -53,22 +57,29 @@ class TraceTags:
     session_id: str | None = None
     sim_run_id: str | None = None
     scenario: str | None = None
-    content: TraceContent = "redacted"
+    content: SpanContent = "redacted"
     service: str | None = None
     release: str | None = None
     model_profile: str | None = None
     experiment: str | None = None
     """MLflow experiment name; None means MLFLOW_EXPERIMENT."""
+    org_id: str | None = None
+    """Real users' traces only (LT-18): finds an org's traces after its rows are gone."""
+    turn_content: bool = False
+    """LT-21: this session's turns may also write a `turn.content` trace (consent given)."""
+    stores_turns: bool = False
+    """LT-23: this trace is a `turn.content` trace; its `content` tag reads `turns`."""
 
     def as_tags(self) -> dict[str, str]:
         out = {
             "session_id": self.session_id,
             "sim_run_id": self.sim_run_id,
             "scenario": self.scenario,
-            "content": self.content,
+            "content": "turns" if self.stores_turns else self.content,
             "service": self.service,
             "release": self.release,
             "model_profile": self.model_profile,
+            "org_id": self.org_id,
         }
         return {k: v for k, v in out.items() if v}
 
@@ -293,7 +304,7 @@ class GatewayCall:
         self._done = False
 
     @property
-    def content(self) -> TraceContent:
+    def content(self) -> SpanContent:
         return self._tags.content
 
     def first_token(self, attribute: str = "ttft_ms") -> None:
@@ -337,8 +348,8 @@ class _NoCall(GatewayCall):
         self._done = True
 
     @property
-    def content(self) -> TraceContent:
-        return "redacted"
+    def content(self) -> SpanContent:
+        return "metadata"
 
     def first_token(self, attribute: str = "ttft_ms") -> None:
         return None
@@ -455,16 +466,18 @@ def digest(text: str) -> dict[str, Any]:
     return {"sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(), "len": len(text)}
 
 
-def content_of(value: Any, content: TraceContent) -> Any:
-    """`value` as stored on a span: as it is when content is full, else a digest of its text."""
+def content_of(value: Any, content: SpanContent) -> Any:
+    """`value` as stored on a span: as it is when content is full, a digest when redacted, and
+    only its length in metadata mode (LT-17)."""
     if content == "full":
         return value
-    if isinstance(value, str):
-        return digest(value)
-    return digest(json.dumps(value, sort_keys=True, default=str))
+    text = value if isinstance(value, str) else json.dumps(value, sort_keys=True, default=str)
+    if content == "metadata":
+        return {"len": len(text)}
+    return digest(text)
 
 
-def messages_of(messages: Sequence[Message], content: TraceContent) -> list[dict[str, Any]]:
+def messages_of(messages: Sequence[Message], content: SpanContent) -> list[dict[str, Any]]:
     """Chat messages as stored on a span. Role and prompt ref are kept in both modes."""
     out: list[dict[str, Any]] = []
     for m in messages:
@@ -473,6 +486,8 @@ def messages_of(messages: Sequence[Message], content: TraceContent) -> list[dict
             item["prompt_ref"] = m.prompt_ref
         if content == "full":
             item["content"] = m.content
+        elif content == "metadata":
+            item["len"] = len(m.content)
         else:
             item.update(digest(m.content))
         out.append(item)
@@ -486,6 +501,45 @@ def _error_attributes(exc: BaseException, tags: TraceTags) -> dict[str, Any]:
     if tags.content == "full":
         attrs["error.message"] = str(exc)[:ERROR_MESSAGE_CHARS]
     return attrs
+
+
+# --- turn content for consenting users (LT-21 to LT-23) ---------------------------------------
+
+
+def record_turn_content(
+    tags: TraceTags | None,
+    index: int,
+    kind: Literal["voice", "text"],
+    interviewer: str,
+    candidate: str,
+    scrub: Callable[[str], str],
+) -> bool:
+    """Write one turn's scrubbed text as its own `turn.content` trace (LT-23).
+
+    Only when `tags.turn_content` is set (the user consented, D-12) and tracing is on. The text
+    comes from the session's turns, never from prompt messages (D-13), and goes through `scrub`
+    first (LT-22). Kept apart from the metadata `turn` trace so withdrawal and retention can delete
+    it alone. Returns whether a trace was written; never raises (LT-31).
+    """
+    try:
+        if tags is None or not tags.turn_content or not is_active():
+            return False
+        content_tags = replace(tags, content="metadata", stores_turns=True)
+        now = time.time_ns()
+        record = SpanRecord(
+            name="turn.content",
+            kind="CHAIN",
+            start_ns=now,
+            end_ns=now,
+            attributes={"turn.kind": kind, "turn.index": index, "content": "turns"},
+            inputs={"candidate": scrub(candidate)},
+            outputs={"interviewer": scrub(interviewer)},
+        )
+        _emit(content_tags, record)
+        return True
+    except Exception:
+        warn_once("tracing: recording turn content failed")
+        return False
 
 
 # --- quiet failures (D-10) -------------------------------------------------------------------
@@ -516,6 +570,7 @@ __all__ = [
     "NO_CALL",
     "Exporter",
     "GatewayCall",
+    "SpanContent",
     "SpanHandle",
     "SpanRecord",
     "TraceRecord",
@@ -528,6 +583,7 @@ __all__ = [
     "flush",
     "is_active",
     "messages_of",
+    "record_turn_content",
     "set_exporter_override",
     "span",
     "start_gateway_call",

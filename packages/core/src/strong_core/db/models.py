@@ -210,6 +210,15 @@ class User(Base):
     )
     # AC-3: profile asked for at the first sign-in. No payment details here.
     full_name: Mapped[str | None] = mapped_column(String(120), comment="AC-3")
+    tracing_consent: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false",
+        comment="LT-20: interview turns may be kept for review. Off by default",
+    )
+    tracing_consent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="LT-20: when tracing_consent last changed"
+    )
     current_title: Mapped[str | None] = mapped_column(String(120), comment="AC-3: optional")
     years_experience: Mapped[int | None] = mapped_column(Integer, comment="AC-3: 0 to 50")
     target_level: Mapped[Level | None] = mapped_column(
