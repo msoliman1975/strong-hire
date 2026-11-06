@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-SpanKind = Literal["CHAT_MODEL", "LLM", "CHAIN", "TASK", "AGENT", "UNKNOWN"]
+SpanKind = Literal["CHAT_MODEL", "LLM", "CHAIN", "TASK", "AGENT", "EVALUATOR", "UNKNOWN"]
 SpanStatus = Literal["OK", "ERROR"]
 ERROR_MESSAGE_CHARS = 300
 
@@ -156,6 +156,23 @@ def _active_exporter() -> Exporter | None:
 
         _exporter = MlflowExporter()
     return _exporter
+
+
+def flush(timeout_s: float = 10.0) -> bool:
+    """Wait until finished traces have been sent (or dropped). True when nothing is left.
+
+    For a process about to read its own traces back, like the sim at the end of a run (LT-9).
+    Never raises.
+    """
+    exporter = _override or _exporter
+    wait = getattr(exporter, "flush", None)
+    if wait is None:
+        return True
+    try:
+        return bool(wait(timeout_s))
+    except Exception:
+        warn_once("tracing: flush failed")
+        return False
 
 
 def is_active() -> bool:
@@ -508,6 +525,7 @@ __all__ = [
     "content_of",
     "current_trace_tags",
     "digest",
+    "flush",
     "is_active",
     "messages_of",
     "set_exporter_override",
