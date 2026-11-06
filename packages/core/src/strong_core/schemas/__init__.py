@@ -203,6 +203,7 @@ from strong_core.schemas.suggestions import (
     TailorRolePayload,
     TuneStoryPayload,
 )
+from strong_core.schemas.tracing import SessionTraceSettings, TraceContent
 
 # Models exported to schemas/<name>.schema.json by `python -m strong_core.export_schemas`.
 EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
@@ -220,6 +221,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "answer_check": AnswerCheck,
     "input_check": InputCheck,
     "custom_session_spec": CustomSessionSpec,
+    "session_trace_settings": SessionTraceSettings,
     "custom_question_check": CustomQuestionCheck,
     "scorecard": Scorecard,
     "scorer_output": ScorerOutput,
@@ -388,6 +390,7 @@ __all__ = [
     "SessionChannel",
     "SessionConfig",
     "SessionStatus",
+    "SessionTraceSettings",
     "Severity",
     "SkillHint",
     "SkillReadiness",
@@ -428,6 +431,7 @@ __all__ = [
     "SuggestionStatus",
     "TailorRolePayload",
     "Tone",
+    "TraceContent",
     "TuneStoryPayload",
     "Turn",
     "UsageComponent",

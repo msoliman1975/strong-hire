@@ -13,7 +13,7 @@ This is a shared-package PR. Keep it to what is listed here.
 
 ## Build
 
-1. **Dependency.** Add `mlflow-tracing` to `packages/core`, pinned to one exact version at least
+1. **Dependency.** Add `mlflow-skinny` (not `mlflow-tracing`: both install the `mlflow` package) to `packages/core`, pinned to one exact version at least
    two weeks old. Write the version in the PR; LT02 and LT05 use the same one.
 2. **`strong_core.tracing`** (design: "Core: `strong_core.tracing`" in the spec):
    - settings: `LLM_TRACING`, `LLM_TRACING_DEV`, `MLFLOW_TRACKING_URI`, `MLFLOW_EXPERIMENT`, and

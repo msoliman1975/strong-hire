@@ -27203,6 +27203,51 @@
         ],
         "title": "SessionStatus"
       },
+      "SessionTraceSettings": {
+        "additionalProperties": false,
+        "description": "Stored in sessions.trace_json for a sim user's session. NULL for every other session.",
+        "properties": {
+          "sim_run_id": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "pattern": "^[A-Za-z0-9._:-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sim Run Id"
+          },
+          "scenario": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "pattern": "^[A-Za-z0-9._:-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Scenario"
+          },
+          "content": {
+            "default": "redacted",
+            "enum": [
+              "full",
+              "redacted"
+            ],
+            "title": "Content",
+            "type": "string"
+          }
+        },
+        "title": "SessionTraceSettings",
+        "type": "object"
+      },
       "SettingIn": {
         "properties": {
           "reason": {

@@ -52,6 +52,24 @@ def test_only_gateway_imports_model_sdks() -> None:
     assert not offenders, "Only strong_core.gateway may import model SDKs:\n" + "\n".join(offenders)
 
 
+TRACING = REPO / "packages/core/src/strong_core/tracing"
+MLFLOW_IMPORT = re.compile(r"^\s*(from|import)\s+mlflow\b", re.M)
+
+
+def test_lt15_only_tracing_and_sim_import_mlflow() -> None:
+    """LT-15: MLflow is imported only in strong_core.tracing and strong_sim."""
+    files = [p for p in _code_files() if p.suffix == ".py"]
+    files += list((REPO / "evals/src").rglob("*.py"))
+    offenders = [
+        str(p.relative_to(REPO))
+        for p in files
+        if TRACING not in p.parents and MLFLOW_IMPORT.search(p.read_text(encoding="utf-8"))
+    ]
+    assert not offenders, "Only strong_core.tracing and strong_sim may import mlflow:\n" + (
+        "\n".join(offenders)
+    )
+
+
 NON_CODE = ["scripts", "infra", "apps/voice/devpage"]
 NON_CODE_SUFFIXES = {".ps1", ".yaml", ".yml", ".html", ".js", ".py", ".txt", ".md", ""}
 
