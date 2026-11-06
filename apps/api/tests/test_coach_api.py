@@ -190,7 +190,7 @@ async def test_co2_records_minutes_and_coach_provenance(
         assert row.model_profile == "fake"
         assert row.model_id
         refs = set((row.prompt_version or "").split(","))
-        assert {"coach/turn.v3", "coach/turn_input.v2", "coach/style_gentle.v2"} <= refs
+        assert {"coach/turn.v4", "coach/turn_input.v2", "coach/style_gentle.v2"} <= refs
         turns = (
             await db.scalars(select(CoachTurn).where(CoachTurn.coach_session_id == row.id))
         ).all()

@@ -594,7 +594,7 @@ async def test_sc6_a_turn_fills_slots_from_the_candidates_words(
     assert detail["session"]["section"] == "situation"
     async with sessionmaker() as db:
         session = await db.get(CoachSession, uuid.UUID(sid))
-        assert session is not None and "coach/craft_turn.v2" in (session.prompt_version or "")
+        assert session is not None and "coach/craft_turn.v3" in (session.prompt_version or "")
 
 
 async def test_sc5_skip_and_move_on(
