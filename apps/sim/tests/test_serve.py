@@ -438,3 +438,61 @@ def test_forget_pasted_keeps_which_halves_were_pasted() -> None:
     assert gone["job_text"] == gone["cv_text"] == "" and gone["pasted_deleted"] == ["job", "cv"]
     plain = Scenario(id="a").model_dump(mode="json")
     assert forget_pasted(plain) == plain
+
+
+async def test_lt10_an_admin_sim_is_an_mlflow_run_of_one_scenario(
+    settings: SimSettings,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    fake_gateway: ModelGateway,
+    fake_api: Any,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """LT-10: source admin, one scenario, named after the run folder, ended FINISHED."""
+    import strong_sim.mlflow_run as mlflow_run
+    from strong_core.tracing import set_exporter_override
+    from strong_core.tracing.testing import InMemoryExporter
+
+    calls: list[tuple[str, Any]] = []
+
+    class Backend:
+        def start_run(self, experiment: str, name: str, tags: dict[str, str]) -> str:
+            calls.append(("start", (name, tags)))
+            return "r1"
+
+        def log(self, run_id: str, params: dict[str, str], metrics: dict[str, float]) -> None:
+            calls.append(("log", (params, metrics)))
+
+        def log_file(self, run_id: str, path: Path) -> None:
+            calls.append(("file", path.name))
+
+        def log_json(self, run_id: str, data: dict[str, Any], name: str) -> None:
+            calls.append(("file", name))
+
+        def end_run(self, run_id: str, status: str) -> None:
+            calls.append(("end", status))
+
+        def traces(self, experiment: str, sim_run_id: str) -> list[Any]:
+            return []
+
+        def assess(self, *args: Any) -> None:
+            calls.append(("assess", args))
+
+    monkeypatch.setattr(mlflow_run.MlflowBackend, "from_settings", classmethod(lambda c: Backend()))
+    monkeypatch.setattr(mlflow_run, "TRACE_WAIT_S", 0.1)
+    monkeypatch.setattr(mlflow_run, "TRACE_POLL_S", 0.0)
+    previous = set_exporter_override(InMemoryExporter())  # tracing on, in memory
+    try:
+        api = fake_api(TOKEN)
+        service = _service(settings, sessionmaker, fake_gateway, api)
+        run_id = await _queue(sessionmaker)
+        assert await service.tick() is True
+    finally:
+        set_exporter_override(previous)
+    run = await _get(sessionmaker, run_id)
+    assert run.status == SimRunStatus.DONE
+    (start,) = [c[1] for c in calls if c[0] == "start"]
+    assert start == (run.run_dir, {"sim_run_id": run.run_dir, "source": "admin"})
+    first_params = next(c[1][0] for c in calls if c[0] == "log")
+    assert first_params["source"] == "admin" and first_params["scenario_count"] == "1"
+    assert ("end", "FINISHED") in calls
+    assert {c[1] for c in calls if c[0] == "file"} >= {"report.json", "sessions.json"}

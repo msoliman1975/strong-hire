@@ -15,10 +15,13 @@ from typing import Any
 import yaml
 
 from strong_core.gateway import ModelGateway, Role
+from strong_core.ops.heartbeat import release
+from strong_core.tracing import TraceTags, span, trace_context
 from strong_sim.candidate import Candidate, Pacer
-from strong_sim.client import AppClient
+from strong_sim.client import AppClient, trace_content
 from strong_sim.cost import CostLimitError, CostMeter, estimate, load_prices
-from strong_sim.judge import judge
+from strong_sim.judge import JudgeResult, judge
+from strong_sim.mlflow_run import SimRunLog
 from strong_sim.report import SessionRow, percentile, render_html, summary
 from strong_sim.scenarios import Scenario, Suite
 from strong_sim.sessions import Conversation, run_text, run_voice
@@ -49,9 +52,13 @@ async def run_scenario(
     run_dir: Path,
     pacer: Pacer | None = None,
     hooks: RunHooks | None = None,
+    run_log: SimRunLog | None = None,
 ) -> SessionRow:
     """One session, judged and saved. On cancel (SM-5) it ends the session, saves what it has
-    and re-raises CancelledError, without the judge."""
+    and re-raises CancelledError, without the judge.
+
+    The run folder's name is the sim run id: the session is created with it (X-Sim-Run), so the
+    server's traces of this session belong to the run's MLflow run (LT-8)."""
     hooks = hooks or RunHooks()
     row = SessionRow(
         scenario_id=scenario.id,
@@ -71,7 +78,7 @@ async def run_scenario(
     conv = Conversation()
     try:
         job_id = await client.job_for(scenario)
-        record = await client.create_session(scenario, job_id)
+        record = await client.create_session(scenario, job_id, sim_run_id=run_dir.name)
         sid = row.session_id = record["id"]
         folder = run_dir / sid
         folder.mkdir(parents=True, exist_ok=True)
@@ -93,9 +100,9 @@ async def run_scenario(
         row.has_audio = bool(conv.audio_path and conv.audio_path.exists())
         if hooks.on_judging:
             await hooks.on_judging()
-        verdict = await judge(
-            scenario, conv.lines, gateway, meter, stopped_early=conv.stopped_early
-        )
+        verdict = await _traced_judge(scenario, conv, gateway, meter, sid, run_dir.name)
+        if run_log is not None:
+            run_log.judged(sid, verdict)
         row.rules = {r.rule: r.verdict for r in verdict.rules}
         row.failed_rules, row.problems = verdict.failed, len(verdict.problems)
         debrief = await client.debrief(sid)
@@ -160,6 +167,33 @@ async def run_scenario(
     return row
 
 
+async def _traced_judge(
+    scenario: Scenario,
+    conv: Conversation,
+    gateway: ModelGateway,
+    meter: CostMeter,
+    session_id: str,
+    sim_run_id: str,
+) -> JudgeResult:
+    """The judge call as its own trace, `judge`, tagged with the session (LT-9). Its verdict
+    is attached to this trace as assessments when the run ends. A no-op with tracing off."""
+    tags = TraceTags(
+        session_id=session_id,
+        sim_run_id=sim_run_id,
+        scenario=scenario.id,
+        content=trace_content(scenario),  # type: ignore[arg-type]
+        service="sim",
+        release=release(),
+        model_profile=gateway.profile,
+    )
+    with trace_context(tags), span("judge", "EVALUATOR") as handle:
+        verdict = await judge(
+            scenario, conv.lines, gateway, meter, stopped_early=conv.stopped_early
+        )
+        handle.set(rubric=verdict.rubric, failed_rules=verdict.failed, passed=verdict.passed)
+    return verdict
+
+
 def write_report(run_dir: Path, rows: list[SessionRow], meta: dict[str, Any]) -> dict[str, Any]:
     info = summary(rows, meta)
     write_json(
@@ -199,6 +233,9 @@ async def run_suite(
     }
     rows: list[SessionRow] = []
     reported = 0.0  # sim-side cost already added to the shared daily budget
+    run_log = SimRunLog.start(  # LT-8: one MLflow run, a no-op with tracing off
+        run_id, suite=suite.name, source="suite", gateway=gateway, scenarios=len(suite.scenarios)
+    )
     pacer = Pacer(min_interval_s=settings.candidate_min_interval_s)
     try:
         me = await client.sign_in()
@@ -220,7 +257,9 @@ async def run_suite(
                     break
                 # The sim side may spend what is left today, and never more than the run limit.
                 meter.limit_usd = min(run_limit, meter.total_usd + left)
-            row = await run_scenario(scenario, client, gateway, settings, meter, run_dir, pacer)
+            row = await run_scenario(
+                scenario, client, gateway, settings, meter, run_dir, pacer, run_log=run_log
+            )
             try:
                 await client.report_spend(meter.total_usd - reported)
                 reported = meter.total_usd
@@ -248,4 +287,5 @@ async def run_suite(
         info = write_report(run_dir, rows, meta)
         uploader.push(run_dir)
         await client.aclose()
+        await asyncio.to_thread(run_log.finish, rows, info, run_dir)  # LT-8, LT-9, LT-13
     return run_dir, info

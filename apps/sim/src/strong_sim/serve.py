@@ -36,6 +36,7 @@ from strong_sim import retention
 from strong_sim.candidate import Pacer
 from strong_sim.client import AppClient
 from strong_sim.cost import CostMeter, estimate, load_prices
+from strong_sim.mlflow_run import SimRunLog
 from strong_sim.report import SessionRow
 from strong_sim.runner import RunHooks, new_run_id, run_scenario, write_report
 from strong_sim.scenarios import Scenario
@@ -196,6 +197,11 @@ class SimService:
         meter = CostMeter(self.prices, limit_usd=self.settings.cost_limit_usd)
         client = self.client_factory(self.settings)
         interview_started: list[float] = []
+        run_log = await asyncio.to_thread(  # LT-10: an admin sim is a run of one scenario
+            lambda: SimRunLog.start(
+                run_dir.name, suite="admin", source="admin", gateway=self.gateway, scenarios=1
+            )
+        )
 
         async def on_session(sid: str) -> None:
             interview_started.append(time.monotonic())
@@ -209,7 +215,7 @@ class SimService:
             return await run_scenario(
                 scenario, client, self.gateway, self.settings, meter, run_dir,
                 Pacer(min_interval_s=self.settings.candidate_min_interval_s),
-                RunHooks(on_session=on_session, on_judging=on_judging),
+                RunHooks(on_session=on_session, on_judging=on_judging), run_log=run_log,
             )  # fmt: skip
 
         meta: dict[str, Any] = {
@@ -253,8 +259,10 @@ class SimService:
             with contextlib.suppress(Exception):
                 await client.aclose()
         meta["finished_at"] = _now().isoformat(timespec="seconds")
-        if row is not None:
-            write_report(run_dir, [row], meta)
+        rows = [row] if row is not None else []
+        info = write_report(run_dir, rows, meta) if rows else dict(meta)
+        failed = status != SimRunStatus.DONE
+        await asyncio.to_thread(run_log.finish, rows, info, run_dir, failed=failed)
         progress = int(time.monotonic() - interview_started[0]) if interview_started else 0
         async with self.sessionmaker() as db:
             run = await db.get(SimRun, run_id)

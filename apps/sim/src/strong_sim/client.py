@@ -29,6 +29,19 @@ class ApiError(RuntimeError):
     pass
 
 
+def trace_content(scenario: Scenario) -> str:
+    """full only for a fixture persona; a pasted resume or job is redacted (D-6, LT-4)."""
+    return "redacted" if scenario.custom else "full"
+
+
+def trace_headers(scenario: Scenario, sim_run_id: str | None) -> dict[str, str]:
+    """How the server traces this session (LT-14). It reads them for the sim user only."""
+    headers = {"X-Sim-Scenario": scenario.id, "X-Sim-Trace-Content": trace_content(scenario)}
+    if sim_run_id:
+        headers["X-Sim-Run"] = sim_run_id
+    return headers
+
+
 class AppClient:
     def __init__(self, settings: SimSettings, http: httpx.AsyncClient | None = None) -> None:
         self.settings = settings
@@ -147,13 +160,16 @@ class AppClient:
 
     # ------------------------------------------------------------------ sessions
 
-    async def create_session(self, scenario: Scenario, job_id: str) -> dict[str, Any]:
+    async def create_session(
+        self, scenario: Scenario, job_id: str, sim_run_id: str | None = None
+    ) -> dict[str, Any]:
         body = {
             "job_target_id": job_id,
             "config": scenario.session_config().model_dump(mode="json"),
             "channel": scenario.channel,
         }
-        record: dict[str, Any] = await self._call("POST", "/sessions", json=body)
+        headers = trace_headers(scenario, sim_run_id)
+        record: dict[str, Any] = await self._call("POST", "/sessions", json=body, headers=headers)
         sid = record["id"]
 
         async def brief_ready() -> dict[str, Any] | None:

@@ -2336,6 +2336,7 @@ source = { editable = "apps/sim" }
 dependencies = [
     { name = "httpx" },
     { name = "livekit" },
+    { name = "mlflow-skinny" },
     { name = "pyyaml" },
     { name = "strong-core" },
     { name = "strong-interview" },
@@ -2345,6 +2346,7 @@ dependencies = [
 requires-dist = [
     { name = "httpx", specifier = ">=0.27" },
     { name = "livekit", specifier = ">=1.0" },
+    { name = "mlflow-skinny", specifier = "==3.17.2" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "strong-core", editable = "packages/core" },
     { name = "strong-interview", editable = "packages/interview" },
