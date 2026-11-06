@@ -584,3 +584,120 @@ def test_lt14_sessions_have_a_trace_json_column() -> None:
 
     column = InterviewSession.__table__.c.trace_json
     assert column.nullable
+
+
+# --- LT-6: turns cut after the fact (voice) ------------------------------------------------------
+
+
+async def test_lt6_collector_groups_spans_from_other_tasks_into_turns(
+    fake: ModelGateway, trace_capture: InMemoryExporter
+) -> None:
+    """LT-6: calls made in tasks started inside collect_turns() become the next cut's children."""
+    import asyncio
+
+    from strong_core.tracing import collect_turns
+
+    with trace_context(FULL), collect_turns() as collector:
+        assert collector is not None
+        greeting = asyncio.create_task(fake.synthesize("Hello."))  # another task, like LiveKit
+        await greeting
+        collector.cut("voice", 0, {"e2e_ms": None})
+        stt = asyncio.create_task(fake.transcribe(_wav(0.5)))
+        await stt
+        reply = asyncio.create_task(fake.complete(Role.INTERVIEWER, MESSAGES))
+        await reply
+        collector.cut("voice", 1, {"e2e_ms": 640.0, "llm_ttft_ms": 210.0})
+    first, second = trace_capture.traces
+    assert first.root.attributes["turn.index"] == 0
+    assert [c.name for c in first.root.children] == ["gateway.tts"]
+    assert "e2e_ms" not in first.root.attributes  # None values are left out
+    assert second.root.attributes["turn.kind"] == "voice"
+    assert [c.name for c in second.root.children] == ["gateway.stt", "gateway.interviewer"]
+    assert second.root.attributes["e2e_ms"] == 640.0
+    assert second.root.start_ns == second.root.children[0].start_ns
+    assert second.tags is FULL
+
+
+async def test_lt6_collector_keeps_running_spans_for_the_next_turn(
+    trace_capture: InMemoryExporter,
+) -> None:
+    """LT-6: a span still running at a cut waits; the rest is flushed when the session ends."""
+    from strong_core.tracing import collect_turns
+
+    with trace_context(FULL), collect_turns() as collector:
+        assert collector is not None
+        running = start_gateway_call("gateway.tts", "LLM", {"role": "tts"})
+        collector.cut("voice", 1, {"e2e_ms": 700.0})
+        running.finish({"audio_bytes": 10})
+    cut, rest = trace_capture.traces
+    assert cut.root.children == []
+    assert [c.name for c in rest.root.children] == ["gateway.tts"]
+    assert rest.root.attributes["turn.rest"] is True and rest.root.attributes["turn.index"] == -1
+
+
+def test_lt6_collector_is_none_without_a_trace_context(trace_capture: InMemoryExporter) -> None:
+    """LT-3: no trace context, no collector."""
+    from strong_core.tracing import collect_turns
+
+    with collect_turns() as collector:
+        assert collector is None
+    assert trace_capture.traces == []
+
+
+async def test_lt6_collector_outlives_its_block_when_asked(
+    fake: ModelGateway, trace_capture: InMemoryExporter
+) -> None:
+    """LT-6: with flush_on_exit=False, tasks started in the block keep feeding the collector."""
+    import asyncio
+
+    from strong_core.tracing import collect_turns
+
+    started = asyncio.Event()
+    go = asyncio.Event()
+
+    async def later_call() -> None:
+        started.set()
+        await go.wait()
+        await fake.transcribe(_wav(0.5))
+
+    with trace_context(FULL), collect_turns(flush_on_exit=False) as collector:
+        assert collector is not None
+        task = asyncio.create_task(later_call())
+        await started.wait()
+    assert trace_capture.traces == []  # nothing flushed when the block ended
+    go.set()
+    await task
+    collector.cut("voice", 1, {"e2e_ms": 500.0})
+    (turn,) = trace_capture.traces
+    assert [c.name for c in turn.root.children] == ["gateway.stt"]
+
+
+def test_lt9_flush_waits_for_the_exporter_and_never_raises() -> None:
+    """LT-9: a process can wait for its traces to be sent before it reads them back."""
+    from strong_core.tracing import flush
+
+    class Slow:
+        def __init__(self) -> None:
+            self.waited: list[float] = []
+
+        def submit(self, trace: TraceRecord) -> None:
+            return None
+
+        def flush(self, timeout_s: float) -> bool:
+            self.waited.append(timeout_s)
+            return True
+
+    class Broken(Slow):
+        def flush(self, timeout_s: float) -> bool:
+            raise RuntimeError("down")
+
+    slow = Slow()
+    previous = set_exporter_override(slow)
+    try:
+        assert flush(3.0) is True and slow.waited == [3.0]
+        set_exporter_override(Broken())
+        assert flush() is False
+        set_exporter_override(InMemoryExporter())  # no flush method: nothing to wait for
+        assert flush() is True
+    finally:
+        set_exporter_override(previous)

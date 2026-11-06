@@ -9,6 +9,7 @@ environment. Exits 0 with a message when no tracking URI is set or the experimen
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 from typing import Protocol
@@ -49,6 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         print("No MLFLOW_TRACKING_URI set; nothing to prune.")
         return 0
 
+    os.environ.setdefault("MLFLOW_DISABLE_AGENT_HINT", "1")
     import mlflow
     from mlflow.tracing.client import TracingClient
 
