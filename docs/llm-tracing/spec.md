@@ -45,7 +45,15 @@ The owner agreed these on Nov 5, 2026. Do not reopen them in a task.
 ### Core: `strong_core.tracing`
 
 A new module in `packages/core`, the only place outside `strong_sim` that imports MLflow (LT-15).
-It depends on the `mlflow-tracing` package (the light tracing SDK), pinned to an exact version.
+It depends on `mlflow-skinny`, pinned to `3.17.2` (LT01), and so does the sim (LT05); the MLflow
+server image (LT02) uses the same version. Not the lighter `mlflow-tracing`: it and
+`mlflow-skinny` both install the `mlflow` package, so the two cannot share one environment, and
+the sim needs skinny's run tracking.
+
+Spans are recorded as plain Python records while the code runs, so the call path does no MLflow
+work. When a trace's root span ends, the finished tree goes on a bounded queue; one background
+thread replays it into MLflow with `mlflow.start_span_no_context`, using the recorded start and
+end times.
 
 - **Settings.** `LLM_TRACING` (`off` by default, or `on`), `MLFLOW_TRACKING_URI`,
   `MLFLOW_EXPERIMENT` (default `dev`), and the tracking credentials for the Caddy route (LT-13).
