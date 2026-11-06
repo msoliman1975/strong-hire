@@ -12,6 +12,9 @@
 
   Secrets come from user environment variables: HCLOUD_TOKEN (or -TokenFile), GEMINI_KEY,
   ANTHROPIC_API_KEY and STRONGHIRE_SIM_TOKEN. The upload key is ~/.ssh/stronghire_simup.
+  Optional: STRONGHIRE_MLFLOW_PASSWORD (the main server's MLflow basic-auth password, LT-13).
+  With it, the run is logged to https://mlflow.<domain> (STRONGHIRE_DOMAIN, default
+  getstronghire.com); without it, nothing goes to MLflow.
 
 .EXAMPLE
   ./infra/sim/sim-run.ps1 -Suite text-smoke
@@ -37,6 +40,8 @@ $script:HcloudToken = Get-HcloudToken $TokenFile
 $gemini = Get-UserSecret 'GEMINI_KEY' 'It is the Google Gemini API key for the candidate.'
 $anthropic = Get-UserSecret 'ANTHROPIC_API_KEY' 'It is the Anthropic key for the judge.'
 $simToken = Get-UserSecret 'STRONGHIRE_SIM_TOKEN' 'It must match SIM_TOKEN in the main server .env.'
+$mlflowPassword = Get-OptionalUserSecret 'STRONGHIRE_MLFLOW_PASSWORD'
+$mlflowDomain = if ($env:STRONGHIRE_DOMAIN) { $env:STRONGHIRE_DOMAIN } else { 'getstronghire.com' }
 $uploadKey = Join-Path $HOME '.ssh/stronghire_simup'
 if (-not (Test-Path $uploadKey)) { throw "Missing $uploadKey (the upload key for user simup on the main server)." }
 
@@ -72,7 +77,7 @@ try {
     # Secrets go in files copied with scp, never on a command line.
     $envFile = [IO.Path]::GetTempFileName()
     $master = 'sk-' + [guid]::NewGuid().ToString('N')
-    @(
+    $lines = @(
         "LITELLM_MASTER_KEY=$master",
         "GEMINI_API_KEY=$gemini",
         "ANTHROPIC_API_KEY=$anthropic",
@@ -81,7 +86,17 @@ try {
         "SIM_COST_LIMIT_USD=$LimitUsd",
         "SIM_CANDIDATE_MIN_INTERVAL_S=$CandidateIntervalS",
         "MODEL_ROLE_CANDIDATE=$CandidateAlias"
-    ) | Set-Content -Encoding ascii $envFile
+    )
+    if ($mlflowPassword) {
+        # LT-13: log this run to the main server's MLflow through Caddy's basic auth.
+        $lines += @(
+            "LLM_TRACING=on",
+            "MLFLOW_TRACKING_URI=https://mlflow.$mlflowDomain",
+            "MLFLOW_TRACKING_USERNAME=mlflow",
+            "MLFLOW_TRACKING_PASSWORD=$mlflowPassword"
+        )
+    }
+    $lines | Set-Content -Encoding ascii $envFile
     try {
         & scp @script:SimSshOpts $envFile "root@${ip}:$script:SimRemoteDir/strong-hire/infra/sim/.env"
         & scp @script:SimSshOpts $uploadKey "root@${ip}:$script:SimRemoteDir/keys/upload_key"
