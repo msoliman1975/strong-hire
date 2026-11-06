@@ -20,9 +20,11 @@ from strong_core.db import get_sessionmaker
 from strong_core.gateway import Role, get_gateway, make_db_usage_sink, set_usage_sink, usage_context
 from strong_core.ops.logs import log_context
 from strong_core.prompts import load_prompt
+from strong_core.tracing import TurnCollector, collect_turns
+from strong_core.tracing.sessions import maybe_trace, trace_tags_for
 from strong_voice.coach_agent import coach_entrypoint
 from strong_voice.interview_agent import run_session
-from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder
+from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder, TurnLatency, turn_attributes
 from strong_voice.plugins import GatewayLLM, GatewaySTT, GatewayTTS
 from strong_voice.session_store import session_id_from_room, session_org
 from strong_voice.settings import get_voice_settings
@@ -94,14 +96,38 @@ async def entrypoint(ctx: JobContext) -> None:
     maker = get_sessionmaker()
     set_usage_sink(make_db_usage_sink(maker))
     org_id = await session_org(maker, session_id)
+    # LT-3, LT-6: a sim user's interview is traced, one trace per turn. Like the usage context,
+    # the trace context and the turn collector are set before the room connects, so every task
+    # the session starts has them. None for everyone else, and when tracing is off.
+    tags = None
+    if org_id is not None:
+        tags = await trace_tags_for(org_id=org_id, session_id=session_id, service="voice")
     with ExitStack() as stack:
         stack.enter_context(log_context(session_id=session_id))
         if org_id is not None:
             stack.enter_context(usage_context(org_id, session_id=session_id))
+        stack.enter_context(maybe_trace(tags))
+        collector = stack.enter_context(collect_turns(flush_on_exit=False))
         await ctx.connect()
         gateway = get_gateway()
         recorder = LatencyRecorder(None, session=room_name, profile=gateway.profile)
+        if collector is not None:
+            trace_turns(ctx, recorder, collector)
         await run_session(ctx, lambda: build_session(ctx.proc, recorder), recorder=recorder)
+
+
+def trace_turns(ctx: JobContext, recorder: LatencyRecorder, collector: TurnCollector) -> None:
+    """Send each turn of the interview as a `turn` trace with its timings (LT-6), and what is
+    left when the session ends."""
+
+    def cut(row: TurnLatency) -> None:
+        collector.cut("voice", row.turn, turn_attributes(row))
+
+    async def flush() -> None:
+        collector.flush()
+
+    recorder.trace_turn = cut
+    ctx.add_shutdown_callback(flush)
 
 
 async def spike_entrypoint(ctx: JobContext) -> None:

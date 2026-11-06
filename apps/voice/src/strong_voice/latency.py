@@ -123,6 +123,9 @@ class LatencyRecorder:
         self.session = session
         self.profile = profile
         self.turns: list[TurnLatency] = []
+        # LT-6: the voice agent sets this to send each turn as an LLM trace. Same rule as
+        # on_turn: it must not block, and an error in it is logged, never raised.
+        self.trace_turn: Callable[[TurnLatency], None] | None = None
         self._pending_user: Mapping[str, Any] | None = None
         self._last_stt_s: float | None = None
 
@@ -157,9 +160,30 @@ class LatencyRecorder:
                     self.on_turn(row)
                 except Exception:
                     log.warning("could not keep the latency of turn %d", row.turn, exc_info=True)
+            if self.trace_turn is not None:
+                try:
+                    self.trace_turn(row)
+                except Exception:
+                    log.warning("could not trace turn %d", row.turn, exc_info=True)
 
     def summary(self) -> str:
         return format_report({self.profile: self.turns})
+
+
+def turn_attributes(row: TurnLatency) -> dict[str, Any]:
+    """A turn's timings as LLM trace attributes (LT-6). A step LiveKit did not report is left
+    out, like the empty CSV cells."""
+    values = {
+        "e2e_ms": row.total_ms,
+        "turn_detection_ms": row.turn_detection_ms,
+        "stt_ms": row.stt_ms,
+        "llm_ttft_ms": row.llm_ttft_ms,
+        "tts_ttfb_ms": row.tts_ttfb_ms,
+        "other_ms": row.other_ms,
+    }
+    out: dict[str, Any] = {k: v for k, v in values.items() if not math.isnan(v)}
+    out["interrupted"] = row.interrupted
+    return out
 
 
 def append_rows(path: Path, rows: Iterable[TurnLatency]) -> None:
