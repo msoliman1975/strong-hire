@@ -2,6 +2,7 @@
 #   core:   postgres, redis, api, worker, web
 #   models: ollama (CPU), litellm proxy
 #   voice:  livekit-server (dev mode), voice agent, stt (faster-whisper), tts (Kokoro)
+#   obs:    mlflow, the LLM trace server (LT-12); start it with core: dev.ps1 up -Profile obs
 #   all-in-one: every service above, for the smallest machine; set MODEL_PROFILE=tiny and
 #               LITELLM_PROFILE=tiny in .env (PL-2)
 # Which models answer each role is set only in config/ (MODEL_PROFILE, LITELLM_PROFILE).
@@ -17,6 +18,11 @@ x-python-env: &python-env
   MODEL_GATEWAY_API_KEY: ${LITELLM_APP_KEY:-${LITELLM_MASTER_KEY:-sk-local-dev-only}}
   LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
   REPO_ROOT: /app
+  # LLM tracing (LT-1, docs/llm-tracing/spec.md): off unless LLM_TRACING=on in .env.
+  LLM_TRACING: ${LLM_TRACING:-off}
+  LLM_TRACING_DEV: ${LLM_TRACING_DEV:-off}
+  MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-http://mlflow:5000}
+  MLFLOW_EXPERIMENT: ${MLFLOW_EXPERIMENT:-dev}
 
 x-healthcheck: &healthcheck
   interval: 5s
@@ -261,8 +267,35 @@ services:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8880/health', timeout=3)"]
       start_period: 120s
 
+  # ---------------------------------------------------------------- obs
+  # The LLM trace server (LT-12). Its own database (mlflow) in the stack's Postgres, created on
+  # first start; artifacts in a volume. UI: http://localhost:5000. Tracing stays off until
+  # LLM_TRACING=on; LLM_TRACING_DEV=on also traces your local sessions, always redacted.
+  mlflow:
+    build:
+      context: ..
+      dockerfile: infra/docker/mlflow.Dockerfile
+    image: strong-mlflow:3.17.2
+    profiles: [obs]
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-strong}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-strong}
+      MLFLOW_DB: mlflow
+      MLFLOW_WORKERS: "2"
+      MLFLOW_ALLOWED_HOSTS: mlflow,mlflow:5000,localhost,localhost:${MLFLOW_PORT:-5000},127.0.0.1:${MLFLOW_PORT:-5000}
+    ports: ["${MLFLOW_PORT:-5000}:5000"]
+    volumes: [mlflow-artifacts:/mlflow/artifacts]
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      <<: *healthcheck
+      start_period: 60s
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=3)"]
+
 volumes:
   postgres-data:
+  mlflow-artifacts:
   ollama-models:
   stt-models:
   voice-models:

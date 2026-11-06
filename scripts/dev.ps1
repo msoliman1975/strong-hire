@@ -6,6 +6,7 @@
   ./scripts/dev.ps1 up                  # core profile: postgres, redis, api, worker, web
   ./scripts/dev.ps1 up -Profile all     # core + models + voice
   ./scripts/dev.ps1 up -Profile all-in-one   # every service, for MODEL_PROFILE=tiny (PL-2)
+  ./scripts/dev.ps1 up -Profile obs     # core + the MLflow trace server on http://localhost:5000 (LT)
   ./scripts/dev.ps1 logs -Service api
   ./scripts/dev.ps1 test
   ./scripts/dev.ps1 admin               # the admin app dev server on http://localhost:5181
@@ -19,7 +20,7 @@ param(
     [string]$Command = 'help',
 
     [Alias('Profile')]
-    [ValidateSet('core', 'models', 'voice', 'all', 'all-in-one')]
+    [ValidateSet('core', 'models', 'voice', 'all', 'all-in-one', 'obs')]
     [string]$StackProfile = 'core',
 
     [string]$Service = '',
@@ -62,7 +63,12 @@ function Initialize-ExtraCerts {
 }
 
 function Get-ProfileArgs([string]$Name) {
-    $names = if ($Name -eq 'all') { $AllProfiles } else { @($Name) }
+    # obs (the MLflow trace server, LT-12) needs Postgres, so it always comes with core.
+    $names = switch ($Name) {
+        'all' { $AllProfiles }
+        'obs' { @('core', 'obs') }
+        default { @($Name) }
+    }
     $result = @()
     foreach ($n in $names) { $result += @('--profile', $n) }
     return $result
@@ -93,6 +99,16 @@ function Invoke-Pnpm([string[]]$PnpmArgs, [string]$App = 'web') {
     Assert-LastExit "pnpm ($App) $($PnpmArgs -join ' ')"
 }
 
+# Every profile, including obs, so down, logs and ps also cover the trace server.
+function Get-EveryProfileArgs { return (Get-ProfileArgs 'all') + @('--profile', 'obs') }
+
+function Invoke-TracePrune {
+    # LT-11: dev traces live 30 days (D-6). A failure only warns: tracing is optional.
+    Write-Step 'Deleting dev traces older than 30 days'
+    & docker @('compose', '-f', $ComposeFile, '--env-file', $EnvFile, 'exec', '-T', 'api', 'python', '-m', 'strong_core.tracing', 'prune', '--experiment', 'dev', '--days', '30')
+    if ($LASTEXITCODE -ne 0) { Write-Warning 'Trace prune failed; the trace server keeps old dev traces for now.' }
+}
+
 function Invoke-Migrate {
     Write-Step 'Applying database migrations'
     Invoke-Compose @('exec', '-T', 'api', 'alembic', '-c', 'packages/core/alembic.ini', 'upgrade', 'head')
@@ -110,7 +126,7 @@ try {
             Initialize-ExtraCerts
             Write-Step "Starting profile '$StackProfile' (first build takes a few minutes)"
             Invoke-Compose ((Get-ProfileArgs $StackProfile) + @('up', '-d', '--build', '--wait'))
-            if ($StackProfile -in @('core', 'all', 'all-in-one')) {
+            if ($StackProfile -in @('core', 'all', 'all-in-one', 'obs')) {
                 Invoke-Migrate
                 Write-Host ''
                 Write-Host 'Web:    http://localhost:5180  (shows API health)'
@@ -118,18 +134,22 @@ try {
             }
             if ($StackProfile -in @('models', 'all', 'all-in-one')) { Write-Host 'LiteLLM: http://localhost:4000' }
             if ($StackProfile -in @('voice', 'all', 'all-in-one')) { Write-Host 'LiveKit: ws://localhost:7880' }
+            if ($StackProfile -eq 'obs') {
+                Invoke-TracePrune
+                Write-Host 'MLflow: http://localhost:5000  (traces only with LLM_TRACING=on in .env)'
+            }
         }
         'down' {
             $downArgs = @('down', '--remove-orphans')
             if ($Volumes) { $downArgs += '--volumes' }
-            Invoke-Compose ((Get-ProfileArgs 'all') + $downArgs)
+            Invoke-Compose ((Get-EveryProfileArgs) + $downArgs)
         }
         'logs' {
-            $logArgs = (Get-ProfileArgs 'all') + @('logs', '-f', '--tail', '200')
+            $logArgs = (Get-EveryProfileArgs) + @('logs', '-f', '--tail', '200')
             if ($Service) { $logArgs += $Service }
             Invoke-Compose $logArgs
         }
-        'ps' { Invoke-Compose ((Get-ProfileArgs 'all') + @('ps')) }
+        'ps' { Invoke-Compose ((Get-EveryProfileArgs) + @('ps')) }
         'test' {
             $savedProfile = $env:MODEL_PROFILE
             try {

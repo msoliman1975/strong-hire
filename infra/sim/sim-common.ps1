@@ -26,6 +26,14 @@ function Get-UserSecret([string]$Name, [string]$Hint) {
     return $value
 }
 
+# A user secret that may be missing: returns '' instead of throwing.
+function Get-OptionalUserSecret([string]$Name) {
+    $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
+    if (-not $value) { $value = [Environment]::GetEnvironmentVariable($Name, 'User') }
+    if (-not $value) { return '' }
+    return $value
+}
+
 function Get-HcloudToken([string]$TokenFile) {
     if ($TokenFile) { return (Get-Content -Raw $TokenFile).Trim() }
     return Get-UserSecret 'HCLOUD_TOKEN' 'It is the Hetzner Cloud API token of the StrongHire project.'
