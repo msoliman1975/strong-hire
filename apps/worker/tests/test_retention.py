@@ -101,7 +101,13 @@ async def test_r2_retention_runs_as_a_daily_cron_job(
     assert job.hour == retention.RUN_AT_HOUR_UTC and job.minute == retention.RUN_AT_MINUTE
     await _fill(sessionmaker, *account, datetime.now(UTC))
     result = await retention.trace_retention({retention.CTX_KEY: sessionmaker})
-    assert result == {"deleted": 2, "voice_turn_timings": 0, "ops_samples": 0, "error_events": 0}
+    assert result == {
+        "deleted": 2,
+        "voice_turn_timings": 0,
+        "ops_samples": 0,
+        "error_events": 0,
+        "stories": 0,
+    }
 
 
 async def test_ob3_ob4_ob5_ops_rows_past_retention_are_deleted_in_batches(

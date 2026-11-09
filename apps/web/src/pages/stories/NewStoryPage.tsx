@@ -1,7 +1,9 @@
 /**
  * ST-10 (mockup #write): Write it yourself. A title and the five parts, each with its hint. Save
  * as a Draft goes back to Career Stories; Save and ask Strova to review saves, queues the review
- * (ST-11) and opens Review with Strova. `?skill=` tags the story first (Home coverage, plan gaps).
+ * (ST-11) and opens Review with Strova. `?skill=` tags the story first (Home coverage, plan gaps);
+ * it may repeat. D-7 (CS-9): `?idea=` is a recommended resume achievement: it names the story and
+ * fills the result, in the user's own words from their resume.
  *
  * SC-1, SC-10: the story can be written in STAR or CARL (STAR is preselected): the outline's
  * sections and slots, in the user's own words, saved as typed with no model call. "Five free-text
@@ -48,15 +50,23 @@ const SHAPES: { value: Shape; name: string; sections: string; description: strin
   },
 ];
 
+/** D-7: a story started from a resume line is first named after it. */
+export function titleFromIdea(idea: string): string {
+  const line = idea.trim().replace(/[.;]+$/, "");
+  return line.length <= 80 ? line : `${line.slice(0, 79).trimEnd()}…`;
+}
+
 export function NewStoryPage() {
   const [params] = useSearchParams();
-  const first = SKILLS.find((c) => c === params.get("skill"));
-  const skills: Competency[] = first ? [first] : [];
-  const [title, setTitle] = useState("");
-  const [parts, setParts] = useState<Parts>({ context: "", stakes: "", action: "", result: "", reflection: "" });
+  const skills: Competency[] = [...new Set(params.getAll("skill"))].filter((s): s is Competency =>
+    SKILLS.includes(s as Competency),
+  );
+  const idea = params.get("idea")?.trim() ?? "";
+  const [title, setTitle] = useState(() => (idea ? titleFromIdea(idea) : ""));
+  const [parts, setParts] = useState<Parts>({ context: "", stakes: "", action: "", result: idea, reflection: "" });
   const [missing, setMissing] = useState(false);
   const [shape, setShape] = useState<Shape>("star");
-  const [written, setWritten] = useState<Written>({});
+  const [written, setWritten] = useState<Written>(() => (idea ? { "result.impact": idea } : ({} as Written)));
   const [steps, setSteps] = useState(1);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -101,6 +111,11 @@ export function NewStoryPage() {
         <p className="sx-small sx-muted">
           Write it in your own words. You can leave parts empty and come back; nothing is added that you didn't write.
         </p>
+        {idea && (
+          <p className="sx-small" data-testid="from-idea">
+            From your resume: <q>{idea}</q>. It's in the result; add what led to it.
+          </p>
+        )}
       </div>
       <form className="sx-card" aria-label="Write a story" onSubmit={(e) => e.preventDefault()} noValidate>
         <div className="sx-field">

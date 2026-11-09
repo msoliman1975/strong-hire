@@ -2,7 +2,8 @@
  * Career Stories with Strova (U10) with MSW (mocks/storyHandlers.ts and suggestionHandlers.ts,
  * the shapes of strong_api.stories and strong_api.suggestions): the list and part-by-part editing
  * (ST-3), the status to show (ST-8), the page (ST-9), Write it yourself (ST-10), Review with
- * Strova (ST-11), Ask Strova (ST-13) and the story page (ST-14). The story pages send the user
+ * Strova (ST-11), Ask Strova (ST-13), the story page (ST-14) and the Career Stories redesign
+ * (CS-5 to CS-17, docs/stories-redesign/spec.md). The story pages send the user
  * Home with `v2_enabled` off.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -10,7 +11,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createQueryClient } from "../../App";
 import { server } from "../../mocks/node";
@@ -85,30 +86,66 @@ function renderAt(path: string) {
   );
 }
 
-describe("Career Stories (ST-9)", () => {
-  it("ST-9: the page has, in order: start a new story, resume ideas, Ask Strova, your stories, Strova suggests", async () => {
+const IDEA = {
+  kind: "resume_idea" as const,
+  achievement: "Cut AWS spend 30% by rightsizing",
+  role: "Senior Engineer, Fernhill",
+  resume_id: "r2",
+  resume_line_ref: "roles[0].achievements[1]",
+  resumes: 2,
+  skills: ["impact" as const],
+  missing_parts: ["stakes" as const, "reflection" as const],
+};
+const GAP = {
+  kind: "missing_skill" as const,
+  suggestion_id: "5a000000-0000-4000-8000-0000000000aa",
+  competency: "learning_from_failure" as const,
+  job_target_id: "j1",
+  company: "Stripe",
+  job_title: "Backend Engineer",
+  reason: "Stripe asks about a failure and no story shows one.",
+};
+
+function withRecommendations(ideas = [IDEA], skills = [GAP]) {
+  server.use(http.get("*/api/stories/recommendations", () => HttpResponse.json({ ideas, skills })));
+}
+
+const TIPPED = mockStory({ ...PROVEN, id: "11111111-1111-4111-8111-111111111111" });
+
+/** Open the row menu of one story and choose an item from it. */
+async function pick(user: ReturnType<typeof userEvent.setup>, title: string, item: string) {
+  const summary = await screen.findByLabelText(`More for ${title}`);
+  await user.click(summary);
+  await user.click(within(summary.closest("details") as HTMLElement).getByRole("menuitem", { name: item }));
+}
+
+describe("Career Stories (CS-5 to CS-17)", () => {
+  it("CS-5, CS-8: stories come first, then the recommended rows; + New story crafts or writes", async () => {
+    withRecommendations();
     renderAt("/stories");
-    const title = await screen.findByRole("heading", { level: 1, name: "Career Stories with Strova" });
-    // The header, like Rehearsals: Strova coaching at 72 px, the title and one line.
-    const header = title.closest(".sx-row") as HTMLElement;
-    expect(within(header).getByRole("img", { name: "Strova is coaching" })).toHaveAttribute("width", "72");
-    expect(header).toHaveTextContent("Build the stories you'll tell in interviews with Strova");
-    const order = [
-      screen.getByRole("heading", { name: "Start a new story" }),
-      screen.getByRole("form", { name: "Ask Strova" }),
-      screen.getByRole("heading", { name: "Your stories" }),
-      screen.getByTestId("strova-suggests"),
-    ];
-    for (let i = 1; i < order.length; i++) {
-      expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    }
-    expect(screen.getByRole("link", { name: /Craft with Strova/ })).toHaveAttribute("href", "/coach/new");
-    expect(screen.getByRole("link", { name: /Write it yourself/ })).toHaveAttribute("href", "/stories/new");
-    // Strova suggests starts collapsed.
-    expect(screen.getByTestId("strova-suggests")).not.toHaveAttribute("open");
+    expect(await screen.findByRole("heading", { level: 1, name: "Career stories" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "+ New story" })).toHaveAttribute("href", "/coach/new");
+    const more = screen.getByLabelText("More ways to start");
+    expect(more.closest("details")).not.toHaveAttribute("open");
+    const menu = more.closest("details") as HTMLElement;
+    expect(within(menu).getByRole("menuitem", { name: /Write it yourself/ })).toHaveAttribute("href", "/stories/new");
+    const list = await screen.findByRole("region", { name: "Stories" });
+    await within(list).findAllByTestId("recommended-row");
+    const items = within(list).getAllByRole("listitem").filter((li) => li.parentElement?.closest("li") === null);
+    expect(items.map((li) => li.dataset.testid)).toEqual(["story-row", "story-row", "recommended-row", "recommended-row"]);
+    // Job gaps come before resume ideas.
+    const recs = within(list).getAllByTestId("recommended-row");
+    expect(recs[0]).toHaveTextContent("Learning from failure story");
+    expect(recs[0]).toHaveTextContent("For Stripe – Backend Engineer");
+    expect(recs[1]).toHaveTextContent("Cut AWS spend 30% by rightsizing");
+    expect(recs[1]).toHaveTextContent("From 2 resumes · Impact");
+    // The old cards are gone.
+    expect(screen.queryByTestId("strova-suggests")).toBeNull();
+    expect(screen.queryByTestId("resume-ideas")).toBeNull();
   });
 
-  it("ST-3, ST-8: your stories list newest first with Draft, Ready or Proven, the skills and the coverage", async () => {
+  it("ST-3, ST-8, CS-5: drafts first, then Ready and Proven, with the skills and the coverage", async () => {
+    withRecommendations([], []);
     resetMockStories([PROVEN, DRAFT, READY]);
     renderAt("/stories");
     const rows = await screen.findAllByTestId("story-row");
@@ -117,18 +154,19 @@ describe("Career Stories (ST-9)", () => {
       expect.stringContaining("Checkout migration"),
       expect.stringContaining("Payments outage"),
     ]);
-    expect(rows[0]).toHaveTextContent("Conflict handling · 0 of 5 parts · you wrote itDraft");
+    expect(rows[0]).toHaveTextContent("Conflict handling · 0 of 5 parts · you wrote it");
+    expect(rows[0]).toHaveTextContent("Draft");
     expect(rows[1]).toHaveTextContent("Proven");
     expect(rows[2]).toHaveTextContent("Ready");
-    expect(within(rows[0]).getByRole("link")).toHaveAttribute("href", "/stories/s2");
-    expect(screen.getByText("1 Proven · 1 Ready · 1 Draft")).toBeInTheDocument();
-    const coverage = screen.getByRole("list", { name: "Skill coverage" });
-    expect(within(coverage).getByText("Ownership · covered")).toBeInTheDocument();
-    expect(within(coverage).getByText("Conflict handling · thin")).toBeInTheDocument();
-    expect(within(coverage).getByText("Communication · missing")).toBeInTheDocument();
+    expect(within(rows[0]).getByRole("link", { name: "Pushback from platform" })).toHaveAttribute("href", "/stories/s2");
+    const coverage = screen.getByRole("group", { name: "Skill coverage" });
+    expect(within(coverage).getByRole("button", { name: "Ownership: covered" })).toBeInTheDocument();
+    expect(within(coverage).getByRole("button", { name: "Conflict handling: thin" })).toBeInTheDocument();
+    expect(within(coverage).getByRole("button", { name: "Communication: missing" })).toBeInTheDocument();
   });
 
   it("ST-3: an empty library says what a story is, with the coach one click away", async () => {
+    withRecommendations([], []);
     resetMockStories([]);
     renderAt("/stories");
     const empty = await screen.findByTestId("stories-empty");
@@ -136,29 +174,188 @@ describe("Career Stories (ST-9)", () => {
     expect(within(empty).getByRole("link", { name: "Build my first story" })).toHaveAttribute("href", "/coach/new");
   });
 
-  it("ST-9: Strova suggests lists this user's suggestions for their stories, collapsed", async () => {
+  it("CS-5: with no stories yet, the recommendations show with a hint", async () => {
+    withRecommendations([IDEA], []);
+    resetMockStories([]);
     renderAt("/stories");
-    const box = await screen.findByTestId("strova-suggests");
-    expect(await within(box).findByText("4 for your stories")).toBeInTheDocument();
-    expect(within(box).getByRole("group", { name: "Tailor for Stripe" })).toBeInTheDocument();
-    expect(within(box).getByRole("link", { name: "Craft it with Strova" })).toHaveAttribute(
+    expect(await screen.findByText("Strova found these in your resume. Start with one.")).toBeInTheDocument();
+    expect(screen.getAllByTestId("recommended-row")).toHaveLength(1);
+  });
+
+  it("CS-6: the filter chips count and filter the list, and the choice is in the URL", async () => {
+    withRecommendations();
+    const user = userEvent.setup();
+    resetMockStories([PROVEN, DRAFT, mockStory({ ...READY, archived_at: "2026-10-30T10:00:00Z" })]);
+    renderAt("/stories");
+    await screen.findAllByTestId("recommended-row");
+    const show = screen.getByRole("group", { name: "Show" });
+    expect(within(show).getByRole("button", { name: "All 4" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(show).getByRole("button", { name: "Archived 1" })).toBeInTheDocument();
+    await user.click(within(show).getByRole("button", { name: "Recommended 2" }));
+    expect(screen.queryAllByTestId("story-row")).toHaveLength(0);
+    expect(screen.getAllByTestId("recommended-row")).toHaveLength(2);
+    expect(screen.getByTestId("where").textContent).toBe("/stories?show=recommended");
+    await user.click(within(show).getByRole("button", { name: "Archived 1" }));
+    expect(screen.getAllByTestId("story-row").map((r) => r.textContent)).toEqual([
+      expect.stringContaining("Payments outage"),
+    ]);
+    await user.click(within(show).getByRole("button", { name: "Drafts 1" }));
+    expect(screen.getAllByTestId("story-row")).toHaveLength(1);
+    expect(screen.queryAllByTestId("recommended-row")).toHaveLength(0);
+  });
+
+  it("CS-7: a coverage chip filters stories and recommendations to that skill; again clears it", async () => {
+    withRecommendations();
+    const user = userEvent.setup();
+    renderAt("/stories");
+    await screen.findAllByTestId("recommended-row");
+    const chip = screen.getByRole("button", { name: "Impact: covered" });
+    await user.click(chip);
+    expect(chip).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getAllByTestId("story-row").map((r) => r.textContent)).toEqual([
+      expect.stringContaining("Checkout migration"),
+    ]);
+    expect(screen.getAllByTestId("recommended-row").map((r) => r.textContent)).toEqual([
+      expect.stringContaining("Cut AWS spend"),
+    ]);
+    await user.click(chip);
+    expect(screen.getAllByTestId("story-row")).toHaveLength(2);
+  });
+
+  it("CS-9, CS-11: Start crafts or writes from the recommendation, prefilled", async () => {
+    withRecommendations();
+    renderAt("/stories");
+    const [gap, idea] = await screen.findAllByTestId("recommended-row");
+    expect(within(idea).getByRole("link", { name: "Start" })).toHaveAttribute(
       "href",
-      "/coach/new?skill=conflict_handling",
+      "/coach/new?resume=r2&idea=roles%5B0%5D.achievements%5B1%5D",
+    );
+    expect(within(idea).getByRole("menuitem", { name: /Write it yourself/ })).toHaveAttribute(
+      "href",
+      "/stories/new?skill=impact&idea=Cut+AWS+spend+30%25+by+rightsizing",
+    );
+    expect(within(gap).getByRole("link", { name: "Start" })).toHaveAttribute(
+      "href",
+      "/coach/new?skill=learning_from_failure&job=j1",
     );
   });
 
-  it("ST-13: Ask Strova answers from your stories, naming the story it leans on", async () => {
+  it("CS-3, CS-9: dismissing a resume idea sends it for that resume line", async () => {
+    let dismissed: unknown = null;
+    withRecommendations([IDEA], []);
+    server.use(
+      http.post("*/api/resumes/:id/story-ideas/dismiss", async ({ params, request }) => {
+        dismissed = { id: params.id, body: await request.json() };
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
     const user = userEvent.setup();
     renderAt("/stories");
-    await user.type(await screen.findByRole("textbox", { name: "Ask Strova" }), "Which story should I lead with?");
-    await user.click(screen.getByRole("button", { name: "Ask" }));
+    await user.click(await screen.findByRole("button", { name: `Dismiss: ${IDEA.achievement}` }));
+    await expect.poll(() => dismissed).toEqual({ id: "r2", body: { resume_line_ref: "roles[0].achievements[1]" } });
+  });
+
+  it("CS-10: a story's job tips show as a tag and open under the row", async () => {
+    withRecommendations([], []);
+    resetMockStories([TIPPED, DRAFT]);
+    const user = userEvent.setup();
+    renderAt("/stories");
+    const tag = await screen.findByRole("button", { name: "Tips: Stripe 1" });
+    await user.click(tag);
+    const tips = screen.getByRole("region", { name: "Tips for Checkout migration" });
+    expect(within(tips).getByRole("group", { name: "For Stripe" })).toHaveTextContent("Lead with the rollback plan");
+    expect(within(tips).getByRole("button", { name: "Add to notes" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tune 1" })).toBeInTheDocument();
+  });
+
+  it("CS-12: Rename in the row menu edits the title in place; Escape cancels, Enter saves", async () => {
+    withRecommendations([], []);
+    const user = userEvent.setup();
+    renderAt("/stories");
+    await pick(user, "Checkout migration", "Rename");
+    const field = screen.getByRole("textbox", { name: "Story name" });
+    expect(field).toHaveValue("Checkout migration");
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("textbox", { name: "Story name" })).toBeNull();
+    await pick(user, "Checkout migration", "Rename");
+    await user.clear(screen.getByRole("textbox", { name: "Story name" }));
+    await user.type(screen.getByRole("textbox", { name: "Story name" }), "Checkout cutover{Enter}");
+    expect(await screen.findByRole("link", { name: "Checkout cutover" })).toHaveAttribute("href", "/stories/s1");
+  });
+
+  it("CS-13, CS-14: Archive moves a story to Archived, out of the coverage; Unarchive brings it back", async () => {
+    withRecommendations([], []);
+    const user = userEvent.setup();
+    renderAt("/stories");
+    await pick(user, "Checkout migration", "Archive");
+    await expect.poll(() => screen.getAllByTestId("story-row").length).toBe(1);
+    expect(screen.getByRole("button", { name: "Ownership: missing" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Archived 1" }));
+    const row = screen.getByTestId("story-row");
+    expect(row).toHaveTextContent("Checkout migration");
+    expect(row).toHaveTextContent("Archived");
+    await pick(user, "Checkout migration", "Unarchive");
+    await expect.poll(() => screen.queryAllByTestId("story-row").length).toBe(0);
+    await user.click(screen.getByRole("button", { name: "All 2" }));
+    expect(screen.getAllByTestId("story-row")).toHaveLength(2);
+  });
+
+  it("CS-15, CS-17: Delete asks first, then hides the story with Undo; Restore is under Archived", async () => {
+    withRecommendations([], []);
+    const user = userEvent.setup();
+    const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValue(true);
+    renderAt("/stories");
+    await pick(user, "Pushback from platform", "Delete");
+    expect(confirm).toHaveBeenCalledWith('Delete "Pushback from platform"? You can undo this for 30 days.');
+    expect(screen.getAllByTestId("story-row")).toHaveLength(2); // cancelled
+    await pick(user, "Pushback from platform", "Delete");
+    const toast = await screen.findByRole("status");
+    expect(toast).toHaveTextContent('Deleted "Pushback from platform".');
+    await expect.poll(() => screen.getAllByTestId("story-row").length).toBe(1);
+    await user.click(within(toast).getByRole("button", { name: "Undo" }));
+    await expect.poll(() => screen.getAllByTestId("story-row").length).toBe(2);
+    // Delete again, then restore from Archived.
+    await pick(user, "Pushback from platform", "Delete");
+    await expect.poll(() => screen.getAllByTestId("story-row").length).toBe(1);
+    await user.click(screen.getByRole("button", { name: "Archived 0" }));
+    const deleted = screen.getByTestId("recently-deleted");
+    await user.click(within(deleted).getByText(/Recently deleted \(1\)/));
+    await user.click(within(deleted).getByRole("button", { name: "Restore" }));
+    await user.click(await screen.findByRole("button", { name: "All 2" }));
+    expect(screen.getAllByTestId("story-row")).toHaveLength(2);
+    confirm.mockRestore();
+  });
+
+  it("ST-13, D-5: Ask Strova opens in a side panel and answers from your stories", async () => {
+    withRecommendations([], []);
+    const user = userEvent.setup();
+    renderAt("/stories");
+    await user.click(await screen.findByRole("button", { name: "Ask Strova" }));
+    const panel = screen.getByRole("complementary", { name: "Ask Strova panel" });
+    await user.type(within(panel).getByRole("textbox", { name: "Ask Strova" }), "Which story should I lead with?");
+    await user.click(within(panel).getByRole("button", { name: "Ask" }));
     const answer = await screen.findByRole("region", { name: "Strova's answer" });
     expect(answer).toHaveTextContent("Lead with “Checkout migration”. Say the result first: Errors dropped 40 percent.");
     expect(within(answer).getByRole("link", { name: "Checkout migration" })).toHaveAttribute("href", "/stories/s1");
+    await user.click(screen.getByRole("button", { name: "Close Ask Strova" }));
+    expect(screen.queryByRole("complementary", { name: "Ask Strova panel" })).toBeNull();
   });
 });
 
 describe("Write it yourself (ST-10)", () => {
+  it("D-7, CS-9: from a recommended resume idea, the title, result and skills are prefilled", async () => {
+    const user = userEvent.setup();
+    renderAt("/stories/new?skill=impact&skill=ownership&idea=Cut+AWS+spend+30%25+by+rightsizing");
+    expect(screen.getByTestId("from-idea")).toHaveTextContent("From your resume: Cut AWS spend 30% by rightsizing.");
+    expect(screen.getByRole("textbox", { name: "Story title" })).toHaveValue("Cut AWS spend 30% by rightsizing");
+    await user.click(screen.getByRole("radio", { name: /Five free-text parts/ }));
+    expect(screen.getByRole("textbox", { name: /Result/ })).toHaveValue("Cut AWS spend 30% by rightsizing");
+    await user.click(screen.getByRole("button", { name: "Save as a Draft" }));
+    await expect.poll(() => screen.getByTestId("where").textContent).toBe("/stories");
+    const row = (await screen.findAllByTestId("story-row")).find((r) => r.textContent?.includes("Cut AWS spend"));
+    expect(row).toHaveTextContent("Impact, Ownership · 1 of 5 parts");
+  });
+
   it("ST-10: Save as a Draft saves the title and parts and goes back to Career Stories", async () => {
     const user = userEvent.setup();
     renderAt("/stories/new?skill=conflict_handling");

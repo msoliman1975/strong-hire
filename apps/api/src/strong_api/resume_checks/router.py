@@ -9,6 +9,14 @@ not dismissed, with the likely skills once the worker job has added them. POST
 
 GET /story-ideas/counts gives the open and used counts of every resume in one read, for the
 Resumes list (RSD-16), with the same rules as the per-resume list.
+
+GET /stories/recommendations is the Recommended rows of Career Stories (CS-5): the resume ideas
+pooled across every resume (CS-1 to CS-4) and the open missing-skill suggestions of the user's
+target roles (CS-11). It lives here, not in the stories router, because the stories router's
+/stories/{id} would catch the path.
+
+All of them use the pool (strong_api.resume_checks.pool): an achievement used, quoted or
+dismissed on one resume version is used or dismissed on every version (CS-3).
 """
 
 from __future__ import annotations
@@ -23,6 +31,7 @@ from sqlalchemy import select
 
 from strong_api.inputs.deps import Db, Me
 from strong_api.resume_checks.checks import ResumeIssue, check_resume
+from strong_api.resume_checks.pool import IdeaPool, build_pool
 from strong_api.resume_checks.story_ideas import (
     Achievement,
     achievements,
@@ -36,6 +45,7 @@ from strong_core.db.models import Suggestion as SuggestionRow
 from strong_core.schemas import (
     Competency,
     JobPosting,
+    MissingSkillPayload,
     Resume,
     StoryIdeaPayload,
     StoryPart,
@@ -160,79 +170,160 @@ async def resume_issues(
     )
 
 
-def _story_texts(story: Story) -> str:
-    return normalize(
-        " ".join(
-            p or ""
-            for p in (story.context, story.stakes, story.action, story.result, story.reflection)
-        )
-    )
-
-
-async def _ideas_for(
-    db: Db, me: Me, row: ResumeRow, resume: Resume, stories: list[Story]
-) -> StoryIdeasOut:
-    """RM-4: one idea per achievement no story uses, not dismissed, with likely skills."""
-    suggestions = {
-        normalize(str(s.payload.get("achievement", ""))): s
-        for s in await db.scalars(
-            select(SuggestionRow).where(
-                SuggestionRow.org_id == me.org_id,
-                SuggestionRow.user_id == me.user_id,
-                SuggestionRow.source_resume_id == row.id,
-                SuggestionRow.kind == SuggestionKind.STORY_IDEA,
-            )
-        )
-    }
-    by_id = {s.id: s for s in stories}
-    texts = [(s, _story_texts(s)) for s in stories]
+def _ideas_for(pool: IdeaPool, row: ResumeRow, resume: Resume) -> StoryIdeasOut:
+    """RM-4: one idea per achievement no story uses, not dismissed, with likely skills. CS-3:
+    used and dismissed are judged across every resume version."""
     ideas: list[StoryIdeaOut] = []
     used: list[UsedAchievement] = []
+    pending = False
     for item in achievements(resume):
-        key = normalize(item.text)
-        suggestion = suggestions.get(key)
-        # Used: a story crafted from this idea, or a story whose parts quote the line.
-        story = by_id.get(suggestion.story_id) if suggestion and suggestion.story_id else None
-        story = story or next((s for s, t in texts if key and key in t), None)
-        if story is not None:
+        group = pool.group_of(row.id, item.ref)
+        if group is None:
+            continue
+        if group.story is not None:
             used.append(
                 UsedAchievement(
                     achievement=item.text,
                     resume_line_ref=item.ref,
-                    story_id=story.id,
-                    story_title=story.title,
+                    story_id=group.story.id,
+                    story_title=group.story.title,
                 )
             )
             continue
-        if suggestion is not None and suggestion.status == SuggestionStatus.DISMISSED:
+        if group.dismissed:
             continue
-        skills = StoryIdeaPayload.model_validate(suggestion.payload).skills if suggestion else []
+        pending = pending or any(
+            line.suggestion is None for line in group.lines if line.resume_id == row.id
+        )
         ideas.append(
             StoryIdeaOut(
                 achievement=item.text,
                 role=item.role,
                 resume_line_ref=item.ref,
-                skills=skills,
+                skills=group.skills,
                 missing_parts=missing_parts(item.text),
             )
         )
-    pending = any(normalize(i.achievement) not in suggestions for i in ideas)
     return StoryIdeasOut(ideas=ideas, used=used, skills="pending" if pending else "ready")
 
 
-async def _stories(db: Db, me: Me) -> list[Story]:
-    return list(
-        await db.scalars(
-            select(Story).where(Story.org_id == me.org_id, Story.user_id == me.user_id)
+async def _pool(db: Db, me: Me) -> IdeaPool:
+    """CS-1: every readable resume of the user, every story_idea suggestion (deleted resumes
+    too) and every story that is not deleted (an archived story still tells its idea)."""
+    resumes = await db.scalars(
+        select(ResumeRow).where(
+            ResumeRow.org_id == me.org_id,
+            ResumeRow.user_id == me.user_id,
+            ResumeRow.deleted_at.is_(None),
+            ResumeRow.parsed_json.is_not(None),
         )
     )
+    suggestions = await db.scalars(
+        select(SuggestionRow).where(
+            SuggestionRow.org_id == me.org_id,
+            SuggestionRow.user_id == me.user_id,
+            SuggestionRow.kind == SuggestionKind.STORY_IDEA,
+        )
+    )
+    stories = await db.scalars(
+        select(Story).where(Story.org_id == me.org_id, Story.user_id == me.user_id, Story.live())
+    )
+    return build_pool(list(resumes), list(suggestions), list(stories))
 
 
 @router.get("/resumes/{resume_id}/story-ideas")
 async def story_ideas(resume_id: uuid.UUID, db: Db, me: Me) -> StoryIdeasOut:
     """RM-4: one idea per achievement no story uses, not dismissed, with likely skills."""
     row, resume = await _read_resume(db, me, resume_id)
-    return await _ideas_for(db, me, row, resume, await _stories(db, me))
+    return _ideas_for(await _pool(db, me), row, resume)
+
+
+class RecommendedIdea(BaseModel):
+    """CS-1, CS-4: one resume achievement, however many resumes it is on."""
+
+    kind: Literal["resume_idea"] = "resume_idea"
+    achievement: str = Field(description="The line as the newest resume words it.")
+    role: str
+    resume_id: uuid.UUID = Field(description="The newest resume with the line: Start uses it.")
+    resume_line_ref: str
+    resumes: int = Field(ge=1, description="How many resumes have the line (From 2 resumes).")
+    skills: list[Competency]
+    missing_parts: list[StoryPart]
+
+
+class RecommendedSkill(BaseModel):
+    """CS-11: a skill one of the user's target roles tests that no story covers."""
+
+    kind: Literal["missing_skill"] = "missing_skill"
+    suggestion_id: uuid.UUID
+    competency: Competency
+    job_target_id: uuid.UUID
+    company: str | None
+    job_title: str | None
+    reason: str
+
+
+class StoryRecommendations(BaseModel):
+    """CS-5: the Recommended rows of Career Stories."""
+
+    skills: list[RecommendedSkill] = Field(description="Job gaps first (CS-5 sort order).")
+    ideas: list[RecommendedIdea] = Field(description="Newest resume first, in resume order.")
+
+
+@router.get("/stories/recommendations")
+async def story_recommendations(db: Db, me: Me) -> StoryRecommendations:
+    """CS-1 to CS-5, CS-11: the stories Strova recommends writing, without duplicates."""
+    pool = await _pool(db, me)
+    ideas = [
+        RecommendedIdea(
+            achievement=g.newest.item.text,
+            role=g.newest.item.role,
+            resume_id=g.newest.resume_id,
+            resume_line_ref=g.newest.item.ref,
+            resumes=len(g.resume_ids),
+            skills=g.skills,
+            missing_parts=missing_parts(g.newest.item.text),
+        )
+        for g in pool.groups
+        if g.lines and g.story is None and not g.dismissed
+    ]
+    rows = await db.execute(
+        select(SuggestionRow, JobTarget)
+        .join(JobTarget, JobTarget.id == SuggestionRow.job_target_id)
+        .where(
+            SuggestionRow.org_id == me.org_id,
+            SuggestionRow.user_id == me.user_id,
+            SuggestionRow.kind == SuggestionKind.MISSING_SKILL,
+            SuggestionRow.status == SuggestionStatus.OPEN,
+            JobTarget.deleted_at.is_(None),
+            JobTarget.archived_at.is_(None),
+        )
+        .order_by(SuggestionRow.created_at.desc(), SuggestionRow.id)
+    )
+    skills: list[RecommendedSkill] = []
+    seen: set[tuple[Competency, uuid.UUID]] = set()
+    for suggestion, target in rows.tuples():
+        payload = MissingSkillPayload.model_validate(suggestion.payload)
+        key = (payload.competency, target.id)
+        if key in seen:
+            continue
+        seen.add(key)
+        posting = (
+            JobPosting.model_validate(target.parsed_json)
+            if target.parsed_json is not None
+            else None
+        )
+        skills.append(
+            RecommendedSkill(
+                suggestion_id=suggestion.id,
+                competency=payload.competency,
+                job_target_id=target.id,
+                company=posting.company_name if posting else None,
+                job_title=posting.title if posting else target.name,
+                reason=suggestion.reason,
+            )
+        )
+    return StoryRecommendations(skills=skills, ideas=ideas)
 
 
 class StoryIdeaCount(BaseModel):
@@ -256,10 +347,10 @@ async def story_idea_counts(db: Db, me: Me) -> list[StoryIdeaCount]:
             )
         )
     )
-    stories = await _stories(db, me)
+    pool = await _pool(db, me)
     out: list[StoryIdeaCount] = []
     for row in rows:
-        found = await _ideas_for(db, me, row, Resume.model_validate(row.parsed_json), stories)
+        found = _ideas_for(pool, row, Resume.model_validate(row.parsed_json))
         out.append(StoryIdeaCount(resume_id=row.id, ideas=len(found.ideas), used=len(found.used)))
     return out
 

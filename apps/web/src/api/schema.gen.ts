@@ -339,6 +339,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stories/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Story Recommendations
+         * @description CS-1 to CS-5, CS-11: the stories Strova recommends writing, without duplicates.
+         */
+        get: operations["story_recommendations_stories_recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/story-ideas/counts": {
         parameters: {
             query?: never;
@@ -969,7 +989,8 @@ export interface paths {
         };
         /**
          * List Stories
-         * @description ST-1: the user's stories, newest first.
+         * @description ST-1: the user's stories, newest first. CS-6: archived and deleted stories only when
+         *     asked for with `include`; a deleted story is listed only while it can be restored.
          */
         get: operations["list_stories_stories_get"];
         put?: never;
@@ -1024,7 +1045,9 @@ export interface paths {
         post?: never;
         /**
          * Delete Story
-         * @description ST-1: delete a story and its notes. Debriefs that used it keep their scores.
+         * @description ST-1, CS-15: delete a story. It is hidden at once and restorable for 30 days; the purge
+         *     job then removes it with its notes and takes (CS-16). Debriefs that used it keep their
+         *     scores.
          */
         delete: operations["delete_story_stories__story_id__delete"];
         options?: never;
@@ -1035,6 +1058,67 @@ export interface paths {
          *     change; a part sent as null or blank is cleared.
          */
         patch: operations["edit_story_stories__story_id__patch"];
+        trace?: never;
+    };
+    "/stories/{story_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore Story
+         * @description CS-15: undo a delete. After 30 days the story is gone (404).
+         */
+        post: operations["restore_story_stories__story_id__restore_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Archive Story
+         * @description CS-13: archive a story. CS-14: it leaves skill coverage, story-fit, Ask Strova and
+         *     Strova's picks, and keeps its takes, scores and Proven status.
+         */
+        post: operations["archive_story_stories__story_id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/unarchive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unarchive Story
+         * @description CS-13: bring an archived story back into the list and into prep.
+         */
+        post: operations["unarchive_story_stories__story_id__unarchive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/stories/{story_id}/notes": {
@@ -9491,6 +9575,71 @@ export interface components {
          * @enum {string}
          */
         ReadinessStatus: "scored" | "not_enough_data";
+        /**
+         * RecommendedIdea
+         * @description CS-1, CS-4: one resume achievement, however many resumes it is on.
+         */
+        RecommendedIdea: {
+            /**
+             * Kind
+             * @default resume_idea
+             * @constant
+             */
+            kind: "resume_idea";
+            /**
+             * Achievement
+             * @description The line as the newest resume words it.
+             */
+            achievement: string;
+            /** Role */
+            role: string;
+            /**
+             * Resume Id
+             * Format: uuid
+             * @description The newest resume with the line: Start uses it.
+             */
+            resume_id: string;
+            /** Resume Line Ref */
+            resume_line_ref: string;
+            /**
+             * Resumes
+             * @description How many resumes have the line (From 2 resumes).
+             */
+            resumes: number;
+            /** Skills */
+            skills: components["schemas"]["Competency"][];
+            /** Missing Parts */
+            missing_parts: components["schemas"]["StoryPart"][];
+        };
+        /**
+         * RecommendedSkill
+         * @description CS-11: a skill one of the user's target roles tests that no story covers.
+         */
+        RecommendedSkill: {
+            /**
+             * Kind
+             * @default missing_skill
+             * @constant
+             */
+            kind: "missing_skill";
+            /**
+             * Suggestion Id
+             * Format: uuid
+             */
+            suggestion_id: string;
+            competency: components["schemas"]["Competency"];
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /** Company */
+            company: string | null;
+            /** Job Title */
+            job_title: string | null;
+            /** Reason */
+            reason: string;
+        };
         /** RedirectOut */
         RedirectOut: {
             /** Url */
@@ -11856,6 +12005,22 @@ export interface components {
             /** Skills */
             skills?: components["schemas"]["Competency"][] | null;
         };
+        /**
+         * StoryRecommendations
+         * @description CS-5: the Recommended rows of Career Stories.
+         */
+        StoryRecommendations: {
+            /**
+             * Skills
+             * @description Job gaps first (CS-5 sort order).
+             */
+            skills: components["schemas"]["RecommendedSkill"][];
+            /**
+             * Ideas
+             * @description Newest resume first, in resume order.
+             */
+            ideas: components["schemas"]["RecommendedIdea"][];
+        };
         /** StoryRef */
         StoryRef: {
             /**
@@ -13278,6 +13443,26 @@ export interface operations {
             };
         };
     };
+    story_recommendations_stories_recommendations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryRecommendations"];
+                };
+            };
+        };
+    };
     story_idea_counts_story_ideas_counts_get: {
         parameters: {
             query?: never;
@@ -14576,6 +14761,8 @@ export interface operations {
                 status?: components["schemas"]["StoryStatus"] | null;
                 /** @description Only stories with this tag. */
                 skill?: components["schemas"]["Competency"] | null;
+                /** @description CS-6: also list archived stories, or deleted ones (restorable). */
+                include?: ("archived" | "deleted")[] | null;
             };
             header?: never;
             path?: never;
@@ -14755,6 +14942,99 @@ export interface operations {
                 "application/json": components["schemas"]["StoryPatch"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_story_stories__story_id__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    archive_story_stories__story_id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unarchive_story_stories__story_id__unarchive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

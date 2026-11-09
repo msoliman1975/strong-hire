@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Stories mockup</title>
+<style>
+:root{--bg:#f7f6f3;--card:#fff;--ink:#1d1b26;--muted:#6b6878;--line:#e6e3ec;--v:#6b4fd8;--vbg:#efeafd;--ok:#1f7a4d;--okbg:#e3f4ea;--warn:#a26200;--warnbg:#fdf0db;--bad:#b42828;--badbg:#fbe5e5;--teal:#0f7173;--tealbg:#ddf1f1}
+@media (prefers-color-scheme:dark){:root{--bg:#15141a;--card:#1f1d26;--ink:#ece9f4;--muted:#a19dae;--line:#33303d;--vbg:#2c2545;--okbg:#173327;--warnbg:#3a2c12;--badbg:#3d1c1c;--tealbg:#123333;--v:#a993ff;--ok:#6fd39f;--warn:#f0b35a;--bad:#f08a8a;--teal:#6fd0d2}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.page{max-width:920px;margin:0 auto;padding:24px 16px 80px}
+.note{font-size:12px;color:var(--muted);border:1px dashed var(--line);padding:8px 10px;border-radius:8px;margin-bottom:18px}
+header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0;font-size:22px}
+.sub{color:var(--muted);margin:2px 0 0}
+.actions{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;font:inherit;cursor:pointer}
+.btn.pri{background:var(--v);border-color:var(--v);color:#fff}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn.q{border-color:transparent;background:transparent;color:var(--muted)}
+.split{position:relative;display:inline-flex}
+.split .btn:first-child{border-top-right-radius:0;border-bottom-right-radius:0}
+.split .btn.caret{border-top-left-radius:0;border-bottom-left-radius:0;border-left:1px solid rgba(255,255,255,.35);padding-left:8px;padding-right:8px}
+.menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:250px;z-index:5;padding:6px;display:none}
+.menu.open{display:block}
+.menu button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:8px 10px;border-radius:7px;font:inherit;cursor:pointer}
+.menu button:hover{background:var(--vbg)}
+.menu small{display:block;color:var(--muted)}
+.menu .danger{color:var(--bad)}
+.bar{margin:18px 0 8px;display:flex;flex-direction:column;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;background:var(--card);color:var(--ink);cursor:pointer;font-family:inherit}
+.chip.ok{background:var(--okbg);color:var(--ok);border-color:transparent}
+.chip.warn{background:var(--warnbg);color:var(--warn);border-color:transparent}
+.chip.bad{background:var(--badbg);color:var(--bad);border-color:transparent}
+.chip.on{outline:2px solid var(--v);outline-offset:1px}
+.filters .chip.on{background:var(--ink);color:var(--bg);outline:0}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:4px;align-self:center}
+.list{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:visible}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;border-top:1px solid var(--line);position:relative;align-items:center}
+.row:first-child{border-top:0}
+.row.rec{border-left:3px dashed var(--v);background:linear-gradient(90deg,var(--vbg),transparent 40%)}
+.row.arch .t{color:var(--muted)}
+.t{font-weight:600}
+.t a{color:inherit;text-decoration:none}
+.meta{color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:2px}
+.right{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.st{font-size:12px;border-radius:999px;padding:2px 9px;background:var(--line)}
+.st.ready{background:var(--vbg);color:var(--v)}
+.st.proven{background:var(--okbg);color:var(--ok)}
+.st.rec{background:transparent;border:1px dashed var(--v);color:var(--v)}
+.tag{font-size:12px;border-radius:6px;padding:2px 7px;background:var(--tealbg);color:var(--teal);border:0;cursor:pointer;font-family:inherit}
+.tag.job{background:var(--warnbg);color:var(--warn);cursor:default}
+.tips{grid-column:1/-1;display:none;border-top:1px dashed var(--line);padding-top:10px;margin-top:4px}
+.tips.open{display:block}
+.tip{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:6px 0;flex-wrap:wrap}
+.tip b{font-size:12px;color:var(--teal);margin-right:6px}
+.rename{font:inherit;font-weight:600;border:1px solid var(--v);border-radius:6px;padding:3px 6px;width:min(360px,100%);background:var(--card);color:var(--ink)}
+.empty{padding:24px 14px;color:var(--muted);text-align:center}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;display:none;gap:12px;align-items:center}
+.toast.show{display:flex}
+.toast button{background:none;border:0;color:var(--v);font:inherit;font-weight:600;cursor:pointer;filter:brightness(1.6)}
+.panel{position:fixed;top:0;right:0;height:100%;width:min(380px,100%);background:var(--card);border-left:1px solid var(--line);padding:18px;transform:translateX(100%);transition:transform .2s;z-index:10}
+.panel.open{transform:none}
+.panel input{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink);margin:10px 0}
+.deleted{margin-top:10px;font-size:12.5px;color:var(--muted)}
+@media (max-width:620px){.row{grid-template-columns:1fr}.right{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="note">Mockup for review (docs/stories-redesign/spec.md). Clickable: filters, coverage chips, <b>+ New story ▾</b>, <b>Start ▾</b>, the <b>⋯</b> menu (rename, archive, delete), tip tags, Ask Strova.</div>
+
+  <header>
+    <div>
+      <h1>Career stories</h1>
+      <p class="sub">The moments you'll tell in "tell me about a time…" questions.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="askBtn">Ask Strova</button>
+      <div class="split">
+        <button class="btn pri" data-go="Craft with Strova">+ New story</button>
+        <button class="btn pri caret" data-menu="newMenu" aria-label="More ways to start">▾</button>
+        <div class="menu" id="newMenu">
+          <button data-go="Craft with Strova">Craft with Strova<small>Strova asks, you answer. Talk or type.</small></button>
+          <button data-go="Write it yourself">Write it yourself<small>Write or paste the five parts. Strova can review after.</small></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="chips" id="coverage"><span class="lbl">Coverage</span></div>
+    <div class="chips filters" id="filters"></div>
+  </div>
+
+  <div class="list" id="list"></div>
+  <div class="deleted" id="deletedNote"></div>
+</div>
+
+<div class="panel" id="panel">
+  <div style="display:flex;justify-content:space-between;align-items:center"><b>Ask Strova</b><button class="btn q" id="closePanel">✕</button></div>
+  <p class="sub">Answers come from your own stories and target roles.</p>
+  <input placeholder="Which story should I use for leadership at Stripe?">
+  <button class="btn pri sm">Ask</button>
+</div>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="undo">Undo</button></div>
+
+<script>
+const SK={ownership:"Ownership",impact:"Impact",collaboration:"Collaboration",conflict_handling:"Conflict",learning_from_failure:"Failure",communication:"Communication"};
+let items=[
+ {id:1,kind:"story",title:"Led the payments migration",skills:["ownership","impact"],status:"ready",tips:[{co:"Stripe",text:"Stress the cross-team rollout: the role asks for stakeholder alignment."}]},
+ {id:2,kind:"story",title:"Reworked the on-call rotation",skills:["collaboration"],status:"draft",parts:3,tips:[{co:"Shopify",text:"Say how many pages per week dropped."},{co:"Shopify",text:"Name the two teams you negotiated with."}]},
+ {id:3,kind:"story",title:"Redesigned the hiring loop",skills:["conflict_handling","communication"],status:"proven",tips:[]},
+ {id:4,kind:"story",title:"Shipped search v2 late",skills:["learning_from_failure"],status:"draft",parts:2,tips:[],manual:true},
+ {id:5,kind:"story",title:"Old internship story",skills:["impact"],status:"ready",tips:[],archived:"Oct 12"},
+ {id:6,kind:"rec",title:"Reduced AWS spend 30% via rightsizing",skills:["impact","ownership"],from:"From 2 resumes"},
+ {id:7,kind:"rec",title:"Mentored 4 junior engineers to promotion",skills:["communication"],from:"From your resume"},
+ {id:8,kind:"rec",title:"Conflict story",skills:["conflict_handling"],from:"For Stripe – Product Manager",job:true},
+ {id:9,kind:"rec",title:"Failure story",skills:["learning_from_failure"],from:"For Shopify – Eng Manager",job:true},
+];
+let filter="all",skill=null,deleted=[],lastDeleted=null;
+const FILTERS=[["all","All"],["draft","Drafts"],["ready","Ready"],["proven","Proven"],["rec","Recommended"],["archived","Archived"]];
+const live=()=>items.filter(i=>!deleted.includes(i.id));
+function match(i,f){if(f==="all")return !i.archived;if(f==="archived")return !!i.archived;if(f==="rec")return i.kind==="rec";return i.kind==="story"&&!i.archived&&i.status===f}
+function coverage(){const st=live().filter(i=>i.kind==="story"&&!i.archived);return Object.keys(SK).map(k=>{const w=st.filter(s=>s.skills.includes(k));return[k,w.some(s=>s.status!=="draft")?"ok":w.length?"warn":"bad"]})}
+function rank(i){if(i.kind==="rec")return i.job?4:5;if(i.status==="draft")return i.tips.length?0:1;return i.status==="ready"?2:3}
+function startMenu(id){return `<div class="split"><button class="btn sm pri" data-go="Craft with Strova">Start</button><button class="btn sm pri caret" data-menu="m${id}">▾</button><div class="menu" id="m${id}"><button data-go="Craft with Strova">Craft with Strova<small>Prefilled from this idea</small></button><button data-go="Write it yourself">Write it yourself<small>Result prefilled, skills preselected</small></button></div></div>`}
+function moreMenu(i){return `<div class="split"><button class="btn sm q" data-menu="x${i.id}" aria-label="More">⋯</button><div class="menu" id="x${i.id}">${i.archived?`<button data-act="unarchive" data-id="${i.id}">Unarchive</button>`:`<button data-act="rename" data-id="${i.id}">Rename</button><button data-act="archive" data-id="${i.id}">Archive<small>Hidden, and left out of coverage and interview prep</small></button>`}<button class="danger" data-act="delete" data-id="${i.id}">Delete<small>You can undo for 30 days</small></button></div></div>`}
+function tipTags(i){const by={};i.tips.forEach(t=>by[t.co]=(by[t.co]||0)+1);return Object.entries(by).map(([c,n])=>`<button class="tag" data-tips="${i.id}">Tips: ${c} ${n}</button>`).join("")}
+function render(){
+ const cov=document.getElementById("coverage");cov.innerHTML='<span class="lbl">Coverage</span>'+coverage().map(([k,c])=>`<button class="chip ${c} ${skill===k?"on":""}" data-skill="${k}">${SK[k]} ${c==="ok"?"✓":c==="warn"?"~":"✕"}</button>`).join("");
+ document.getElementById("filters").innerHTML=FILTERS.map(([k,l])=>`<button class="chip ${filter===k?"on":""}" data-filter="${k}">${l} ${live().filter(i=>match(i,k)).length}</button>`).join("");
+ const rows=live().filter(i=>match(i,filter)&&(!skill||i.skills.includes(skill))).sort((a,b)=>rank(a)-rank(b));
+ const L=document.getElementById("list");
+ if(!rows.length){L.innerHTML=`<div class="empty">No ${FILTERS.find(f=>f[0]===filter)[1].toLowerCase()} stories${skill?" for "+SK[skill]:""}. <a href="#" data-filter="all">Show all</a></div>`}
+ else L.innerHTML=rows.map(i=>{
+  const sk=i.skills.map(s=>SK[s]).join(", ");
+  if(i.kind==="rec")return `<div class="row rec"><div><div class="t">${i.title}</div><div class="meta">${i.job?`<span class="tag job">${i.from}</span>`:i.from} · ${sk}</div></div><div class="right"><span class="st rec">Recommended</span>${startMenu(i.id)}<button class="btn sm q" data-act="dismiss" data-id="${i.id}" title="Dismiss for every resume">✕</button></div></div>`;
+  const meta=[sk,i.status==="draft"?`${i.parts} of 5 parts`:"",i.manual?"you wrote it":"",i.archived?`Archived ${i.archived}`:""].filter(Boolean).join(" · ");
+  return `<div class="row ${i.archived?"arch":""}"><div><div class="t" id="t${i.id}"><a href="#">${i.title}</a></div><div class="meta">${meta}</div></div><div class="right">${i.archived?"":tipTags(i)}<span class="st ${i.status}">${i.status==="proven"?"✦ Proven":i.status[0].toUpperCase()+i.status.slice(1)}</span>${moreMenu(i)}</div><div class="tips" id="tips${i.id}">${i.tips.map((t,n)=>`<div class="tip"><span><b>For ${t.co}</b>${t.text}</span><span><button class="btn sm">Add to notes</button> <button class="btn sm q" data-act="tipx" data-id="${i.id}" data-n="${n}">Dismiss</button></span></div>`).join("")}</div></div>`}).join("");
+ document.getElementById("deletedNote").innerHTML=filter==="archived"&&deleted.length?`Recently deleted (${deleted.length}) · restorable for 30 days`:"";
+}
+function toast(msg,undo){const t=document.getElementById("toast");document.getElementById("toastMsg").textContent=msg;document.getElementById("undo").style.display=undo?"":"none";t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),6000)}
+document.addEventListener("click",e=>{
+ const el=e.target.closest("button,a");
+ const openMenu=el&&el.dataset.menu;
+ document.querySelectorAll(".menu.open").forEach(m=>{if(m.id!==openMenu)m.classList.remove("open")});
+ if(!el)return;
+ if(el.tagName==="A"&&!el.dataset.filter){e.preventDefault();return}
+ const d=el.dataset;
+ if(d.menu){document.getElementById(d.menu).classList.toggle("open");return}
+ if(d.filter){e.preventDefault();filter=d.filter;render();return}
+ if(d.skill){skill=skill===d.skill?null:d.skill;if(filter==="archived")filter="all";render();return}
+ if(d.go){toast(`Opens the "${d.go}" authoring screen`);return}
+ if(d.tips){document.getElementById("tips"+d.tips).classList.toggle("open");return}
+ const it=items.find(i=>i.id==d.id);
+ switch(d.act){
+  case "rename":{const t=document.getElementById("t"+it.id);t.innerHTML=`<input class="rename" value="${it.title}">`;const inp=t.querySelector("input");inp.focus();inp.select();
+    inp.onkeydown=k=>{if(k.key==="Enter"&&inp.value.trim()){it.title=inp.value.trim();render();toast("Renamed")}if(k.key==="Escape")render()};inp.onblur=()=>render();break}
+  case "archive":it.archived="today";render();toast(`Archived "${it.title}"`);break;
+  case "unarchive":it.archived=null;render();toast(`Unarchived "${it.title}"`);break;
+  case "delete":if(confirm(`Delete "${it.title}"? You can undo this for 30 days.`)){deleted.push(it.id);lastDeleted=it.id;render();toast(`Deleted "${it.title}".`,true)}break;
+  case "dismiss":items=items.filter(i=>i!==it);render();toast("Dismissed for every resume");break;
+  case "tipx":it.tips.splice(+d.n,1);render();break;
+ }
+});
+document.getElementById("undo").onclick=()=>{deleted=deleted.filter(x=>x!==lastDeleted);render();document.getElementById("toast").classList.remove("show")};
+document.getElementById("askBtn").onclick=()=>document.getElementById("panel").classList.add("open");
+document.getElementById("closePanel").onclick=()=>document.getElementById("panel").classList.remove("open");
+render();
+</script>
+</body>
+</html>
