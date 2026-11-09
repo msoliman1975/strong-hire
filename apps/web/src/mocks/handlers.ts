@@ -19,7 +19,11 @@ import { delay } from "msw";
 import { http, HttpResponse } from "msw/http";
 
 import type { SessionFeedbackIn } from "../api/feedback";
-import type { CreateSessionRequest, SessionRecord, VoiceJoin } from "../api/sessions";
+import type {
+  CreateSessionRequest,
+  SessionRecord,
+  VoiceJoin,
+} from "../api/sessions";
 import { MOCK_VOICE_URL } from "../session/voice";
 import type {
   AuthState,
@@ -59,11 +63,19 @@ import {
   customScorecard,
   mockCustomRecommendation,
 } from "./custom";
-import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
+import {
+  gapAnalysis,
+  jobPosting,
+  resume,
+  scorecardFor,
+  sessionPlan,
+} from "./fixtures";
 import { mockAnswersAtBar, mockPreviousSignal } from "./debrief";
 
 /** CU-1: fill the defaults the API adds to a Custom setup. */
-function withCustomDefaults(custom: CreateSessionRequest["config"]["custom"]): SessionRecord["config"]["custom"] {
+function withCustomDefaults(
+  custom: CreateSessionRequest["config"]["custom"],
+): SessionRecord["config"]["custom"] {
   if (!custom) return null;
   return {
     categories: custom.categories.map((c) => ({ ...c, focus: c.focus ?? [] })),
@@ -83,14 +95,18 @@ function notFound(what: string) {
 }
 
 /** Drops the mock-only `readyAt` field before a record goes over the wire. */
-function publicView<T extends { readyAt: number }>(record: T): Omit<T, "readyAt"> {
+function publicView<T extends { readyAt: number }>(
+  record: T,
+): Omit<T, "readyAt"> {
   const copy: Partial<T> = { ...record };
   delete copy.readyAt;
   return copy as Omit<T, "readyAt">;
 }
 
 /** The API's OC-1 to OC-3 refusal (strong_api.controls). */
-function paused(code: "signups_paused" | "sessions_paused" | "spend_cap_reached") {
+function paused(
+  code: "signups_paused" | "sessions_paused" | "spend_cap_reached",
+) {
   const message =
     code === "signups_paused"
       ? "We are not taking new sign-ups right now. Write to support@getstronghire.com to join the waitlist, and we will email you when we open again."
@@ -110,10 +126,20 @@ const mockUnconfirmed = new Set<string>();
 export function authHandlers(store: MockStore) {
   const state = (): AuthState => {
     const { auth, users } = store.db;
-    if (auth.status === "signed_in" && auth.userEmail && users[auth.userEmail] && !mockUnconfirmed.has(auth.userEmail)) {
-      return { status: "signed_in", email: auth.userEmail, user: users[auth.userEmail] };
+    if (
+      auth.status === "signed_in" &&
+      auth.userEmail &&
+      users[auth.userEmail] &&
+      !mockUnconfirmed.has(auth.userEmail)
+    ) {
+      return {
+        status: "signed_in",
+        email: auth.userEmail,
+        user: users[auth.userEmail],
+      };
     }
-    if (auth.status === "needs_signup") return { status: "needs_signup", email: auth.email, user: null };
+    if (auth.status === "needs_signup")
+      return { status: "needs_signup", email: auth.email, user: null };
     return { status: "signed_out", email: null, user: null };
   };
 
@@ -129,7 +155,14 @@ export function authHandlers(store: MockStore) {
 
   return [
     http.get(`${API}/status`, () => HttpResponse.json(store.db.siteStatus)),
-    http.get(`${API}/auth/providers`, () => HttpResponse.json({ google: false, email: true, password: true, dev: true })),
+    http.get(`${API}/auth/providers`, () =>
+      HttpResponse.json({
+        google: false,
+        email: true,
+        password: true,
+        dev: true,
+      }),
+    ),
     http.get(`${API}/auth/me`, () => HttpResponse.json(state())),
     http.post(`${API}/auth/dev-login`, async ({ request }) => {
       const body = (await request.json()) as { email?: string };
@@ -138,7 +171,10 @@ export function authHandlers(store: MockStore) {
     http.post(`${API}/auth/magic-link`, async ({ request }) => {
       const body = (await request.json()) as { email?: string };
       if (!body.email || !body.email.includes("@")) {
-        return HttpResponse.json({ detail: [{ msg: "value is not a valid email address" }] }, { status: 422 });
+        return HttpResponse.json(
+          { detail: [{ msg: "value is not a valid email address" }] },
+          { status: 422 },
+        );
       }
       return HttpResponse.json({ sent: true, dev_link: null }, { status: 202 });
     }),
@@ -150,8 +186,16 @@ export function authHandlers(store: MockStore) {
       };
       const { auth } = store.db;
       if (auth.status !== "needs_signup" || !auth.email) return unauthorized();
-      if (!body.age_confirmed) return HttpResponse.json({ detail: "You must be 18 or older" }, { status: 422 });
-      if (!body.terms_accepted) return HttpResponse.json({ detail: "Accept the terms first" }, { status: 422 });
+      if (!body.age_confirmed)
+        return HttpResponse.json(
+          { detail: "You must be 18 or older" },
+          { status: 422 },
+        );
+      if (!body.terms_accepted)
+        return HttpResponse.json(
+          { detail: "Accept the terms first" },
+          { status: 422 },
+        );
       if (!store.db.siteStatus.signups_open) return paused("signups_paused");
       store.db.users[auth.email] = {
         id: newId(),
@@ -162,20 +206,37 @@ export function authHandlers(store: MockStore) {
         created_at: new Date().toISOString(),
         full_name: null,
         profile_complete: false,
+        tracing_consent: false,
+        tracing_consent_available: false,
       };
-      store.db.auth = { status: "signed_in", email: auth.email, userEmail: auth.email };
+      store.db.auth = {
+        status: "signed_in",
+        email: auth.email,
+        userEmail: auth.email,
+      };
       store.save();
       return HttpResponse.json(state());
     }),
     // AC-4, AC-5. Sign-up does not sign in: it answers confirm_email until the link is opened.
     // The mock keeps passwords in memory only.
     http.post(`${API}/auth/password/signup`, async ({ request }) => {
-      const body = (await request.json()) as { email: string; password: string; full_name?: string | null };
+      const body = (await request.json()) as {
+        email: string;
+        password: string;
+        full_name?: string | null;
+      };
       const email = body.email.trim().toLowerCase();
-      if (body.password.length < 8) return HttpResponse.json({ detail: "Use at least 8 characters." }, { status: 422 });
+      if (body.password.length < 8)
+        return HttpResponse.json(
+          { detail: "Use at least 8 characters." },
+          { status: 422 },
+        );
       if (store.db.users[email]) {
         return HttpResponse.json(
-          { detail: "An account with this email already exists. Sign in, or reset your password." },
+          {
+            detail:
+              "An account with this email already exists. Sign in, or reset your password.",
+          },
           { status: 409 },
         );
       }
@@ -190,39 +251,72 @@ export function authHandlers(store: MockStore) {
           created_at: new Date().toISOString(),
           full_name: body.full_name ?? null,
           profile_complete: false,
+          tracing_consent: false,
+          tracing_consent_available: false,
         };
         mockPasswords.set(email, body.password);
         mockUnconfirmed.add(email);
         store.db.auth = { status: "signed_out", email: null, userEmail: null };
         store.save();
       }
-      return HttpResponse.json({ status: "confirm_email", email, user: null, dev_link: null } satisfies AuthState);
+      return HttpResponse.json({
+        status: "confirm_email",
+        email,
+        user: null,
+        dev_link: null,
+      } satisfies AuthState);
     }),
     http.post(`${API}/auth/password/login`, async ({ request }) => {
-      const body = (await request.json()) as { email: string; password: string };
+      const body = (await request.json()) as {
+        email: string;
+        password: string;
+      };
       const email = body.email.trim().toLowerCase();
-      if (!store.db.users[email] || mockPasswords.get(email) !== body.password) {
-        return HttpResponse.json({ detail: "The email or password is wrong." }, { status: 401 });
+      if (
+        !store.db.users[email] ||
+        mockPasswords.get(email) !== body.password
+      ) {
+        return HttpResponse.json(
+          { detail: "The email or password is wrong." },
+          { status: 401 },
+        );
       }
       if (mockUnconfirmed.has(email)) {
-        const message = "Confirm your email first. Open the link we sent, or ask for a new one.";
-        return HttpResponse.json({ detail: { code: "email_not_confirmed", message, email } }, { status: 403 });
+        const message =
+          "Confirm your email first. Open the link we sent, or ask for a new one.";
+        return HttpResponse.json(
+          { detail: { code: "email_not_confirmed", message, email } },
+          { status: 403 },
+        );
       }
       return HttpResponse.json(signInAs(email));
     }),
-    http.post(`${API}/auth/password/resend`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
+    http.post(`${API}/auth/password/resend`, () =>
+      HttpResponse.json({ sent: true, dev_link: null }, { status: 202 }),
+    ),
     // AC-4: the confirmation link. The real API redirects to /welcome; the mock answers the state.
     http.get(`${API}/auth/password/confirm`, ({ request }) => {
-      const email = (new URL(request.url).searchParams.get("token") ?? "").trim().toLowerCase();
-      if (!store.db.users[email]) return HttpResponse.json({ detail: "link_invalid" }, { status: 400 });
+      const email = (new URL(request.url).searchParams.get("token") ?? "")
+        .trim()
+        .toLowerCase();
+      if (!store.db.users[email])
+        return HttpResponse.json({ detail: "link_invalid" }, { status: 400 });
       return HttpResponse.json(signInAs(email));
     }),
-    http.post(`${API}/auth/password/forgot`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
+    http.post(`${API}/auth/password/forgot`, () =>
+      HttpResponse.json({ sent: true, dev_link: null }, { status: 202 }),
+    ),
     http.post(`${API}/auth/password/reset`, async ({ request }) => {
-      const body = (await request.json()) as { token: string; password: string };
+      const body = (await request.json()) as {
+        token: string;
+        password: string;
+      };
       const email = body.token.trim().toLowerCase();
       if (!store.db.users[email]) {
-        return HttpResponse.json({ detail: "That reset link is not valid. Ask for a new one." }, { status: 400 });
+        return HttpResponse.json(
+          { detail: "That reset link is not valid. Ask for a new one." },
+          { status: 400 },
+        );
       }
       mockPasswords.set(email, body.password);
       return HttpResponse.json(signInAs(email));
@@ -247,7 +341,12 @@ function matchCompany(target: JobTargetOut, posting: JobPosting) {
   target.company_id = company?.id ?? null;
   target.company_slug = company?.slug ?? null;
   target.generic_mode = !company;
-  return { company_id: target.company_id, slug: target.company_slug, method: "mock", generic_mode: !company };
+  return {
+    company_id: target.company_id,
+    slug: target.company_slug,
+    method: "mock",
+    generic_mode: !company,
+  };
 }
 
 const EMPTY_CONTEXT: JobContext = {
@@ -281,11 +380,14 @@ function safeHost(url: string): string {
 
 /** Same rule as the API: LinkedIn cannot be fetched, so it needs pasted text. */
 const isPasteOnly = (url: string) =>
-  ["linkedin.com", "lnkd.in"].some((h) => safeHost(url) === h || safeHost(url).endsWith(`.${h}`));
+  ["linkedin.com", "lnkd.in"].some(
+    (h) => safeHost(url) === h || safeHost(url).endsWith(`.${h}`),
+  );
 
 /** Same rules as strong_core.library (R1), for the mock. */
 const today = () => new Date().toISOString().slice(0, 10);
-const normalizeText = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
+const normalizeText = (text: string) =>
+  text.replace(/\s+/g, " ").trim().toLowerCase();
 function normalizeUrl(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
   try {
@@ -298,8 +400,11 @@ function normalizeUrl(url: string | null | undefined): string | null {
 }
 function defaultJobName(target: JobTargetOut): string {
   const p = target.posting;
-  if (p?.title && p.company_name) return `${p.title} at ${p.company_name}`.slice(0, 120);
-  const host = target.source_url ? safeHost(target.source_url).replace(/^www\./, "") : "";
+  if (p?.title && p.company_name)
+    return `${p.title} at ${p.company_name}`.slice(0, 120);
+  const host = target.source_url
+    ? safeHost(target.source_url).replace(/^www\./, "")
+    : "";
   return host || `Job description ${today()}`;
 }
 /** Like the API: a default name no live resume has, numbered " (2)", " (3)", at most 120 characters. */
@@ -317,18 +422,28 @@ function defaultResumeName(file: File | null): string {
   return stem ? stem.slice(0, 120) : `Resume ${today()}`;
 }
 async function sha256Of(data: ArrayBuffer | string): Promise<string> {
-  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : new Uint8Array(data);
+  const bytes =
+    typeof data === "string"
+      ? new TextEncoder().encode(data)
+      : new Uint8Array(data);
   const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  return [...new Uint8Array(digest)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 /** Same check as the API's LibraryRename: trimmed, 1 to 120 characters. */
 function renameProblem(name: unknown): string | null {
-  const value = typeof name === "string" ? name.replace(/\s+/g, " ").trim() : "";
+  const value =
+    typeof name === "string" ? name.replace(/\s+/g, " ").trim() : "";
   if (!value) return "The name cannot be empty.";
   if (value.length > 120) return "Use at most 120 characters.";
   return null;
 }
-const invalid = (msg: string) => HttpResponse.json({ detail: [{ msg: `Value error, ${msg}` }] }, { status: 422 });
+const invalid = (msg: string) =>
+  HttpResponse.json(
+    { detail: [{ msg: `Value error, ${msg}` }] },
+    { status: 422 },
+  );
 
 /** A gap analysis as the API sends it, with the R1 name fields. */
 function gapView(store: MockStore, gap: MockGap): GapAnalysisOut {
@@ -346,16 +461,20 @@ function gapView(store: MockStore, gap: MockGap): GapAnalysisOut {
 }
 
 /** Mock only: links to this host act like a job board that blocks reading (outcome needs_paste). */
-const isBlockedBoard = (url: string) => safeHost(url).endsWith("blocked.example");
+const isBlockedBoard = (url: string) =>
+  safeHost(url).endsWith("blocked.example");
 
 /**
  * Mock only (IN-6): a list of jobs is a link to this host with no text (pasted text is checked
  * instead of the link), or text that starts with "Open roles".
  */
 const isJobList = (url: string | null, text: string | null) =>
-  text ? /^\s*open roles/i.test(text) : url !== null && safeHost(url).endsWith("careers.example");
+  text
+    ? /^\s*open roles/i.test(text)
+    : url !== null && safeHost(url).endsWith("careers.example");
 /** Mock only (IN-7): a CV file or text that says "we are hiring" is a job description. */
-const isNotCv = (name: string, text: string) => /job-description/i.test(name) || /we are hiring/i.test(text);
+const isNotCv = (name: string, text: string) =>
+  /job-description/i.test(name) || /we are hiring/i.test(text);
 
 export const MOCK_JOB_LIST_REFUSAL =
   "This link shows a list of jobs, not one job description. Open one job and use its link, or paste its text. The page lists 12 open jobs.";
@@ -369,7 +488,8 @@ const taskView = (task: MockTask): JobOut => ({
   error: task.error,
 });
 
-const pauseFor = (store: MockStore) => (store.delayMs > 0 ? delay(150) : Promise.resolve());
+const pauseFor = (store: MockStore) =>
+  store.delayMs > 0 ? delay(150) : Promise.resolve();
 
 /** Moves time-based mock states forward, as background jobs would. */
 function advance(store: MockStore) {
@@ -382,25 +502,44 @@ function advance(store: MockStore) {
       const target = d.jobs.find((j) => j.id === task.entityId);
       if (!target) continue;
       if (task.outcome === "needs_paste") {
-        task.result = { outcome: "needs_paste", reason: "blocked", detail: "This job board blocks automatic reading." };
+        task.result = {
+          outcome: "needs_paste",
+          reason: "blocked",
+          detail: "This job board blocks automatic reading.",
+        };
         continue;
       }
       if (task.outcome === "rejected") {
-        task.result = { outcome: "rejected", reason: MOCK_JOB_LIST_REFUSAL, looks_like: "job_list" };
+        task.result = {
+          outcome: "rejected",
+          reason: MOCK_JOB_LIST_REFUSAL,
+          looks_like: "job_list",
+        };
         continue;
       }
       if (target.deleted) continue;
-      const posting: JobPosting = { ...jobPosting, source_url: target.source_url };
+      const posting: JobPosting = {
+        ...jobPosting,
+        source_url: target.source_url,
+      };
       target.status = "extracted";
       target.posting = posting;
       target.level = posting.level;
       target.name = defaultJobName(target);
-      task.result = { outcome: "extracted", board: null, company: matchCompany(target, posting) };
+      task.result = {
+        outcome: "extracted",
+        board: null,
+        company: matchCompany(target, posting),
+      };
     } else {
       const r = d.resumes.find((x) => x.id === task.entityId);
       if (!r || r.deleted) continue;
       if (task.outcome === "rejected") {
-        task.result = { outcome: "rejected", reason: MOCK_NOT_CV_REFUSAL, looks_like: "job_posting" };
+        task.result = {
+          outcome: "rejected",
+          reason: MOCK_NOT_CV_REFUSAL,
+          looks_like: "job_posting",
+        };
         continue;
       }
       r.status = "extracted";
@@ -410,7 +549,8 @@ function advance(store: MockStore) {
   }
   for (const gap of Object.values(d.gaps)) {
     if (gap.status === "running" && now >= gap.readyAt) {
-      const generic = d.jobs.find((j) => j.id === gap.job_target_id)?.company_id == null;
+      const generic =
+        d.jobs.find((j) => j.id === gap.job_target_id)?.company_id == null;
       gap.status = "ready";
       gap.analysis = gapAnalysis;
       gap.generic_mode = generic;
@@ -419,12 +559,14 @@ function advance(store: MockStore) {
     }
   }
   for (const s of d.sessions) {
-    if (s.status === "scoring" && now >= (d.debriefReadyAt[s.id] ?? 0)) s.status = "completed";
+    if (s.status === "scoring" && now >= (d.debriefReadyAt[s.id] ?? 0))
+      s.status = "completed";
   }
   for (const e of Object.values(d.exports)) {
     if (e.status === "preparing" && now >= e.readyAt) {
       e.status = "ready";
-      e.download_url = "data:application/json;charset=utf-8,%7B%22mock%22%3Atrue%7D";
+      e.download_url =
+        "data:application/json;charset=utf-8,%7B%22mock%22%3Atrue%7D";
     }
   }
   store.save();
@@ -438,9 +580,14 @@ export function inputHandlers(store: MockStore) {
   const findJob = (id: unknown) => db().jobs.find((j) => j.id === id);
   const findResume = (id: unknown) => db().resumes.find((r) => r.id === id);
   /** LB-2: a job with a gap analysis or a session is archived, not deleted. */
-  const jobInUse = (id: string) => Boolean(db().gaps[id]) || db().sessions.some((x) => x.job_target_id === id);
+  const jobInUse = (id: string) =>
+    Boolean(db().gaps[id]) || db().sessions.some((x) => x.job_target_id === id);
 
-  const enqueue = (kind: MockTask["kind"], entityId: string, outcome: MockTask["outcome"]): MockTask => {
+  const enqueue = (
+    kind: MockTask["kind"],
+    entityId: string,
+    outcome: MockTask["outcome"],
+  ): MockTask => {
     const prefix = kind === "job_target" ? "jt" : "rs";
     const task: MockTask = {
       id: `${prefix}:${entityId}:${newId().replaceAll("-", "").slice(0, 12)}`,
@@ -456,10 +603,15 @@ export function inputHandlers(store: MockStore) {
     return task;
   };
 
-  const getTask = (kind: MockTask["kind"], entityId: string, taskId: string) => {
+  const getTask = (
+    kind: MockTask["kind"],
+    entityId: string,
+    taskId: string,
+  ) => {
     advance(store);
     const task = db().tasks[taskId];
-    if (!task || task.kind !== kind || task.entityId !== entityId) return notFound("Job");
+    if (!task || task.kind !== kind || task.entityId !== entityId)
+      return notFound("Job");
     return HttpResponse.json(taskView(task));
   };
 
@@ -471,13 +623,23 @@ export function inputHandlers(store: MockStore) {
       const text = body.text ?? null;
       if (!url && !text) {
         return HttpResponse.json(
-          { detail: [{ msg: "Value error, Give the posting text, a URL, or both." }] },
+          {
+            detail: [
+              { msg: "Value error, Give the posting text, a URL, or both." },
+            ],
+          },
           { status: 422 },
         );
       }
       if (url && !text && isPasteOnly(url)) {
         return HttpResponse.json(
-          { detail: { code: "paste_required", reason: "linkedin", message: "Paste the posting text." } },
+          {
+            detail: {
+              code: "paste_required",
+              reason: "linkedin",
+              message: "Paste the posting text.",
+            },
+          },
           { status: 422 },
         );
       }
@@ -501,10 +663,17 @@ export function inputHandlers(store: MockStore) {
       db().jobs.push(target);
       if (text) db().jobTexts[target.id] = normalizeText(text);
       const blocked = url !== null && !text && isBlockedBoard(url);
-      const outcome = blocked ? "needs_paste" : isJobList(url, text) ? "rejected" : "extracted";
+      const outcome = blocked
+        ? "needs_paste"
+        : isJobList(url, text)
+          ? "rejected"
+          : "extracted";
       const task = enqueue("job_target", target.id, outcome);
       store.save();
-      const accepted: JobTargetAccepted = { job_target: target, job: taskView(task) };
+      const accepted: JobTargetAccepted = {
+        job_target: target,
+        job: taskView(task),
+      };
       return HttpResponse.json(accepted, { status: 202 });
     }),
     http.get(`${API}/job-targets/:jobTargetId`, ({ params }) => {
@@ -522,20 +691,24 @@ export function inputHandlers(store: MockStore) {
         .find(
           (j) =>
             !j.deleted &&
-            ((text !== null && db().jobTexts[j.id] === text) || (url !== null && normalizeUrl(j.source_url) === url)),
+            ((text !== null && db().jobTexts[j.id] === text) ||
+              (url !== null && normalizeUrl(j.source_url) === url)),
         );
       return HttpResponse.json({ job_target: match ?? null });
     }),
-    http.patch(`${API}/job-targets/:jobTargetId`, async ({ params, request }) => {
-      const target = findJob(params.jobTargetId);
-      if (!target || target.deleted) return notFound("Job target");
-      const body = (await request.json()) as { name?: unknown };
-      const problem = renameProblem(body.name);
-      if (problem) return invalid(problem);
-      target.name = String(body.name).replace(/\s+/g, " ").trim();
-      store.save();
-      return HttpResponse.json(target);
-    }),
+    http.patch(
+      `${API}/job-targets/:jobTargetId`,
+      async ({ params, request }) => {
+        const target = findJob(params.jobTargetId);
+        if (!target || target.deleted) return notFound("Job target");
+        const body = (await request.json()) as { name?: unknown };
+        const problem = renameProblem(body.name);
+        if (problem) return invalid(problem);
+        target.name = String(body.name).replace(/\s+/g, " ").trim();
+        store.save();
+        return HttpResponse.json(target);
+      },
+    ),
     http.post(`${API}/job-targets/:jobTargetId/archive`, ({ params }) => {
       const target = findJob(params.jobTargetId);
       if (!target || target.deleted) return notFound("Job target");
@@ -556,12 +729,21 @@ export function inputHandlers(store: MockStore) {
       // LB-2, like the API: a job with reports is archived, not deleted.
       if (!target.deleted && jobInUse(target.id)) {
         return HttpResponse.json(
-          { detail: "This job description has reports. Archive it instead of deleting it." },
+          {
+            detail:
+              "This job description has reports. Archive it instead of deleting it.",
+          },
           { status: 409 },
         );
       }
       // Like the API: the content goes.
-      Object.assign(target, { deleted: true, name: null, posting: null, source_url: null, context: { ...EMPTY_CONTEXT } });
+      Object.assign(target, {
+        deleted: true,
+        name: null,
+        posting: null,
+        source_url: null,
+        context: { ...EMPTY_CONTEXT },
+      });
       delete db().jobTexts[target.id];
       store.save();
       return new HttpResponse(null, { status: 204 });
@@ -571,7 +753,10 @@ export function inputHandlers(store: MockStore) {
       if (!target || target.deleted) return notFound("Job target");
       const body = (await request.json()) as JobTargetUpdate;
       const oldCompany = target.posting?.company_name;
-      const posting = { ...(body.posting as JobPosting), source_url: target.source_url };
+      const posting = {
+        ...(body.posting as JobPosting),
+        source_url: target.source_url,
+      };
       target.posting = posting;
       target.level = posting.level;
       target.status = "extracted";
@@ -582,11 +767,15 @@ export function inputHandlers(store: MockStore) {
         // The real API matches the company again in the background; the mock finishes at once.
         const task = enqueue("job_target", target.id, "extracted");
         task.status = "complete";
-        task.result = { outcome: "matched", company: matchCompany(target, posting) };
+        task.result = {
+          outcome: "matched",
+          company: matchCompany(target, posting),
+        };
         job = taskView(task);
       }
       // TG-2, RH-1: "Create the role" keeps its interviews in the same request.
-      if (body.interview_types?.length) addMockInterviews(store, target, body.interview_types, body.resume_id);
+      if (body.interview_types?.length)
+        addMockInterviews(store, target, body.interview_types, body.resume_id);
       store.save();
       const accepted: JobTargetAccepted = { job_target: target, job };
       return HttpResponse.json(accepted);
@@ -603,10 +792,16 @@ export function inputHandlers(store: MockStore) {
       const hasFile = file instanceof File;
       const hasText = typeof text === "string" && text.trim() !== "";
       if (hasFile === hasText) {
-        return HttpResponse.json({ detail: "Send either a file or the resume text." }, { status: 422 });
+        return HttpResponse.json(
+          { detail: "Send either a file or the resume text." },
+          { status: 422 },
+        );
       }
       if (hasFile && !/\.(pdf|docx|txt|md)$/i.test(file.name)) {
-        return HttpResponse.json({ detail: "Use a PDF, DOCX or text file." }, { status: 415 });
+        return HttpResponse.json(
+          { detail: "Use a PDF, DOCX or text file." },
+          { status: 415 },
+        );
       }
       // The worker stores the file when it runs, so has_file starts false, as in the API.
       const record: ResumeOut = {
@@ -628,9 +823,18 @@ export function inputHandlers(store: MockStore) {
         is_main: !db().resumes.some((x) => !x.deleted && x.is_main),
       };
       db().resumes.push(record);
-      db().resumeHashes[record.id] = await sha256Of(hasFile ? await file.arrayBuffer() : String(text));
-      const refused = isNotCv(hasFile ? file.name : "", hasFile ? "" : String(text));
-      const task = enqueue("resume", record.id, refused ? "rejected" : "extracted");
+      db().resumeHashes[record.id] = await sha256Of(
+        hasFile ? await file.arrayBuffer() : String(text),
+      );
+      const refused = isNotCv(
+        hasFile ? file.name : "",
+        hasFile ? "" : String(text),
+      );
+      const task = enqueue(
+        "resume",
+        record.id,
+        refused ? "rejected" : "extracted",
+      );
       store.save();
       const accepted: ResumeAccepted = { resume: record, job: taskView(task) };
       return HttpResponse.json(accepted, { status: 202 });
@@ -642,8 +846,11 @@ export function inputHandlers(store: MockStore) {
     }),
     http.post(`${API}/resumes/match`, async ({ request }) => {
       const body = (await request.json()) as { sha256?: string };
-      if (!body.sha256 || !/^[0-9a-f]{64}$/.test(body.sha256)) return invalid("sha256 must be 64 hex characters");
-      const match = [...db().resumes].reverse().find((r) => !r.deleted && db().resumeHashes[r.id] === body.sha256);
+      if (!body.sha256 || !/^[0-9a-f]{64}$/.test(body.sha256))
+        return invalid("sha256 must be 64 hex characters");
+      const match = [...db().resumes]
+        .reverse()
+        .find((r) => !r.deleted && db().resumeHashes[r.id] === body.sha256);
       return HttpResponse.json({ resume: match ?? null });
     }),
     http.patch(`${API}/resumes/:resumeId`, async ({ params, request }) => {
@@ -660,10 +867,19 @@ export function inputHandlers(store: MockStore) {
       const r = findResume(params.resumeId);
       if (!r) return notFound("Resume");
       const wasMain = r.is_main && !r.deleted;
-      Object.assign(r, { deleted: true, name: null, resume: null, has_file: false, confirmed_at: null, is_main: false });
+      Object.assign(r, {
+        deleted: true,
+        name: null,
+        resume: null,
+        has_file: false,
+        confirmed_at: null,
+        is_main: false,
+      });
       delete db().resumeHashes[r.id];
       // RM-2: the newest other resume becomes main.
-      const newest = wasMain ? [...db().resumes].reverse().find((x) => !x.deleted) : undefined;
+      const newest = wasMain
+        ? [...db().resumes].reverse().find((x) => !x.deleted)
+        : undefined;
       if (newest) newest.is_main = true;
       store.save();
       return new HttpResponse(null, { status: 204 });
@@ -672,7 +888,10 @@ export function inputHandlers(store: MockStore) {
       const r = findResume(params.resumeId);
       if (!r || r.deleted) return notFound("Resume");
       if (r.status !== "extracted") {
-        return HttpResponse.json({ detail: "The resume is still being read. Try again in a minute." }, { status: 409 });
+        return HttpResponse.json(
+          { detail: "The resume is still being read. Try again in a minute." },
+          { status: 409 },
+        );
       }
       r.resume = ((await request.json()) as { resume: Resume }).resume;
       r.confirmed_at = new Date().toISOString();
@@ -686,64 +905,89 @@ export function inputHandlers(store: MockStore) {
     // ------------------------------------------------------------ lists (P6)
     http.get(`${API}/job-targets`, ({ request }) => {
       advance(store);
-      const withArchived = new URL(request.url).searchParams.get("include_archived") === "true";
-      const live = db().jobs.filter((j) => !j.deleted && (withArchived || !j.archived_at));
-      const summaries: JobTargetSummary[] = [...live].reverse().map((target) => {
-        const sessions = db().sessions.filter((x) => x.job_target_id === target.id);
-        const gap = db().gaps[target.id];
-        return {
-          job_target: target,
-          match_score: gap?.analysis?.match_score ?? null,
-          gap_status: gap?.status ?? null,
-          sessions_count: sessions.length,
-          last_session_at: sessions.at(-1)?.started_at ?? null,
-          in_use: jobInUse(target.id),
-        };
-      });
+      const withArchived =
+        new URL(request.url).searchParams.get("include_archived") === "true";
+      const live = db().jobs.filter(
+        (j) => !j.deleted && (withArchived || !j.archived_at),
+      );
+      const summaries: JobTargetSummary[] = [...live]
+        .reverse()
+        .map((target) => {
+          const sessions = db().sessions.filter(
+            (x) => x.job_target_id === target.id,
+          );
+          const gap = db().gaps[target.id];
+          return {
+            job_target: target,
+            match_score: gap?.analysis?.match_score ?? null,
+            gap_status: gap?.status ?? null,
+            sessions_count: sessions.length,
+            last_session_at: sessions.at(-1)?.started_at ?? null,
+            in_use: jobInUse(target.id),
+          };
+        });
       return HttpResponse.json(summaries);
     }),
     http.get(`${API}/resumes`, () => {
       advance(store);
       // RM-2: the main resume first, then newest first.
       const live = [...db().resumes].filter((r) => !r.deleted).reverse();
-      return HttpResponse.json([...live.filter((r) => r.is_main), ...live.filter((r) => !r.is_main)]);
+      return HttpResponse.json([
+        ...live.filter((r) => r.is_main),
+        ...live.filter((r) => !r.is_main),
+      ]);
     }),
 
     // ------------------------------------------------------------ gap analysis (P6)
-    http.post(`${API}/job-targets/:jobId/gap-analysis`, async ({ params, request }) => {
-      const job = findJob(params.jobId);
-      if (!job || job.deleted) return notFound("Job target");
-      const body = (await request.json()) as GapAnalysisStart;
-      const resumeId = body.resume_id ?? db().gaps[job.id]?.resume_id;
-      if (!resumeId) return HttpResponse.json({ detail: "Choose a resume first." }, { status: 422 });
-      const r = findResume(resumeId);
-      if (!r || r.deleted) return notFound("Resume");
-      const current = db().gaps[job.id];
-      // R1: the same saved job and CV picked again get the ready analysis back.
-      if (body.reuse_ready && current?.status === "ready" && current.resume_id === r.id && !current.stale) {
-        return HttpResponse.json(gapView(store, current), { status: 202 });
-      }
-      if (job.status !== "extracted" || r.status !== "extracted") {
-        return HttpResponse.json({ detail: "The job posting or the resume is still being read." }, { status: 409 });
-      }
-      const gap: MockGap = {
-        id: newId(),
-        job_target_id: job.id,
-        resume_id: r.id,
-        status: "running",
-        analysis: null,
-        error: null,
-        generic_mode: null,
-        profile_version: null,
-        stale: false,
-        created_at: new Date().toISOString(),
-        updated_at: null,
-        readyAt: Date.now() + store.delayMs * 1.5,
-      };
-      db().gaps[job.id] = gap;
-      store.save();
-      return HttpResponse.json(gapView(store, gap), { status: 202 });
-    }),
+    http.post(
+      `${API}/job-targets/:jobId/gap-analysis`,
+      async ({ params, request }) => {
+        const job = findJob(params.jobId);
+        if (!job || job.deleted) return notFound("Job target");
+        const body = (await request.json()) as GapAnalysisStart;
+        const resumeId = body.resume_id ?? db().gaps[job.id]?.resume_id;
+        if (!resumeId)
+          return HttpResponse.json(
+            { detail: "Choose a resume first." },
+            { status: 422 },
+          );
+        const r = findResume(resumeId);
+        if (!r || r.deleted) return notFound("Resume");
+        const current = db().gaps[job.id];
+        // R1: the same saved job and CV picked again get the ready analysis back.
+        if (
+          body.reuse_ready &&
+          current?.status === "ready" &&
+          current.resume_id === r.id &&
+          !current.stale
+        ) {
+          return HttpResponse.json(gapView(store, current), { status: 202 });
+        }
+        if (job.status !== "extracted" || r.status !== "extracted") {
+          return HttpResponse.json(
+            { detail: "The job posting or the resume is still being read." },
+            { status: 409 },
+          );
+        }
+        const gap: MockGap = {
+          id: newId(),
+          job_target_id: job.id,
+          resume_id: r.id,
+          status: "running",
+          analysis: null,
+          error: null,
+          generic_mode: null,
+          profile_version: null,
+          stale: false,
+          created_at: new Date().toISOString(),
+          updated_at: null,
+          readyAt: Date.now() + store.delayMs * 1.5,
+        };
+        db().gaps[job.id] = gap;
+        store.save();
+        return HttpResponse.json(gapView(store, gap), { status: 202 });
+      },
+    ),
     http.get(`${API}/job-targets/:jobId/gap-analysis`, ({ params }) => {
       advance(store);
       const gap = db().gaps[String(params.jobId)];
@@ -753,7 +997,9 @@ export function inputHandlers(store: MockStore) {
     http.get(`${API}/gap-analyses/:gapId`, ({ params }) => {
       advance(store);
       const gap = Object.values(db().gaps).find((g) => g.id === params.gapId);
-      return gap ? HttpResponse.json(gapView(store, gap)) : notFound("Gap analysis");
+      return gap
+        ? HttpResponse.json(gapView(store, gap))
+        : notFound("Gap analysis");
     }),
 
     // ------------------------------------------------------------ reports (R1)
@@ -763,17 +1009,28 @@ export function inputHandlers(store: MockStore) {
       const jobFilter = query.get("job_target_id");
       const resumeFilter = query.get("resume_id");
       const typeFilter = query.get("type");
-      if (typeFilter && typeFilter !== "gap_report" && typeFilter !== "interview_debrief") {
+      if (
+        typeFilter &&
+        typeFilter !== "gap_report" &&
+        typeFilter !== "interview_debrief"
+      ) {
         return invalid("type must be gap_report or interview_debrief");
       }
       const jobInfo = (jobId: string) => {
         const job = findJob(jobId);
-        return { job_name: job && !job.deleted ? job.name : null, job_deleted: job?.deleted ?? true };
+        return {
+          job_name: job && !job.deleted ? job.name : null,
+          job_deleted: job?.deleted ?? true,
+        };
       };
       const items: ReportItem[] = [];
       if (typeFilter !== "interview_debrief") {
         for (const gap of Object.values(db().gaps)) {
-          if (gap.status !== "ready" || (jobFilter && gap.job_target_id !== jobFilter)) continue;
+          if (
+            gap.status !== "ready" ||
+            (jobFilter && gap.job_target_id !== jobFilter)
+          )
+            continue;
           if (resumeFilter && gap.resume_id !== resumeFilter) continue;
           const view = gapView(store, gap);
           items.push({
@@ -796,11 +1053,17 @@ export function inputHandlers(store: MockStore) {
       }
       if (typeFilter !== "gap_report") {
         for (const s of db().sessions) {
-          if (!s.started_at || !["scoring", "completed", "failed"].includes(s.status)) continue;
+          if (
+            !s.started_at ||
+            !["scoring", "completed", "failed"].includes(s.status)
+          )
+            continue;
           if (jobFilter && s.job_target_id !== jobFilter) continue;
           if (resumeFilter && s.resume_id !== resumeFilter) continue;
           const generic = findJob(s.job_target_id)?.generic_mode ?? true;
-          const cv = s.resume_id ? db().resumes.find((r) => r.id === s.resume_id) : undefined;
+          const cv = s.resume_id
+            ? db().resumes.find((r) => r.id === s.resume_id)
+            : undefined;
           items.push({
             type: "interview_debrief",
             id: s.id,
@@ -809,13 +1072,20 @@ export function inputHandlers(store: MockStore) {
             resume_id: s.resume_id,
             resume_name: cv && !cv.deleted ? cv.name : null,
             resume_deleted: s.resume_id !== null && (!cv || cv.deleted),
-            status: s.status === "completed" ? "ready" : s.status === "failed" ? "failed" : "scoring",
+            status:
+              s.status === "completed"
+                ? "ready"
+                : s.status === "failed"
+                  ? "failed"
+                  : "scoring",
             at: s.ended_at ?? s.started_at,
             match_score: null,
             hire_signal:
               s.status === "completed"
-                ? (s.config.custom ? customScorecard(s.config.custom, generic) : scorecardFor(s.config.interview_type, generic))
-                    .hire_signal
+                ? (s.config.custom
+                    ? customScorecard(s.config.custom, generic)
+                    : scorecardFor(s.config.interview_type, generic)
+                  ).hire_signal
                 : null,
             interview_type: s.config.interview_type,
             mode: s.config.mode,
@@ -851,22 +1121,33 @@ export function sessionHandlers(store: MockStore) {
       if (body.interview_id) {
         const interview = interviewForTake(store, body.interview_id);
         if (!interview) return notFound("Interview");
-        if (interview.job_target_id !== target.id) return invalid("The interview is for another role.");
+        if (interview.job_target_id !== target.id)
+          return invalid("The interview is for another role.");
         body.resume_id = interview.resume_id;
-        body.config = { ...body.config, interview_type: interview.interview_type };
+        body.config = {
+          ...body.config,
+          interview_type: interview.interview_type,
+        };
       }
-      const open = body.channel === "text" ? db().siteStatus.text_sessions_open : db().siteStatus.voice_sessions_open;
+      const open =
+        body.channel === "text"
+          ? db().siteStatus.text_sessions_open
+          : db().siteStatus.voice_sessions_open;
       if (!open) return paused("sessions_paused");
       const usage = db().usage;
       const isCustom = body.config.interview_type === "custom";
       if (isCustom) {
         // CU-11 (strong_api.custom.access), then the SessionConfig rules (CU-1, CU-3).
-        if (db().siteStatus.custom_interview_access === "paid_only" && !usage.full_interviews_allowed) {
+        if (
+          db().siteStatus.custom_interview_access === "paid_only" &&
+          !usage.full_interviews_allowed
+        ) {
           return HttpResponse.json(
             {
               detail: {
                 code: "upgrade_required",
-                message: "Custom interviews are part of the subscription. Subscribe to build your own interview.",
+                message:
+                  "Custom interviews are part of the subscription. Subscribe to build your own interview.",
                 upgrade_url: "/upgrade",
               },
             },
@@ -876,26 +1157,35 @@ export function sessionHandlers(store: MockStore) {
         const problem = customProblem(body.config);
         if (problem) return invalid(problem);
         // CU-5: the server checks every chip and own question again (strong_api.custom.guard).
-        const refused = body.config.custom ? customRefusal(body.config.custom) : null;
+        const refused = body.config.custom
+          ? customRefusal(body.config.custom)
+          : null;
         if (refused) return HttpResponse.json(refused, { status: 422 });
       }
       // CU-11: while Custom is open to everyone, a free account may run a 30-minute Custom session.
       const freeFull =
-        isCustom && body.config.duration_min === 30 && db().siteStatus.custom_interview_access === "everyone";
+        isCustom &&
+        body.config.duration_min === 30 &&
+        db().siteStatus.custom_interview_access === "everyone";
       // Same answer as strong_api.billing.ensure_can_start_session.
       const code: string | null = !usage.can_start_session
         ? (usage.block_code ?? "upgrade_required")
-        : body.config.duration_min !== 10 && !usage.full_interviews_allowed && !freeFull
+        : body.config.duration_min !== 10 &&
+            !usage.full_interviews_allowed &&
+            !freeFull
           ? "full_interview_requires_plan"
           : null;
       if (code) {
         const messages: Record<string, string> = {
           minutes_exhausted: "You have used this period's interview minutes.",
-          upgrade_required: "You have used your free mini interviews. Subscribe to keep practicing.",
+          upgrade_required:
+            "You have used your free mini interviews. Subscribe to keep practicing.",
           full_interview_requires_plan: `Full interviews are part of the subscription. Free accounts get ${usage.free_interviews_total} mini interviews.`,
         };
         return HttpResponse.json(
-          { detail: { code, message: messages[code], upgrade_url: "/upgrade" } },
+          {
+            detail: { code, message: messages[code], upgrade_url: "/upgrade" },
+          },
           { status: 402 },
         );
       }
@@ -903,7 +1193,10 @@ export function sessionHandlers(store: MockStore) {
       const gap = db().gaps[body.job_target_id];
       const readyCv = gap?.status === "ready" ? gap.resume_id : null;
       if (body.resume_id && body.resume_id !== readyCv) {
-        return HttpResponse.json({ detail: "Run the gap analysis for this CV and job first." }, { status: 409 });
+        return HttpResponse.json(
+          { detail: "Run the gap analysis for this CV and job first." },
+          { status: 409 },
+        );
       }
       const session: SessionRecord = {
         id: newId(),
@@ -949,17 +1242,29 @@ export function sessionHandlers(store: MockStore) {
       const s = findSession(params.sessionId);
       if (!s) return notFound("Session");
       if (s.status !== "created" && s.status !== "in_progress")
-        return HttpResponse.json({ detail: "The session has ended." }, { status: 409 });
+        return HttpResponse.json(
+          { detail: "The session has ended." },
+          { status: 409 },
+        );
       if (s.status === "created") {
         // Like the API: the first join starts the session, and only a started one uses the free one.
         s.status = "in_progress";
         s.started_at = new Date().toISOString();
         const usage = db().usage;
-        if (usage.plan === "free") usage.free_interviews_left = Math.max(0, usage.free_interviews_left - 1);
+        if (usage.plan === "free")
+          usage.free_interviews_left = Math.max(
+            0,
+            usage.free_interviews_left - 1,
+          );
         refreshUsage(usage);
         store.save();
       }
-      const join: VoiceJoin = { livekit_url: MOCK_VOICE_URL, room: `session-${s.id}`, token: "mock", identity: "candidate" };
+      const join: VoiceJoin = {
+        livekit_url: MOCK_VOICE_URL,
+        room: `session-${s.id}`,
+        token: "mock",
+        identity: "candidate",
+      };
       return HttpResponse.json(join);
     }),
     http.post(`${API}/sessions/:sessionId/end`, ({ params }) => {
@@ -974,7 +1279,8 @@ export function sessionHandlers(store: MockStore) {
         s.status = "scoring";
         s.ended_at = new Date().toISOString();
         s.minutes_billed = s.config.duration_min;
-        if (db().usage.plan === "paid") db().usage.minutes_used += s.minutes_billed;
+        if (db().usage.plan === "paid")
+          db().usage.minutes_used += s.minutes_billed;
         refreshUsage(db().usage);
         db().debriefReadyAt[s.id] = later(2);
       }
@@ -983,7 +1289,9 @@ export function sessionHandlers(store: MockStore) {
     }),
     http.get(`${API}/job-targets/:jobId/sessions`, ({ params }) => {
       advanceAll();
-      return HttpResponse.json(db().sessions.filter((s) => s.job_target_id === params.jobId));
+      return HttpResponse.json(
+        db().sessions.filter((s) => s.job_target_id === params.jobId),
+      );
     }),
   ];
 }
@@ -1002,14 +1310,23 @@ function trendsFor(snapshots: ProgressSnapshot[]): CompetencyTrend[] {
       const latest = points[points.length - 1].score;
       const change = Math.round((latest - first) * 100) / 100;
       const direction: CompetencyTrend["direction"] =
-        points.length === 1 ? "single" : Math.abs(change) < 0.25 ? "flat" : change > 0 ? "up" : "down";
+        points.length === 1
+          ? "single"
+          : Math.abs(change) < 0.25
+            ? "flat"
+            : change > 0
+              ? "up"
+              : "down";
       return {
         competency: points[0].competency,
         sessions: points.length,
         first,
         latest,
         change,
-        average: Math.round((points.reduce((n, p) => n + p.score, 0) / points.length) * 100) / 100,
+        average:
+          Math.round(
+            (points.reduce((n, p) => n + p.score, 0) / points.length) * 100,
+          ) / 100,
         direction,
       };
     })
@@ -1032,7 +1349,10 @@ export function scoringHandlers(store: MockStore) {
         s.config.duration_min !== 10,
     );
     return realistic.flatMap((s, index) =>
-      (s.config.custom ? customScorecard(s.config.custom) : scorecardFor(s.config.interview_type)).competency_scores.map((c) => ({
+      (s.config.custom
+        ? customScorecard(s.config.custom)
+        : scorecardFor(s.config.interview_type)
+      ).competency_scores.map((c) => ({
         job_target_id: jobId,
         session_id: s.id,
         competency: c.competency,
@@ -1044,7 +1364,9 @@ export function scoringHandlers(store: MockStore) {
 
   /** CU-10: a Custom next session once the job has two Realistic sessions, unless Custom is locked (CU-11). */
   const customNext = (jobId: string) => {
-    const locked = db().siteStatus.custom_interview_access === "paid_only" && !db().usage.full_interviews_allowed;
+    const locked =
+      db().siteStatus.custom_interview_access === "paid_only" &&
+      !db().usage.full_interviews_allowed;
     const sessions = new Set(progressFor(jobId).map((p) => p.session_id));
     return !locked && sessions.size >= 2 ? mockCustomRecommendation() : null;
   };
@@ -1055,16 +1377,24 @@ export function scoringHandlers(store: MockStore) {
       if (!s) return notFound("Session");
       return HttpResponse.json((db().feedback ?? {})[s.id] ?? null);
     }),
-    http.put(`${API}/sessions/:sessionId/feedback`, async ({ params, request }) => {
-      const s = findSession(params.sessionId);
-      if (!s) return notFound("Session");
-      if (!s.ended_at) return HttpResponse.json({ detail: "not_ended" }, { status: 409 });
-      const body = (await request.json()) as SessionFeedbackIn;
-      const row = { realism: body.realism, comment: body.comment?.trim() || null, created_at: new Date().toISOString() };
-      db().feedback = { ...(db().feedback ?? {}), [s.id]: row };
-      store.save();
-      return HttpResponse.json(row);
-    }),
+    http.put(
+      `${API}/sessions/:sessionId/feedback`,
+      async ({ params, request }) => {
+        const s = findSession(params.sessionId);
+        if (!s) return notFound("Session");
+        if (!s.ended_at)
+          return HttpResponse.json({ detail: "not_ended" }, { status: 409 });
+        const body = (await request.json()) as SessionFeedbackIn;
+        const row = {
+          realism: body.realism,
+          comment: body.comment?.trim() || null,
+          created_at: new Date().toISOString(),
+        };
+        db().feedback = { ...(db().feedback ?? {}), [s.id]: row };
+        store.save();
+        return HttpResponse.json(row);
+      },
+    ),
     http.get(`${API}/sessions/:sessionId/debrief`, ({ params }) => {
       advanceAll();
       const s = findSession(params.sessionId);
@@ -1103,11 +1433,17 @@ export function scoringHandlers(store: MockStore) {
         next_custom_session: ready ? customNext(s.job_target_id) : null,
         generic_mode: generic,
         company_name: job?.posting?.company_name ?? null,
-        company_slug: generic ? null : (job?.posting?.company_name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-") || null,
+        company_slug: generic
+          ? null
+          : (job?.posting?.company_name ?? "")
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-") || null,
         values_framework: generic ? null : "Company values",
         questions: custom ? customDebriefQuestions(custom) : [],
         // DB-1, DB-2 (S12): the mock scorecards are fixed, so the previous signal is the same.
-        previous_signal: scorecard ? mockPreviousSignal(s, scorecard, db().sessions) : null,
+        previous_signal: scorecard
+          ? mockPreviousSignal(s, scorecard, db().sessions)
+          : null,
         answers_at_bar: scorecard ? mockAnswersAtBar(scorecard) : null,
         suggestions: scorecard ? debriefSuggestions(s.id, s.job_target_id) : [],
         next_plan_item: null,
@@ -1119,26 +1455,37 @@ export function scoringHandlers(store: MockStore) {
       const jobId = String(params.jobId);
       if (!findJob(jobId)) return notFound("Job target");
       // CU-7: own questions of Custom sessions are marked, or left out on request.
-      const exclude = new URL(request.url).searchParams.get("exclude_own_questions") === "true";
+      const exclude =
+        new URL(request.url).searchParams.get("exclude_own_questions") ===
+        "true";
       const ownSessions = new Set(
         db()
           .sessions.filter((s) => (s.config.custom?.questions.length ?? 0) > 0)
           .map((s) => s.id),
       );
       const snapshots = progressFor(jobId).map((p) =>
-        exclude && ownSessions.has(p.session_id) ? { ...p, score: Math.max(1, p.score - 0.25) } : p,
+        exclude && ownSessions.has(p.session_id)
+          ? { ...p, score: Math.max(1, p.score - 0.25) }
+          : p,
       );
       const progress: JobProgress = {
         job_target_id: jobId,
         snapshots,
         trends: trendsFor(snapshots),
-        next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
+        next_session: db().gaps[jobId]?.analysis
+          ? sessionPlan[snapshots.length ? 1 : 0]
+          : null,
         next_custom_session: customNext(jobId),
         own_question_points: exclude
           ? []
           : snapshots
               .filter((p) => ownSessions.has(p.session_id))
-              .map((p) => ({ session_id: p.session_id, competency: p.competency, own_questions: 1, other_questions: 2 })),
+              .map((p) => ({
+                session_id: p.session_id,
+                competency: p.competency,
+                own_questions: 1,
+                other_questions: 2,
+              })),
         own_questions_excluded: exclude,
       };
       return HttpResponse.json(progress);
@@ -1150,11 +1497,15 @@ export function scoringHandlers(store: MockStore) {
 
 /** The API's rules for what a user may start (strong_api.billing.entitlements), for the mock. */
 export function refreshUsage(usage: Usage): Usage {
-  usage.minutes_left = usage.plan === "paid" ? Math.max(0, usage.minutes_cap - usage.minutes_used) : 0;
+  usage.minutes_left =
+    usage.plan === "paid"
+      ? Math.max(0, usage.minutes_cap - usage.minutes_used)
+      : 0;
   if (usage.plan === "paid") {
     usage.block_code = usage.minutes_left > 0 ? null : "minutes_exhausted";
   } else {
-    usage.block_code = usage.free_interviews_left > 0 ? null : "upgrade_required";
+    usage.block_code =
+      usage.free_interviews_left > 0 ? null : "upgrade_required";
   }
   usage.can_start_session = usage.block_code === null;
   usage.full_interviews_allowed = usage.plan === "paid";
@@ -1179,24 +1530,42 @@ const EXIT_REASONS = new Set([
   "missing_feature",
   "other",
 ]);
-const GOT_JOB = new Set(["yes", "no", "still_interviewing", "prefer_not_to_say"]);
+const GOT_JOB = new Set([
+  "yes",
+  "no",
+  "still_interviewing",
+  "prefer_not_to_say",
+]);
 
 /** Mocks of the real P9 endpoints. Paths, status codes and bodies follow openapi.json. */
 export function accountHandlers(store: MockStore) {
   const db = () => store.db;
 
   return [
-    http.get(`${API}/billing/usage`, () => HttpResponse.json(refreshUsage(db().usage))),
+    http.get(`${API}/billing/usage`, () =>
+      HttpResponse.json(refreshUsage(db().usage)),
+    ),
     // Dev-only spend indicator: the mocks track no model spend, so the indicator stays hidden.
     http.get(`${API}/dev/model-usage`, () =>
-      HttpResponse.json({ profile: "fake", tracked: false, today: null, month: null, rpm_limit: null }),
+      HttpResponse.json({
+        profile: "fake",
+        tracked: false,
+        today: null,
+        month: null,
+        rpm_limit: null,
+      }),
     ),
     http.get(`${API}/billing/plan`, () => HttpResponse.json(MOCK_PLAN)),
     http.post(`${API}/billing/checkout`, async () => {
       await pauseFor(store);
       if (db().usage.plan === "paid") {
         return HttpResponse.json(
-          { detail: { code: "already_subscribed", message: "Your plan is already active." } },
+          {
+            detail: {
+              code: "already_subscribed",
+              message: "Your plan is already active.",
+            },
+          },
           { status: 409 },
         );
       }
@@ -1218,10 +1587,17 @@ export function accountHandlers(store: MockStore) {
       return HttpResponse.json({ url: "/?upgraded=1" });
     }),
     http.post(`${API}/billing/portal`, async ({ request }) => {
-      const body = (await request.json().catch(() => null)) as { flow?: string } | null;
+      const body = (await request.json().catch(() => null)) as {
+        flow?: string;
+      } | null;
       if (!db().usage.has_billing_account) {
         return HttpResponse.json(
-          { detail: { code: "no_billing_account", message: "You have no plan to manage." } },
+          {
+            detail: {
+              code: "no_billing_account",
+              message: "You have no plan to manage.",
+            },
+          },
           { status: 404 },
         );
       }
@@ -1232,28 +1608,45 @@ export function accountHandlers(store: MockStore) {
     }),
     http.post(`${API}/billing/exit-survey`, async ({ request }) => {
       const body = (await request.json()) as Partial<ExitSurveyIn>;
-      if (!body.reason || !EXIT_REASONS.has(body.reason) || !body.got_job || !GOT_JOB.has(body.got_job)) {
-        return HttpResponse.json({ detail: [{ msg: "Answer both questions" }] }, { status: 422 });
+      if (
+        !body.reason ||
+        !EXIT_REASONS.has(body.reason) ||
+        !body.got_job ||
+        !GOT_JOB.has(body.got_job)
+      ) {
+        return HttpResponse.json(
+          { detail: [{ msg: "Answer both questions" }] },
+          { status: 422 },
+        );
       }
       store.db.exitSurveys.push(body as ExitSurveyIn);
       store.save();
-      return HttpResponse.json({ id: newId(), created_at: new Date().toISOString() }, { status: 201 });
+      return HttpResponse.json(
+        { id: newId(), created_at: new Date().toISOString() },
+        { status: 201 },
+      );
     }),
     http.get(`${API}/account/profile`, () => {
       const email = db().auth.userEmail;
-      if (!email) return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
+      if (!email)
+        return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
       return HttpResponse.json(db().profiles[email] ?? EMPTY_PROFILE);
     }),
     http.put(`${API}/account/profile`, async ({ request }) => {
       const email = db().auth.userEmail;
-      if (!email) return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
+      if (!email)
+        return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
       const body = (await request.json()) as ProfileIn;
       const fullName = body.full_name.trim();
       const years = body.years_experience;
       if (!fullName || years < 0 || years > 50) {
-        return HttpResponse.json({ detail: [{ msg: "Check the required fields." }] }, { status: 422 });
+        return HttpResponse.json(
+          { detail: [{ msg: "Check the required fields." }] },
+          { status: 422 },
+        );
       }
-      const blank = (v: string | null | undefined) => (v && v.trim() ? v.trim() : null);
+      const blank = (v: string | null | undefined) =>
+        v && v.trim() ? v.trim() : null;
       const profile: Profile = {
         full_name: fullName,
         years_experience: years,
@@ -1268,16 +1661,31 @@ export function accountHandlers(store: MockStore) {
         plan_email_muted: db().profiles[email]?.plan_email_muted ?? false,
       };
       db().profiles[email] = profile;
-      if (db().users[email]) Object.assign(db().users[email], { full_name: fullName, profile_complete: true });
+      if (db().users[email])
+        Object.assign(db().users[email], {
+          full_name: fullName,
+          profile_complete: true,
+        });
       store.save();
       return HttpResponse.json(profile);
     }),
     http.put(`${API}/account/consent`, async ({ request }) => {
       const body = (await request.json()) as { training_consent: boolean };
       const email = db().auth.userEmail;
-      if (email && db().users[email]) db().users[email].training_consent = body.training_consent;
+      if (email && db().users[email])
+        db().users[email].training_consent = body.training_consent;
       store.save();
       return HttpResponse.json({ training_consent: body.training_consent });
+    }),
+    http.put(`${API}/account/tracing-consent`, async ({ request }) => {
+      const body = (await request.json()) as { tracing_consent: boolean };
+      const email = db().auth.userEmail;
+      const user = email ? db().users[email] : undefined;
+      if (!user?.tracing_consent_available)
+        return HttpResponse.json({ detail: "Not Found" }, { status: 404 });
+      user.tracing_consent = body.tracing_consent;
+      store.save();
+      return HttpResponse.json({ tracing_consent: body.tracing_consent });
     }),
     http.post(`${API}/account/export`, async () => {
       await pauseFor(store);

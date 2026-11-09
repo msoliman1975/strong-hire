@@ -6300,6 +6300,48 @@
         }
       }
     },
+    "/account/tracing-consent": {
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Set Tracing Consent",
+        "description": "LT-20, LT-24: let the team review my interview turns, off by default (D-12).\n\n404 while LLM_TRACING_PROD_CONTENT is off (gate 2). Turning it off stops content from the\nnext turn and queues deletion of the content already kept, within 24 hours.",
+        "operationId": "set_tracing_consent_account_tracing_consent_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TracingConsentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TracingConsentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/account/export": {
       "post": {
         "tags": [
@@ -14725,6 +14767,18 @@
             "type": "boolean",
             "title": "Profile Complete",
             "description": "AC-3: false until the user saves the first sign-in profile.",
+            "default": false
+          },
+          "tracing_consent": {
+            "type": "boolean",
+            "title": "Tracing Consent",
+            "description": "LT-20: the user lets the team review their interview turns.",
+            "default": false
+          },
+          "tracing_consent_available": {
+            "type": "boolean",
+            "title": "Tracing Consent Available",
+            "description": "LT-20: show the tracing consent toggle (LLM_TRACING_PROD_CONTENT is on).",
             "default": false
           }
         },
@@ -30865,6 +30919,34 @@
         ],
         "title": "Tone",
         "description": "TN-1: how the interviewer sounds. `as_company` uses the company profile's persona tone,\nor a neutral tone in generic mode. Old sessions read as `as_company`."
+      },
+      "TracingConsentIn": {
+        "properties": {
+          "tracing_consent": {
+            "type": "boolean",
+            "title": "Tracing Consent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tracing_consent"
+        ],
+        "title": "TracingConsentIn",
+        "description": "LT-20: let the team review this user's interview turns (D-12)."
+      },
+      "TracingConsentOut": {
+        "properties": {
+          "tracing_consent": {
+            "type": "boolean",
+            "title": "Tracing Consent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tracing_consent"
+        ],
+        "title": "TracingConsentOut"
       },
       "Transcript": {
         "properties": {

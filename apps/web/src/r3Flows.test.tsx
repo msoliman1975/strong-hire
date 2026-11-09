@@ -34,6 +34,8 @@ function signedIn(email = "ana@example.com") {
     created_at: "2026-10-01T10:00:00Z",
     full_name: "Ana Lopez",
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email, userEmail: email };
 }
@@ -61,42 +63,60 @@ async function addResumes(n: number) {
   }
 }
 
-const words = (n: number) => Array.from({ length: n }, (_, i) => `w${i}`).join(" ");
+const words = (n: number) =>
+  Array.from({ length: n }, (_, i) => `w${i}`).join(" ");
 
 describe("add flow (v2)", () => {
   it("TG-2: with v2 on, adding a job opens Add a target role with its three steps", async () => {
     renderApp("/jobs/new");
-    const steps = await screen.findByRole("list", { name: "Add a target role steps" });
-    expect(within(steps).getAllByRole("listitem").map((li) => li.textContent)).toEqual([
-      "1 · Job posting",
-      "2 · Check the role",
-      "3 · Interviews",
-    ]);
-    expect(screen.getByRole("button", { name: "Read the posting" })).toBeInTheDocument();
+    const steps = await screen.findByRole("list", {
+      name: "Add a target role steps",
+    });
+    expect(
+      within(steps)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent),
+    ).toEqual(["1 · Job posting", "2 · Check the role", "3 · Interviews"]);
+    expect(
+      screen.getByRole("button", { name: "Read the posting" }),
+    ).toBeInTheDocument();
   });
 
   it("IN-1: a live word counter turns amber at 2,000 words and blocks Read the posting past 2,500", async () => {
     renderApp("/roles/new");
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "paste the text" }));
+    await user.click(
+      await screen.findByRole("button", { name: "paste the text" }),
+    );
     const box = screen.getByRole("textbox", { name: "Job posting text" });
     await user.click(box);
     await user.paste(words(812));
-    expect(screen.getByText(/812 \/ 2,500 words/)).not.toHaveAttribute("data-level");
+    expect(screen.getByText(/812 \/ 2,500 words/)).not.toHaveAttribute(
+      "data-level",
+    );
     await user.paste(" " + words(1300));
-    expect(screen.getByText(/2,112 \/ 2,500 words/)).toHaveAttribute("data-level", "warn");
+    expect(screen.getByText(/2,112 \/ 2,500 words/)).toHaveAttribute(
+      "data-level",
+      "warn",
+    );
     await user.paste(" " + words(500));
     const count = screen.getByText(/2,612 \/ 2,500 words/);
     expect(count).toHaveAttribute("data-level", "over");
-    expect(count).toHaveTextContent("Trim the benefits and company boilerplate");
-    expect(screen.getByRole("button", { name: "Read the posting" })).toBeDisabled();
+    expect(count).toHaveTextContent(
+      "Trim the benefits and company boilerplate",
+    );
+    expect(
+      screen.getByRole("button", { name: "Read the posting" }),
+    ).toBeDisabled();
   });
 
   it("FL-1: with v2 off the add form has no word counter and the v1 steps", async () => {
     renderApp("/jobs/new", false);
     expect(await screen.findByText("Job posting")).toBeInTheDocument();
     expect(screen.queryByText(/\/ 2,500 words/)).toBeNull();
-    expect(screen.getByRole("button", { name: "Read job posting" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Read job posting" }),
+    ).toBeInTheDocument();
   });
 
   it("IN-1: words are counted by whitespace", () => {
@@ -109,19 +129,25 @@ describe("resume limits (v2)", () => {
   it("LB-1: the Resumes page says N of 5 and up to 1 MB each", async () => {
     await addResumes(2);
     renderApp("/resumes");
-    expect(await screen.findByTestId("resume-limit")).toHaveTextContent("2 of 5 · up to 1 MB each");
+    expect(await screen.findByTestId("resume-limit")).toHaveTextContent(
+      "2 of 5 · up to 1 MB each",
+    );
   });
 
   it("LB-1: the upload form says when the library is full", async () => {
     await addResumes(5);
     renderApp("/resumes");
-    expect(await screen.findByTestId("resumes-full")).toHaveTextContent(RESUMES_FULL);
+    expect(await screen.findByTestId("resumes-full")).toHaveTextContent(
+      RESUMES_FULL,
+    );
     // RM-1: with v2 the resumes page adds through the first-run screen; Add a resume is blocked.
     expect(screen.getByRole("button", { name: "Add a resume" })).toBeDisabled();
   });
 
   it("LB-1: a file over 1 MB is refused in the browser, before any upload", () => {
-    const big = new File([new Uint8Array(1024 * 1024 + 1)], "cv.pdf", { type: "application/pdf" });
+    const big = new File([new Uint8Array(1024 * 1024 + 1)], "cv.pdf", {
+      type: "application/pdf",
+    });
     expect(validateResumeInput(big, "", 1024 * 1024)).toBe(RESUME_TOO_BIG);
     // v1 keeps its 5 MB check.
     expect(validateResumeInput(big, "")).toBeNull();
@@ -129,13 +155,37 @@ describe("resume limits (v2)", () => {
 
   it("LB-1: the API's 413 and 422 limit refusals read in plain words", () => {
     // The codes of strong_api.inputs.limits (A1).
-    expect((friendlyLimitError(new ApiError(413, "x", "file_too_large")) as Error).message).toBe(RESUME_TOO_BIG);
-    expect((friendlyLimitError(new ApiError(422, "x", "resume_limit")) as Error).message).toBe(RESUMES_FULL);
-    expect((friendlyLimitError(new ApiError(422, "x", "posting_too_long")) as Error).message).toBe(JD_TOO_LONG);
+    expect(
+      (friendlyLimitError(new ApiError(413, "x", "file_too_large")) as Error)
+        .message,
+    ).toBe(RESUME_TOO_BIG);
+    expect(
+      (friendlyLimitError(new ApiError(422, "x", "resume_limit")) as Error)
+        .message,
+    ).toBe(RESUMES_FULL);
+    expect(
+      (friendlyLimitError(new ApiError(422, "x", "posting_too_long")) as Error)
+        .message,
+    ).toBe(JD_TOO_LONG);
     // Without a code, by status and words.
-    expect((friendlyLimitError(new ApiError(413, "Payload too large")) as Error).message).toBe(RESUME_TOO_BIG);
-    expect((friendlyLimitError(new ApiError(422, "The job description is over 2500 words.")) as Error).message).toBe(JD_TOO_LONG);
-    expect((friendlyLimitError(new ApiError(422, "Resume limit reached", "resume_limit")) as Error).message).toBe(RESUMES_FULL);
+    expect(
+      (friendlyLimitError(new ApiError(413, "Payload too large")) as Error)
+        .message,
+    ).toBe(RESUME_TOO_BIG);
+    expect(
+      (
+        friendlyLimitError(
+          new ApiError(422, "The job description is over 2500 words."),
+        ) as Error
+      ).message,
+    ).toBe(JD_TOO_LONG);
+    expect(
+      (
+        friendlyLimitError(
+          new ApiError(422, "Resume limit reached", "resume_limit"),
+        ) as Error
+      ).message,
+    ).toBe(RESUMES_FULL);
     const other = new ApiError(422, "Something else");
     expect(friendlyLimitError(other)).toBe(other);
   });
@@ -148,9 +198,23 @@ describe("Account (v2)", () => {
     await screen.findByRole("heading", { level: 2, name: "Plan and usage" });
     const headings = screen.getAllByRole("heading", { level: 2 });
     const names = headings.map((h) => h.textContent);
-    expect(names).toEqual(expect.arrayContaining(["Profile", "Plan and usage", "Sign-in", "Privacy", "Your data"]));
-    expect(screen.getByRole("heading", { level: 1, name: "Account" }).closest(".account-v2")).not.toBeNull();
-    expect(await screen.findByTestId("account-resumes")).toHaveTextContent("Resumes: 1 of 5");
+    expect(names).toEqual(
+      expect.arrayContaining([
+        "Profile",
+        "Plan and usage",
+        "Sign-in",
+        "Privacy",
+        "Your data",
+      ]),
+    );
+    expect(
+      screen
+        .getByRole("heading", { level: 1, name: "Account" })
+        .closest(".account-v2"),
+    ).not.toBeNull();
+    expect(await screen.findByTestId("account-resumes")).toHaveTextContent(
+      "Resumes: 1 of 5",
+    );
     expect(screen.getByText("Email and password")).toBeInTheDocument();
     // My questions moved into the Question bank.
     expect(screen.queryByRole("heading", { name: "My questions" })).toBeNull();
@@ -158,7 +222,9 @@ describe("Account (v2)", () => {
 
   it("FL-1: with v2 off, Account keeps its one column and v1 sections", async () => {
     renderApp("/account", false);
-    expect(await screen.findByRole("heading", { level: 2, name: "My questions" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "My questions" }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Sign-in" })).toBeNull();
   });
 });

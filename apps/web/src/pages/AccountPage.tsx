@@ -5,9 +5,20 @@ import { Link, useNavigate } from "react-router";
 import { accountApi } from "../api/account";
 import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
-import { keys, POLL_MS, useAuth, usePlan, useProfile, useResumes, useUsage } from "../api/hooks";
+import {
+  keys,
+  POLL_MS,
+  useAuth,
+  usePlan,
+  useProfile,
+  useResumes,
+  useUsage,
+} from "../api/hooks";
 import type { AuthState, ExitReason, GotJob, Usage } from "../api/types";
-import { ConsentSwitch } from "../components/ConsentSwitch";
+import {
+  ConsentSwitch,
+  TracingConsentSwitch,
+} from "../components/ConsentSwitch";
 import { ErrorNotice, PageHead } from "../components/ui";
 import { formatDate, levelLabel } from "../labels";
 import { MAX_RESUMES } from "../limits";
@@ -55,7 +66,11 @@ function PlanSection({ usage }: { usage: Usage }) {
       return;
     }
     setSurveyError(null);
-    survey.mutate({ reason, got_job: gotJob, reason_detail: detail.trim() || null });
+    survey.mutate({
+      reason,
+      got_job: gotJob,
+      reason_detail: detail.trim() || null,
+    });
   };
 
   const busy = portal.isPending || survey.isPending;
@@ -63,10 +78,17 @@ function PlanSection({ usage }: { usage: Usage }) {
   // R3: "Plan and usage" also counts the resumes on file against the limit.
   const v2 = useFeature("v2_enabled");
   const resumes = useResumes();
-  const resumesOnFile = resumes.data ? resumes.data.filter((r) => !r.deleted).length : null;
+  const resumesOnFile = resumes.data
+    ? resumes.data.filter((r) => !r.deleted).length
+    : null;
 
   return (
-    <section className="panel" aria-labelledby="plan-heading" id="plan" data-order="2">
+    <section
+      className="panel"
+      aria-labelledby="plan-heading"
+      id="plan"
+      data-order="2"
+    >
       <h2 id="plan-heading">{v2 ? "Plan and usage" : "Plan"}</h2>
       {v2 && resumesOnFile !== null && (
         <p className="muted" data-testid="account-resumes">
@@ -79,20 +101,24 @@ function PlanSection({ usage }: { usage: Usage }) {
           <dd>{plan.data?.name ?? "Monthly plan"}</dd>
           <dt>Minutes this period</dt>
           <dd>
-            {usage.minutes_used} of {usage.minutes_cap} used, {usage.minutes_left} left
+            {usage.minutes_used} of {usage.minutes_cap} used,{" "}
+            {usage.minutes_left} left
           </dd>
           {usage.period_end && (
             <>
-              <dt>{usage.cancel_at_period_end ? "Plan ends on" : "Renews on"}</dt>
+              <dt>
+                {usage.cancel_at_period_end ? "Plan ends on" : "Renews on"}
+              </dt>
               <dd>{formatDate(usage.period_end)}</dd>
             </>
           )}
         </dl>
       ) : (
         <p>
-          Free plan. {usage.free_interviews_left} of {usage.free_interviews_total} free mini{" "}
-          {usage.free_interviews_total === 1 ? "interview" : "interviews"} left. Gap analyses are free.{" "}
-          <Link to="/upgrade">See the monthly plan</Link>
+          Free plan. {usage.free_interviews_left} of{" "}
+          {usage.free_interviews_total} free mini{" "}
+          {usage.free_interviews_total === 1 ? "interview" : "interviews"} left.
+          Gap analyses are free. <Link to="/upgrade">See the monthly plan</Link>
         </p>
       )}
       {usage.cancel_at_period_end && paid && (
@@ -113,16 +139,28 @@ function PlanSection({ usage }: { usage: Usage }) {
           </button>
         )}
         {paid && !usage.cancel_at_period_end && !surveyOpen && (
-          <button type="button" className="btn btn--quiet" onClick={() => setSurveyOpen(true)}>
+          <button
+            type="button"
+            className="btn btn--quiet"
+            onClick={() => setSurveyOpen(true)}
+          >
             Cancel plan
           </button>
         )}
       </div>
 
       {paid && surveyOpen && !usage.cancel_at_period_end && (
-        <form className="section" onSubmit={onCancel} aria-labelledby="survey-heading" noValidate>
+        <form
+          className="section"
+          onSubmit={onCancel}
+          aria-labelledby="survey-heading"
+          noValidate
+        >
           <h3 id="survey-heading">Before you go</h3>
-          <p className="muted">Two questions help us improve. Then Stripe asks you to confirm the cancellation.</p>
+          <p className="muted">
+            Two questions help us improve. Then Stripe asks you to confirm the
+            cancellation.
+          </p>
           <fieldset>
             <legend>Why are you leaving?</legend>
             {EXIT_REASONS.map((o) => (
@@ -171,16 +209,28 @@ function PlanSection({ usage }: { usage: Usage }) {
             <button type="submit" className="btn btn--danger" disabled={busy}>
               Continue to cancel
             </button>
-            <button type="button" className="btn btn--quiet" onClick={() => portal.mutate("cancel")} disabled={busy}>
+            <button
+              type="button"
+              className="btn btn--quiet"
+              onClick={() => portal.mutate("cancel")}
+              disabled={busy}
+            >
               Skip the survey and cancel
             </button>
-            <button type="button" className="btn btn--quiet" onClick={() => setSurveyOpen(false)} disabled={busy}>
+            <button
+              type="button"
+              className="btn btn--quiet"
+              onClick={() => setSurveyOpen(false)}
+              disabled={busy}
+            >
               Keep my plan
             </button>
           </div>
         </form>
       )}
-      {(portal.isError || survey.isError) && <ErrorNotice error={portal.error ?? survey.error} />}
+      {(portal.isError || survey.isError) && (
+        <ErrorNotice error={portal.error ?? survey.error} />
+      )}
     </section>
   );
 }
@@ -207,21 +257,41 @@ export function AccountPage() {
     mutationFn: accountApi.setConsent,
     onSuccess: ({ training_consent }) => {
       queryClient.setQueryData<AuthState>(keys.me, (prev) =>
-        prev?.user ? { ...prev, user: { ...prev.user, training_consent } } : prev,
+        prev?.user
+          ? { ...prev, user: { ...prev.user, training_consent } }
+          : prev,
+      );
+    },
+  });
+
+  const tracing = useMutation({
+    mutationFn: accountApi.setTracingConsent,
+    onSuccess: ({ tracing_consent }) => {
+      queryClient.setQueryData<AuthState>(keys.me, (prev) =>
+        prev?.user
+          ? { ...prev, user: { ...prev.user, tracing_consent } }
+          : prev,
       );
     },
   });
 
   const [exportId, setExportId] = useState<string | null>(null);
-  const startExport = useMutation({ mutationFn: accountApi.startExport, onSuccess: (job) => setExportId(job.id) });
+  const startExport = useMutation({
+    mutationFn: accountApi.startExport,
+    onSuccess: (job) => setExportId(job.id),
+  });
   const exportJob = useQuery({
     queryKey: ["account", "export", exportId],
     queryFn: () => accountApi.getExport(exportId ?? ""),
     enabled: Boolean(exportId),
-    refetchInterval: (q) => (q.state.data && q.state.data.status !== "preparing" ? false : POLL_MS),
+    refetchInterval: (q) =>
+      q.state.data && q.state.data.status !== "preparing" ? false : POLL_MS,
   });
   const exportStatus = exportJob.data?.status;
-  const exportDone = exportStatus !== undefined && exportStatus !== "preparing" && exportStatus !== "ready";
+  const exportDone =
+    exportStatus !== undefined &&
+    exportStatus !== "preparing" &&
+    exportStatus !== "ready";
 
   const [confirmText, setConfirmText] = useState("");
   const remove = useMutation({
@@ -236,14 +306,24 @@ export function AccountPage() {
   });
 
   if (!user) return null;
-  const consentValue = consent.isPending ? (consent.variables ?? user.training_consent) : user.training_consent;
+  const consentValue = consent.isPending
+    ? (consent.variables ?? user.training_consent)
+    : user.training_consent;
+  const tracingValue = tracing.isPending
+    ? (tracing.variables ?? user.tracing_consent)
+    : user.tracing_consent;
 
   // R3 (v2): two columns, one on phones, in this order: Profile, Plan and usage, Sign-in, Privacy,
   // Your data, Delete. My questions moved into the Question bank. v1 keeps its one column.
   return (
     <div className={v2 ? "account-v2" : "page--narrow"}>
       <PageHead title="Account" />
-      <section className="panel" aria-labelledby="profile-heading" id="profile" data-order="1">
+      <section
+        className="panel"
+        aria-labelledby="profile-heading"
+        id="profile"
+        data-order="1"
+      >
         <h2 id="profile-heading">Profile</h2>
         {profile.isError && <ErrorNotice error={profile.error} />}
         <dl className="dl">
@@ -254,7 +334,11 @@ export function AccountPage() {
           <dt>Years of experience</dt>
           <dd>{profile.data?.years_experience ?? "Not set"}</dd>
           <dt>Level you are interviewing for</dt>
-          <dd>{profile.data?.target_level ? levelLabel[profile.data.target_level] : "Not set"}</dd>
+          <dd>
+            {profile.data?.target_level
+              ? levelLabel[profile.data.target_level]
+              : "Not set"}
+          </dd>
           <dt>Country</dt>
           <dd>{profile.data?.country ?? "Not set"}</dd>
           <dt>Time zone</dt>
@@ -277,7 +361,11 @@ export function AccountPage() {
       {usage.isError && <ErrorNotice error={usage.error} />}
 
       {v2 ? (
-        <section className="panel" aria-labelledby="signin-heading" data-order="3">
+        <section
+          className="panel"
+          aria-labelledby="signin-heading"
+          data-order="3"
+        >
           <h2 id="signin-heading">Sign-in</h2>
           <dl className="dl">
             <dt>Email</dt>
@@ -286,7 +374,10 @@ export function AccountPage() {
             <dd>{SIGN_IN_LABEL[user.auth_provider] ?? user.auth_provider}</dd>
           </dl>
           {user.auth_provider === "password" && (
-            <p className="muted small">To change your password, sign out and choose "Forgot password" on the sign-in page.</p>
+            <p className="muted small">
+              To change your password, sign out and choose "Forgot password" on
+              the sign-in page.
+            </p>
           )}
         </section>
       ) : (
@@ -300,20 +391,50 @@ export function AccountPage() {
         </section>
       )}
 
-      <section className="panel" aria-labelledby="privacy-heading" data-order="4">
+      <section
+        className="panel"
+        aria-labelledby="privacy-heading"
+        data-order="4"
+      >
         <h2 id="privacy-heading">{v2 ? "Privacy" : "Training data"}</h2>
-        <ConsentSwitch checked={consentValue} onChange={(v) => consent.mutate(v)} disabled={consent.isPending} />
+        <ConsentSwitch
+          checked={consentValue}
+          onChange={(v) => consent.mutate(v)}
+          disabled={consent.isPending}
+        />
         <p role="status" className="muted">
-          {consent.isSuccess && `Saved. Training-data use is ${consentValue ? "on" : "off"}.`}
+          {consent.isSuccess &&
+            `Saved. Training-data use is ${consentValue ? "on" : "off"}.`}
         </p>
         {consent.isError && <ErrorNotice error={consent.error} />}
+        {user.tracing_consent_available && (
+          <>
+            <TracingConsentSwitch
+              checked={tracingValue}
+              onChange={(v) => tracing.mutate(v)}
+              disabled={tracing.isPending}
+            />
+            <p role="status" className="muted">
+              {tracing.isSuccess &&
+                (tracingValue
+                  ? "Saved. The team may review your interviews from your next answer."
+                  : "Saved. Nothing more is kept, and what was kept is deleted within 24 hours.")}
+            </p>
+            {tracing.isError && <ErrorNotice error={tracing.error} />}
+          </>
+        )}
       </section>
 
-      <section className="panel" aria-labelledby="export-heading" data-order="5">
+      <section
+        className="panel"
+        aria-labelledby="export-heading"
+        data-order="5"
+      >
         <h2 id="export-heading">{v2 ? "Your data" : "Export your data"}</h2>
         <p>
-          Download all your data as a zip file: a JSON file with every record, and your original resume files. The
-          download link works once, for 24 hours.
+          Download all your data as a zip file: a JSON file with every record,
+          and your original resume files. The download link works once, for 24
+          hours.
         </p>
         {exportStatus === "ready" && exportJob.data?.download_url ? (
           <a
@@ -321,7 +442,9 @@ export function AccountPage() {
             href={exportJob.data.download_url}
             download="strong-hire-export.zip"
             // The link works once. Check the status again after the browser starts the download.
-            onClick={() => window.setTimeout(() => void exportJob.refetch(), 1500)}
+            onClick={() =>
+              window.setTimeout(() => void exportJob.refetch(), 1500)
+            }
           >
             Download export
           </a>
@@ -333,27 +456,45 @@ export function AccountPage() {
               setExportId(null);
               startExport.mutate();
             }}
-            disabled={startExport.isPending || exportStatus === "preparing" || (Boolean(exportId) && !exportDone)}
+            disabled={
+              startExport.isPending ||
+              exportStatus === "preparing" ||
+              (Boolean(exportId) && !exportDone)
+            }
           >
-            {exportId && !exportDone ? "Preparing your export" : "Prepare export"}
+            {exportId && !exportDone
+              ? "Preparing your export"
+              : "Prepare export"}
           </button>
         )}
         <p role="status" className={exportDone ? "muted" : "visually-hidden"}>
           {exportStatus === "ready" && "Your export is ready to download."}
-          {exportStatus === "downloaded" && "Your export was downloaded. Prepare a new one to download again."}
-          {exportStatus === "expired" && "Your export link has expired. Prepare a new one."}
+          {exportStatus === "downloaded" &&
+            "Your export was downloaded. Prepare a new one to download again."}
+          {exportStatus === "expired" &&
+            "Your export link has expired. Prepare a new one."}
         </p>
         {exportStatus === "failed" && (
-          <ErrorNotice error={exportJob.data?.error ?? "The export failed."} title="We could not prepare your export." />
+          <ErrorNotice
+            error={exportJob.data?.error ?? "The export failed."}
+            title="We could not prepare your export."
+          />
         )}
-        {(startExport.isError || exportJob.isError) && <ErrorNotice error={startExport.error ?? exportJob.error} />}
+        {(startExport.isError || exportJob.isError) && (
+          <ErrorNotice error={startExport.error ?? exportJob.error} />
+        )}
       </section>
 
-      <section className="panel" aria-labelledby="delete-heading" data-order="6">
+      <section
+        className="panel"
+        aria-labelledby="delete-heading"
+        data-order="6"
+      >
         <h2 id="delete-heading">Delete your account</h2>
         <p>
-          This deletes your account, resumes, jobs, transcripts and scores within 24 hours, and cancels your plan.
-          Backups expire within 30 days. You cannot undo this.
+          This deletes your account, resumes, jobs, transcripts and scores
+          within 24 hours, and cancels your plan. Backups expire within 30 days.
+          You cannot undo this.
         </p>
         <div className="field">
           <label htmlFor="delete-confirm">Type DELETE to confirm</label>

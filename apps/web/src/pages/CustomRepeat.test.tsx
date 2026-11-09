@@ -16,7 +16,10 @@ import { AppRoutes, createQueryClient } from "../App";
 import { FREE_USAGE, OPEN_STATUS } from "../mocks/db";
 import { mockStore } from "../mocks/node";
 
-const POSTING = "Senior Software Engineer at Stripe. Payments reliability, Python, Go. ".repeat(4);
+const POSTING =
+  "Senior Software Engineer at Stripe. Payments reliability, Python, Go. ".repeat(
+    4,
+  );
 
 const PAID: Usage = {
   ...FREE_USAGE,
@@ -64,11 +67,19 @@ function signedIn(email = "ana@example.com") {
     created_at: "2026-10-01T10:00:00Z",
     full_name: "Ana Lopez",
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email, userEmail: email };
 }
 
-function session(id: string, jobId: string, resumeId: string, config: SessionConfig, day: number): SessionRecord {
+function session(
+  id: string,
+  jobId: string,
+  resumeId: string,
+  config: SessionConfig,
+  day: number,
+): SessionRecord {
   return {
     id,
     job_target_id: jobId,
@@ -101,7 +112,13 @@ async function seed(configs: SessionConfig[]) {
   await gapApi.get(job.id);
   configs.forEach((config, i) => {
     mockStore.db.sessions.push(
-      session(`00000000-0000-4000-8000-00000000e00${i + 1}`, job.id, resume.id, config, i + 3),
+      session(
+        `00000000-0000-4000-8000-00000000e00${i + 1}`,
+        job.id,
+        resume.id,
+        config,
+        i + 3,
+      ),
     );
   });
   return { job, resume };
@@ -119,7 +136,11 @@ function renderAt(path: string) {
   return user;
 }
 
-const behavioral: SessionConfig = { ...CUSTOM_CONFIG, interview_type: "behavioral", custom: null };
+const behavioral: SessionConfig = {
+  ...CUSTOM_CONFIG,
+  interview_type: "behavioral",
+  custom: null,
+};
 
 // These tests render the whole app; under a loaded test run they need more than the defaults.
 const SLOW = { timeout: 4000 };
@@ -128,44 +149,90 @@ describe("Custom run again and recommendation", { timeout: 20_000 }, () => {
   it("CU-9: the rehearsals view runs an earlier Custom setup again, prefilled", async () => {
     const { job, resume } = await seed([behavioral, CUSTOM_CONFIG]);
     const user = renderAt(`/jobs/${job.id}/rehearse/${resume.id}`);
-    const panel = await screen.findByRole("region", { name: "Your Custom setups" }, SLOW);
+    const panel = await screen.findByRole(
+      "region",
+      { name: "Your Custom setups" },
+      SLOW,
+    );
     expect(within(panel).getAllByTestId("custom-setup")).toHaveLength(1);
-    expect(panel).toHaveTextContent("Behavioral, Verbal technical Q&A. 1 of your questions");
-    await user.click(within(panel).getByRole("button", { name: /^Run this setup again/ }));
+    expect(panel).toHaveTextContent(
+      "Behavioral, Verbal technical Q&A. 1 of your questions",
+    );
+    await user.click(
+      within(panel).getByRole("button", { name: /^Run this setup again/ }),
+    );
 
-    expect(await screen.findByRole("heading", { name: "Set up your interview" }, SLOW)).toBeInTheDocument();
-    expect(await screen.findByRole("radio", { name: /^Custom/ }, SLOW)).toBeChecked();
-    expect(await screen.findByRole("button", { name: "Kubernetes" }, SLOW)).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("own-question")).toHaveTextContent("Tell me about a time you disagreed with your manager.");
+    expect(
+      await screen.findByRole(
+        "heading",
+        { name: "Set up your interview" },
+        SLOW,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("radio", { name: /^Custom/ }, SLOW),
+    ).toBeChecked();
+    expect(
+      await screen.findByRole("button", { name: "Kubernetes" }, SLOW),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("own-question")).toHaveTextContent(
+      "Tell me about a time you disagreed with your manager.",
+    );
   });
 
   it("CU-9: the rehearsals view has no Custom panel without a Custom session", async () => {
     const { job, resume } = await seed([behavioral]);
     renderAt(`/jobs/${job.id}/rehearse/${resume.id}`);
-    expect(await screen.findByRole("region", { name: "Where you stand" }, SLOW)).toBeInTheDocument();
-    expect(screen.queryByRole("region", { name: "Your Custom setups" })).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole("region", { name: "Where you stand" }, SLOW),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Your Custom setups" }),
+    ).not.toBeInTheDocument();
   });
 
   it("CU-10: the dashboard recommends a Custom session and opens its setup prefilled", async () => {
     await seed([behavioral, { ...behavioral, interview_type: "technical_qa" }]);
     const user = renderAt("/");
     const card = await screen.findByTestId("custom-next", {}, SLOW);
-    expect(within(card).getByRole("heading", { name: "Practice trade offs and conflict handling" })).toBeInTheDocument();
-    expect(card).toHaveTextContent("Custom interview, Verbal technical Q&A, Behavioral, 30 minutes.");
-    await user.click(within(card).getByRole("link", { name: "Set up this Custom interview" }));
+    expect(
+      within(card).getByRole("heading", {
+        name: "Practice trade offs and conflict handling",
+      }),
+    ).toBeInTheDocument();
+    expect(card).toHaveTextContent(
+      "Custom interview, Verbal technical Q&A, Behavioral, 30 minutes.",
+    );
+    await user.click(
+      within(card).getByRole("link", { name: "Set up this Custom interview" }),
+    );
 
-    expect(await screen.findByRole("radio", { name: /^Custom/ }, SLOW)).toBeChecked();
-    expect(await screen.findByRole("button", { name: "Trade offs" }, SLOW)).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "Idempotency" })).toHaveAttribute("aria-pressed", "true");
+    expect(
+      await screen.findByRole("radio", { name: /^Custom/ }, SLOW),
+    ).toBeChecked();
+    expect(
+      await screen.findByRole("button", { name: "Trade offs" }, SLOW),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Idempotency" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("CU-10, CU-11: no Custom recommendation while Custom is locked for a free account", async () => {
     await seed([behavioral, { ...behavioral, interview_type: "technical_qa" }]);
     mockStore.db.usage = FREE_USAGE;
-    mockStore.db.siteStatus = { ...OPEN_STATUS, custom_interview_access: "paid_only" };
+    mockStore.db.siteStatus = {
+      ...OPEN_STATUS,
+      custom_interview_access: "paid_only",
+    };
     renderAt("/");
-    expect(await screen.findByRole("heading", { name: "Your trend" }, SLOW)).toBeInTheDocument();
-    expect(await screen.findByText("Next rehearsal", {}, SLOW)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Your trend" }, SLOW),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Next rehearsal", {}, SLOW),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId("custom-next")).not.toBeInTheDocument();
   });
 });

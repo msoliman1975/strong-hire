@@ -29,7 +29,11 @@ function renderAt(path: string) {
   return user;
 }
 
-function setBanner(text: string, severity: "info" | "warning" | "critical", untilMs: number) {
+function setBanner(
+  text: string,
+  severity: "info" | "warning" | "critical",
+  untilMs: number,
+) {
   mockStore.db.siteStatus = {
     ...mockStore.db.siteStatus,
     banner: { text, severity, until: new Date(untilMs).toISOString() },
@@ -40,7 +44,11 @@ describe("site banner (OC-4)", () => {
   it("shows the banner with its severity on the sign-in page", async () => {
     setBanner("Scoring is slow today.", "warning", Date.now() + HOUR);
     renderAt("/signin");
-    const banner = await screen.findByRole("status", { name: "Site notice" }, { timeout: 4000 });
+    const banner = await screen.findByRole(
+      "status",
+      { name: "Site notice" },
+      { timeout: 4000 },
+    );
     expect(banner).toHaveTextContent("Scoring is slow today.");
     expect(banner).toHaveAttribute("data-severity", "warning");
   });
@@ -55,44 +63,85 @@ describe("site banner (OC-4)", () => {
       created_at: "2026-10-01T10:00:00Z",
       full_name: "Ana",
       profile_complete: true,
+      tracing_consent: false,
+      tracing_consent_available: false,
     };
-    mockStore.db.auth = { status: "signed_in", email: "ana@example.com", userEmail: "ana@example.com" };
+    mockStore.db.auth = {
+      status: "signed_in",
+      email: "ana@example.com",
+      userEmail: "ana@example.com",
+    };
     setBanner("Voice interviews are down.", "critical", Date.now() + HOUR);
     renderAt("/reports");
-    expect(await screen.findByRole("alert", { name: "Site notice" }, { timeout: 4000 })).toHaveTextContent("Voice interviews are down.");
+    expect(
+      await screen.findByRole(
+        "alert",
+        { name: "Site notice" },
+        { timeout: 4000 },
+      ),
+    ).toHaveTextContent("Voice interviews are down.");
   });
 
   it("is hidden after its end time", async () => {
     setBanner("Old news", "info", Date.now() - 1000);
     renderAt("/signin");
-    expect(await screen.findByRole("tab", { name: "Sign in", selected: true }, { timeout: 4000 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole(
+        "tab",
+        { name: "Sign in", selected: true },
+        { timeout: 4000 },
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Old news")).not.toBeInTheDocument();
   });
 
   it("shows nothing when there is no banner", async () => {
     renderAt("/signin");
-    expect(await screen.findByRole("tab", { name: "Sign in", selected: true }, { timeout: 4000 })).toBeInTheDocument();
-    expect(screen.queryByRole("status", { name: "Site notice" })).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole(
+        "tab",
+        { name: "Sign in", selected: true },
+        { timeout: 4000 },
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("status", { name: "Site notice" }),
+    ).not.toBeInTheDocument();
   });
 });
 
 describe("paused sign-ups (OC-1)", () => {
   it("the create-account tab says sign-ups are paused, and the API refusal is shown", async () => {
-    mockStore.db.siteStatus = { ...mockStore.db.siteStatus, signups_open: false };
+    mockStore.db.siteStatus = {
+      ...mockStore.db.siteStatus,
+      signups_open: false,
+    };
     const user = renderAt("/signin");
-    await user.click(await screen.findByRole("tab", { name: "Create account" }, { timeout: 4000 }));
-    expect(await screen.findByText(/We are not taking new sign-ups right now/)).toBeInTheDocument();
+    await user.click(
+      await screen.findByRole(
+        "tab",
+        { name: "Create account" },
+        { timeout: 4000 },
+      ),
+    );
+    expect(
+      await screen.findByText(/We are not taking new sign-ups right now/),
+    ).toBeInTheDocument();
     await user.type(screen.getByLabelText("Email address"), "new@example.com");
     await user.type(screen.getByLabelText("Password"), "correct horse battery");
     await user.click(screen.getByRole("checkbox"));
     await user.click(screen.getByRole("button", { name: "Create account" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("join the waitlist");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "join the waitlist",
+    );
     expect(mockStore.db.users["new@example.com"]).toBeUndefined();
   });
 
   it("an email link or Google sign-up comes back with the waitlist message", async () => {
     renderAt("/signin?error=signups_paused");
-    expect(await screen.findByRole("alert", {}, { timeout: 4000 })).toHaveTextContent("We are not taking new sign-ups right now");
+    expect(
+      await screen.findByRole("alert", {}, { timeout: 4000 }),
+    ).toHaveTextContent("We are not taking new sign-ups right now");
   });
 });
 
@@ -108,13 +157,20 @@ const JOB: JobTargetOut = {
   company_slug: null,
   generic_mode: true,
   stage: null,
-  context: { interviewer_name: null, interviewer_role: null, recruiter_notes: null, concerns: null },
+  context: {
+    interviewer_name: null,
+    interviewer_role: null,
+    recruiter_notes: null,
+    concerns: null,
+  },
   created_at: "2026-10-01T10:00:00Z",
   archived_at: null,
 };
 
 function renderSetup() {
-  server.use(http.get("*/api/job-targets/:jobId", () => HttpResponse.json(JOB)));
+  server.use(
+    http.get("*/api/job-targets/:jobId", () => HttpResponse.json(JOB)),
+  );
   const user = userEvent.setup();
   render(
     <QueryClientProvider client={createQueryClient()}>
@@ -131,10 +187,17 @@ function renderSetup() {
 
 describe("paused sessions (OC-2, OC-3)", () => {
   it("the setup page says interviews are unavailable and does not offer to start", async () => {
-    mockStore.db.siteStatus = { ...mockStore.db.siteStatus, voice_sessions_open: false };
+    mockStore.db.siteStatus = {
+      ...mockStore.db.siteStatus,
+      voice_sessions_open: false,
+    };
     renderSetup();
-    expect(await screen.findByTestId("sessions-unavailable", {}, { timeout: 4000 })).toHaveTextContent("temporarily unavailable");
-    expect(screen.getByRole("button", { name: "Start interview" })).toBeDisabled();
+    expect(
+      await screen.findByTestId("sessions-unavailable", {}, { timeout: 4000 }),
+    ).toHaveTextContent("temporarily unavailable");
+    expect(
+      screen.getByRole("button", { name: "Start interview" }),
+    ).toBeDisabled();
   });
 
   it("a refusal from the API (the spend cap) shows the friendly notice, not an error", async () => {
@@ -144,7 +207,8 @@ describe("paused sessions (OC-2, OC-3)", () => {
           {
             detail: {
               code: "spend_cap_reached",
-              message: "New interviews are temporarily unavailable. Please try again in a little while.",
+              message:
+                "New interviews are temporarily unavailable. Please try again in a little while.",
             },
           },
           { status: 503 },
@@ -152,8 +216,16 @@ describe("paused sessions (OC-2, OC-3)", () => {
       ),
     );
     const user = renderSetup();
-    await user.click(await screen.findByRole("button", { name: "Start interview" }, { timeout: 4000 }));
-    expect(await screen.findByTestId("sessions-unavailable", {}, { timeout: 4000 })).toHaveTextContent("Please try again in a little while.");
+    await user.click(
+      await screen.findByRole(
+        "button",
+        { name: "Start interview" },
+        { timeout: 4000 },
+      ),
+    );
+    expect(
+      await screen.findByTestId("sessions-unavailable", {}, { timeout: 4000 }),
+    ).toHaveTextContent("Please try again in a little while.");
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

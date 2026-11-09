@@ -17,11 +17,16 @@ import { setFeatureOverrides } from "../../theme/features";
 import { MAX_RESUMES } from "../../limits";
 import { checkResume, thisMonth } from "../onboarding/resumeChecks";
 import { resumeIssueCounts } from "../onboarding/resumeSummary";
-import { HIGH_MARK_LABEL, resumeStats, usingRoleCount } from "./ResumesListPage";
+import {
+  HIGH_MARK_LABEL,
+  resumeStats,
+  usingRoleCount,
+} from "./ResumesListPage";
 
 const USER_ID = "00000000-0000-4000-8000-0000000000a1";
 const EMAIL = "ana@example.com";
-const RESUME_TEXT = "Backend engineer, Python and Go. Led the move of 30 services to PostgreSQL.";
+const RESUME_TEXT =
+  "Backend engineer, Python and Go. Led the move of 30 services to PostgreSQL.";
 
 beforeEach(() => {
   globalThis.localStorage?.setItem(`sh-tour-done-${USER_ID}`, "x");
@@ -34,6 +39,8 @@ beforeEach(() => {
     created_at: "2026-10-01T10:00:00Z",
     full_name: "Ana Lopez",
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email: EMAIL, userEmail: EMAIL };
   mockStore.db.profiles[EMAIL] = { ...EMPTY_PROFILE, plan_style: "weekly" };
@@ -64,12 +71,17 @@ async function addResume(name?: string): Promise<ResumeOut> {
 
 /** A role on this resume, through the interviews endpoint, as the app creates it. */
 async function roleOn(resumeId: string) {
-  const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
+  const { job_target: created } = await jobTargetsApi.create({
+    text: "Senior engineer, payments. ".repeat(5),
+  });
   const job = await jobTargetsApi.get(created.id);
   await fetch(`${location.origin}/api/roles/${job.id}/interviews`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ interview_types: ["behavioral"], resume_id: resumeId }),
+    body: JSON.stringify({
+      interview_types: ["behavioral"],
+      resume_id: resumeId,
+    }),
   });
 }
 
@@ -85,8 +97,14 @@ function withHighIssue(record: ResumeOut) {
 /** No high-severity issue: accept the high ones, as a user can (IN-12). */
 function withoutHighIssue(record: ResumeOut) {
   if (!record.resume) return;
-  const high = checkResume(record.resume, { today: thisMonth(), job: null }).filter((i) => i.severity === "high");
-  record.accepted_issues = high.map((i) => ({ key: i.key, accepted_at: "2026-10-28T10:00:00Z" }));
+  const high = checkResume(record.resume, {
+    today: thisMonth(),
+    job: null,
+  }).filter((i) => i.severity === "high");
+  record.accepted_issues = high.map((i) => ({
+    key: i.key,
+    accepted_at: "2026-10-28T10:00:00Z",
+  }));
 }
 
 const cardOf = async (name: string) => {
@@ -97,7 +115,10 @@ const cardOf = async (name: string) => {
 const tiles = (card: HTMLElement) =>
   within(card)
     .queryAllByRole("term")
-    .map((t, i) => `${within(card).getAllByRole("definition")[i].textContent} ${t.textContent}`);
+    .map(
+      (t, i) =>
+        `${within(card).getAllByRole("definition")[i].textContent} ${t.textContent}`,
+    );
 
 describe("RSD-1: the cards", () => {
   it("RSD-1: one card per resume in a two-column grid, with three tiles and the dates, and no company names", async () => {
@@ -109,7 +130,8 @@ describe("RSD-1: the cards", () => {
     expect(list.closest(".sx-grid2")).toHaveClass("stretch");
     const items = within(list).getAllByRole("listitem");
     expect(items).toHaveLength(2);
-    for (const item of items) expect(within(item).getByRole("region")).toHaveClass("sx-summary");
+    for (const item of items)
+      expect(within(item).getByRole("region")).toHaveClass("sx-summary");
 
     const card = await cardOf("Senior SWE resume");
     expect(within(card).getByText("Default")).toBeInTheDocument();
@@ -120,15 +142,23 @@ describe("RSD-1: the cards", () => {
     // The page no longer names the companies that use a resume.
     expect(card).not.toHaveTextContent(/Used by/);
     // The tiles are not interactive.
-    expect(card.querySelector(".sx-summary__stats")?.querySelectorAll("a, button")).toHaveLength(0);
+    expect(
+      card.querySelector(".sx-summary__stats")?.querySelectorAll("a, button"),
+    ).toHaveLength(0);
   });
 
   it("RSD-1: the roles count is the rule behind usedBy; story ideas use the story-ideas query", async () => {
     const r = await addResume("Senior SWE resume");
     renderApp();
     const card = await cardOf("Senior SWE resume");
-    const ideas = (await (await fetch(`${location.origin}/api/resumes/${r.id}/story-ideas`)).json()) as { ideas: unknown[] };
-    await waitFor(() => expect(tiles(card)[2]).toBe(`${ideas.ideas.length} ${ideas.ideas.length === 1 ? "story idea" : "story ideas"}`));
+    const ideas = (await (
+      await fetch(`${location.origin}/api/resumes/${r.id}/story-ideas`)
+    ).json()) as { ideas: unknown[] };
+    await waitFor(() =>
+      expect(tiles(card)[2]).toBe(
+        `${ideas.ideas.length} ${ideas.ideas.length === 1 ? "story idea" : "story ideas"}`,
+      ),
+    );
     expect(tiles(card)[0]).toBe("0 roles");
     expect(usingRoleCount(undefined, r.id)).toBeNull();
   });
@@ -144,21 +174,36 @@ describe("RSD-2: the open issues tile", () => {
     const amber = await cardOf("Senior SWE resume");
     const counts = resumeIssueCounts(high);
     expect(counts?.high).toBeGreaterThan(0);
-    const mark = await within(amber).findByRole("img", { name: HIGH_MARK_LABEL });
+    const mark = await within(amber).findByRole("img", {
+      name: HIGH_MARK_LABEL,
+    });
     expect(mark.closest(".sx-stat")).toHaveClass("sx-stat--warn");
-    expect(tiles(amber)[1]).toBe(`${counts?.open} ${counts?.open === 1 ? "open issue" : "open issues"}`);
+    expect(tiles(amber)[1]).toBe(
+      `${counts?.open} ${counts?.open === 1 ? "open issue" : "open issues"}`,
+    );
 
     const plain = await cardOf("Platform lead resume");
-    const other = resumeIssueCounts(mockStore.db.resumes.find((r) => r.name === "Platform lead resume") as ResumeOut);
+    const other = resumeIssueCounts(
+      mockStore.db.resumes.find(
+        (r) => r.name === "Platform lead resume",
+      ) as ResumeOut,
+    );
     expect(other?.high).toBe(0);
-    expect(within(plain).queryByRole("img", { name: HIGH_MARK_LABEL })).not.toBeInTheDocument();
+    expect(
+      within(plain).queryByRole("img", { name: HIGH_MARK_LABEL }),
+    ).not.toBeInTheDocument();
     expect(plain.querySelector(".sx-stat--warn")).toBeNull();
   });
 
   it("RSD-2: singular labels for 1, '—' while a count loads, and no sub-text", () => {
     expect(resumeStats(1, { open: 1, high: 1 }, 1)).toEqual([
       { value: 1, label: "role" },
-      { value: 1, label: "open issue", tone: "warn", markLabel: HIGH_MARK_LABEL },
+      {
+        value: 1,
+        label: "open issue",
+        tone: "warn",
+        markLabel: HIGH_MARK_LABEL,
+      },
       { value: 1, label: "story idea" },
     ]);
     expect(resumeStats(7, { open: 4, high: 0 }, 18)).toEqual([
@@ -166,7 +211,11 @@ describe("RSD-2: the open issues tile", () => {
       { value: 4, label: "open issues" },
       { value: 18, label: "story ideas" },
     ]);
-    expect(resumeStats(null, null, null).map((t) => t.value)).toEqual(["—", "—", "—"]);
+    expect(resumeStats(null, null, null).map((t) => t.value)).toEqual([
+      "—",
+      "—",
+      "—",
+    ]);
   });
 });
 
@@ -178,21 +227,41 @@ describe("RSD-3: the footer", () => {
 
     const def = await cardOf("Senior SWE resume");
     const foot = def.querySelector(".sx-summary__foot") as HTMLElement;
-    expect([...foot.querySelectorAll("a, button")].map((el) => el.getAttribute("aria-label"))).toEqual([
+    expect(
+      [...foot.querySelectorAll("a, button")].map((el) =>
+        el.getAttribute("aria-label"),
+      ),
+    ).toEqual([
       "Show details: Senior SWE resume",
       "Rename Senior SWE resume",
       "Delete Senior SWE resume",
     ]);
-    expect(within(def).getByRole("link", { name: /^Show details/ })).toHaveAttribute("href", `/resumes/${main.id}/check`);
+    expect(
+      within(def).getByRole("link", { name: /^Show details/ }),
+    ).toHaveAttribute("href", `/resumes/${main.id}/check`);
     expect(within(def).queryByText(/More/)).not.toBeInTheDocument();
-    expect(within(def).queryByRole("link", { name: /^Open/ })).not.toBeInTheDocument();
+    expect(
+      within(def).queryByRole("link", { name: /^Open/ }),
+    ).not.toBeInTheDocument();
     // The card is not a link (D-2).
     expect(def.closest("a")).toBeNull();
 
     const card = await cardOf("Platform lead resume");
-    await user.click(within(card).getByRole("button", { name: "Set Platform lead resume as default" }));
-    await waitFor(() => expect(mockStore.db.resumes.find((r) => r.id === other.id)?.is_main).toBe(true));
-    await waitFor(async () => expect(within(await cardOf("Platform lead resume")).getByText("Default")).toBeInTheDocument());
+    await user.click(
+      within(card).getByRole("button", {
+        name: "Set Platform lead resume as default",
+      }),
+    );
+    await waitFor(() =>
+      expect(mockStore.db.resumes.find((r) => r.id === other.id)?.is_main).toBe(
+        true,
+      ),
+    );
+    await waitFor(async () =>
+      expect(
+        within(await cardOf("Platform lead resume")).getByText("Default"),
+      ).toBeInTheDocument(),
+    );
   });
 
   it("RSD-3: Rename replaces the card body with the form; Delete opens the dialog with the RMAP-5 roles note", async () => {
@@ -201,17 +270,32 @@ describe("RSD-3: the footer", () => {
     const user = renderApp();
     const card = await cardOf("Senior SWE resume");
 
-    await user.click(within(card).getByRole("button", { name: "Rename Senior SWE resume" }));
-    const form = within(card).getByRole("form", { name: "Rename Senior SWE resume" });
-    expect(within(form).getByRole("textbox", { name: "New name" })).toHaveValue("Senior SWE resume");
-    expect(within(card).queryByRole("link", { name: /^Show details/ })).not.toBeInTheDocument();
+    await user.click(
+      within(card).getByRole("button", { name: "Rename Senior SWE resume" }),
+    );
+    const form = within(card).getByRole("form", {
+      name: "Rename Senior SWE resume",
+    });
+    expect(within(form).getByRole("textbox", { name: "New name" })).toHaveValue(
+      "Senior SWE resume",
+    );
+    expect(
+      within(card).queryByRole("link", { name: /^Show details/ }),
+    ).not.toBeInTheDocument();
     await user.click(within(form).getByRole("button", { name: "Cancel" }));
 
-    const del = within(card).getByRole("button", { name: "Delete Senior SWE resume" });
+    const del = within(card).getByRole("button", {
+      name: "Delete Senior SWE resume",
+    });
     await waitFor(() => expect(tiles(card)[0]).toBe("1 role"));
     await user.click(del);
-    const dialog = within(card.closest("li") as HTMLElement).getByRole("dialog", { name: "Delete this resume?" });
-    expect(within(dialog).getByTestId("delete-roles-note")).toHaveTextContent(/uses this resume\./);
+    const dialog = within(card.closest("li") as HTMLElement).getByRole(
+      "dialog",
+      { name: "Delete this resume?" },
+    );
+    expect(within(dialog).getByTestId("delete-roles-note")).toHaveTextContent(
+      /uses this resume\./,
+    );
     await user.click(within(dialog).getByRole("button", { name: "Keep it" }));
     expect(del).toHaveFocus();
   });
@@ -219,15 +303,25 @@ describe("RSD-3: the footer", () => {
   it("RSD-3: a resume still being read shows empty tiles, 'Being read' and only Rename and Delete", async () => {
     await addResume("Senior SWE resume");
     const reading = await addResume("Data engineering resume");
-    Object.assign(reading, { status: "pending", resume: null, confirmed_at: null });
+    Object.assign(reading, {
+      status: "pending",
+      resume: null,
+      confirmed_at: null,
+    });
     // No task for it, so the mock keeps it pending.
     renderApp();
     const card = await cardOf("Data engineering resume");
     expect(within(card).getByText("Being read")).toBeInTheDocument();
-    expect(card).toHaveTextContent("Strova is reading this resume. The numbers show when she is done.");
+    expect(card).toHaveTextContent(
+      "Strova is reading this resume. The numbers show when she is done.",
+    );
     expect(within(card).queryAllByRole("term")).toHaveLength(0);
     expect(card.querySelectorAll(".sx-stat--empty")).toHaveLength(3);
-    const controls = [...(card.querySelector(".sx-summary__foot") as HTMLElement).querySelectorAll("a, button")];
+    const controls = [
+      ...(
+        card.querySelector(".sx-summary__foot") as HTMLElement
+      ).querySelectorAll("a, button"),
+    ];
     expect(controls.map((el) => el.textContent)).toEqual(["Rename", "Delete"]);
   });
 
@@ -235,9 +329,13 @@ describe("RSD-3: the footer", () => {
     await addResume("Senior SWE resume");
     await addResume("Platform lead resume");
     renderApp();
-    const add = await screen.findByRole("link", { name: /Add a resume.*slots left/ });
+    const add = await screen.findByRole("link", {
+      name: /Add a resume.*slots left/,
+    });
     expect(add).toHaveAttribute("href", "/start");
-    expect(add).toHaveTextContent(`${MAX_RESUMES - 2} slots left. Add the version you sent for a role.`);
+    expect(add).toHaveTextContent(
+      `${MAX_RESUMES - 2} slots left. Add the version you sent for a role.`,
+    );
     expect(add.closest("ul")).toBeNull();
   });
 
@@ -245,8 +343,14 @@ describe("RSD-3: the footer", () => {
     for (let i = 0; i < MAX_RESUMES; i += 1) await addResume(`Resume ${i + 1}`);
     renderApp();
     expect(await screen.findByTestId("resumes-full")).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /slots? left/ })).not.toBeInTheDocument();
-    expect(within(screen.getByRole("list", { name: "Your resumes" })).getAllByRole("listitem")).toHaveLength(MAX_RESUMES);
+    expect(
+      screen.queryByRole("link", { name: /slots? left/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole("list", { name: "Your resumes" })).getAllByRole(
+        "listitem",
+      ),
+    ).toHaveLength(MAX_RESUMES);
   });
 });
 
@@ -255,9 +359,15 @@ describe("RSD-16: story ideas on the list", () => {
     const senior = await addResume("Senior SWE resume");
     await addResume("Platform lead resume");
     const reading = await addResume("Data engineering resume");
-    Object.assign(reading, { status: "pending", resume: null, confirmed_at: null });
+    Object.assign(reading, {
+      status: "pending",
+      resume: null,
+      confirmed_at: null,
+    });
     // One idea set aside on the first resume, so the counts differ.
-    const first = (await (await fetch(`${location.origin}/api/resumes/${senior.id}/story-ideas`)).json()) as {
+    const first = (await (
+      await fetch(`${location.origin}/api/resumes/${senior.id}/story-ideas`)
+    ).json()) as {
       ideas: { resume_line_ref: string }[];
     };
     await resumesApi.dismissIdea(senior.id, first.ideas[0].resume_line_ref);

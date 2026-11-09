@@ -541,10 +541,11 @@ async def open_text_session(
     try:
         async with (
             asyncio.timeout(settings.text_turn_timeout_s),
-            traced_text_turn(db, session, next_turn_index(request, session.id)),  # LT-6
+            traced_text_turn(db, session, next_turn_index(request, session.id)) as traced,  # LT-6
         ):
             with usage_context(session.org_id, session.id):  # OB-2
                 turns = await runner.open()
+            traced.replies(turns)  # LT-21
     except TimeoutError:
         log.error(
             "text/open %s: no greeting after %d ms (limit %.0f s); stopped after step %s",
@@ -604,10 +605,13 @@ async def text_turn(
     try:
         async with (
             asyncio.timeout(settings.text_turn_timeout_s),
-            traced_text_turn(db, session, next_turn_index(request, session.id)),  # LT-6
+            traced_text_turn(
+                db, session, next_turn_index(request, session.id), candidate=body.text
+            ) as traced,  # LT-6, LT-21
         ):
             with usage_context(session.org_id, session.id):  # OB-2
                 turns = await runner.respond(body.text, on_stage=steps.step)
+            traced.replies(turns)
     except TimeoutError:
         stage = runner.stage if steps.last != "received" else "waiting_for_runner_lock"
         log.error(
@@ -652,9 +656,12 @@ async def coach(
         elif body.command == "resume":
             runner.resume()
         else:
-            async with traced_text_turn(db, session, next_turn_index(request, session.id)):
+            async with traced_text_turn(
+                db, session, next_turn_index(request, session.id)
+            ) as traced:
                 with usage_context(session.org_id, session.id):  # OB-2
                     turns = await runner.coach(body.command)
+                traced.replies(turns)
             await _flush_traces(runner)  # the text channel answers after its traces are saved
     except CoachNotAllowedError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc

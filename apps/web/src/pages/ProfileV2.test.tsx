@@ -17,7 +17,10 @@ const EMAIL = "ana@example.com";
 
 beforeEach(() => {
   setFeatureOverrides({ v2_enabled: true });
-  globalThis.localStorage?.setItem("sh-tour-done-00000000-0000-4000-8000-0000000000a1", "x");
+  globalThis.localStorage?.setItem(
+    "sh-tour-done-00000000-0000-4000-8000-0000000000a1",
+    "x",
+  );
   mockStore.db.users[EMAIL] = {
     id: "00000000-0000-4000-8000-0000000000a1",
     org_id: "00000000-0000-4000-8000-0000000000b1",
@@ -27,6 +30,8 @@ beforeEach(() => {
     created_at: "2026-10-01T10:00:00Z",
     full_name: "Ana Lopez",
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email: EMAIL, userEmail: EMAIL };
   mockStore.db.profiles[EMAIL] = {
@@ -55,36 +60,62 @@ function renderAt(path: string) {
 describe("Profile with Strova", () => {
   it("PS-2: shows the plan style and changes it at once; the account summary and details stay", async () => {
     const user = renderAt("/account/profile");
-    expect(await screen.findByRole("heading", { level: 1, name: "Profile" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Profile" }),
+    ).toBeInTheDocument();
     const styles = screen.getByRole("group", { name: "Plan style" });
     const weekly = within(styles).getByRole("button", { name: /Weekly plan/ });
-    const checklist = within(styles).getByRole("button", { name: /Readiness checklist/ });
+    const checklist = within(styles).getByRole("button", {
+      name: /Readiness checklist/,
+    });
     expect(weekly).toHaveAttribute("aria-pressed", "true");
     await user.click(checklist);
-    await expect.poll(() => mockStore.db.profiles[EMAIL].plan_style).toBe("checklist");
-    expect(await within(styles).findByRole("button", { name: /Readiness checklist/ })).toHaveAttribute("aria-pressed", "true");
+    await expect
+      .poll(() => mockStore.db.profiles[EMAIL].plan_style)
+      .toBe("checklist");
+    expect(
+      await within(styles).findByRole("button", {
+        name: /Readiness checklist/,
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
     const account = screen.getByRole("region", { name: "Account" });
-    expect(account).toHaveTextContent("Ana Lopez · ana@example.com · Senior · 7 years");
-    expect(within(account).getByRole("link", { name: "Account" })).toHaveAttribute("href", "/account");
+    expect(account).toHaveTextContent(
+      "Ana Lopez · ana@example.com · Senior · 7 years",
+    );
+    expect(
+      within(account).getByRole("link", { name: "Account" }),
+    ).toHaveAttribute("href", "/account");
     expect(screen.getByRole("form", { name: "Profile" })).toBeInTheDocument();
   });
 
   it("PS-6: email reminders can be muted and unmuted; in the app they stay on", async () => {
     const user = renderAt("/account/profile");
-    const reminders = await screen.findByRole("region", { name: "Reminders from Strova" });
+    const reminders = await screen.findByRole("region", {
+      name: "Reminders from Strova",
+    });
     expect(reminders).toHaveTextContent("In the app");
     expect(within(reminders).getByText("On")).toBeInTheDocument();
-    await user.click(within(reminders).getByRole("button", { name: "Mute email" }));
-    await expect.poll(() => mockStore.db.profiles[EMAIL].plan_email_muted).toBe(true);
+    await user.click(
+      within(reminders).getByRole("button", { name: "Mute email" }),
+    );
+    await expect
+      .poll(() => mockStore.db.profiles[EMAIL].plan_email_muted)
+      .toBe(true);
     expect(await within(reminders).findByText("Muted")).toBeInTheDocument();
-    await user.click(within(reminders).getByRole("button", { name: "Unmute email" }));
-    await expect.poll(() => mockStore.db.profiles[EMAIL].plan_email_muted).toBe(false);
+    await user.click(
+      within(reminders).getByRole("button", { name: "Unmute email" }),
+    );
+    await expect
+      .poll(() => mockStore.db.profiles[EMAIL].plan_email_muted)
+      .toBe(false);
   });
 
   it("FL-1: with v2 off the profile page keeps its v1 form", async () => {
     setFeatureOverrides({ v2_enabled: false });
     renderAt("/account/profile");
-    expect(await screen.findByRole("heading", { level: 1, name: "Your profile" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Your profile" }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("group", { name: "Plan style" })).toBeNull();
   });
 });

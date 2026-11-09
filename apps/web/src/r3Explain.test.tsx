@@ -41,6 +41,8 @@ function signedIn() {
     created_at: "2026-10-01T10:00:00Z",
     full_name: "Ana Lopez",
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email, userEmail: email };
 }
@@ -66,7 +68,9 @@ describe("explainers", () => {
     const toggle = screen.getByText("i").closest("summary") as HTMLElement;
     expect(toggle).toHaveAttribute("aria-label", "What's this: Readiness");
     await user.click(toggle);
-    expect(screen.getByRole("note")).toHaveTextContent("It counts nothing from Practice mode");
+    expect(screen.getByRole("note")).toHaveTextContent(
+      "It counts nothing from Practice mode",
+    );
   });
 
   it("RD-3: the readiness, takes, Proven and hire-signal sentences keep the practice-estimate framing", () => {
@@ -84,7 +88,9 @@ describe("tour", () => {
     const tour = await screen.findByRole("dialog", { name: "Your menu" });
     expect(tour).toHaveTextContent("1 of 3");
     await user.click(within(tour).getByRole("button", { name: "Next tip" }));
-    expect(screen.getByRole("dialog", { name: "Career Stories with Strova" })).toHaveTextContent("2 of 3");
+    expect(
+      screen.getByRole("dialog", { name: "Career Stories with Strova" }),
+    ).toHaveTextContent("2 of 3");
     await user.click(screen.getByRole("button", { name: "Skip the tour" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     cleanup();
@@ -99,7 +105,9 @@ describe("tour", () => {
     act(() => {
       window.dispatchEvent(new Event(TOUR_REPLAY_EVENT));
     });
-    expect(await screen.findByRole("dialog", { name: "Your menu" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("dialog", { name: "Your menu" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -108,11 +116,19 @@ describe("How it works", () => {
     const user = renderApp("/");
     const bar = await screen.findByRole("banner", { name: "Top bar" });
     await user.click(within(bar).getByRole("button", { name: "Account menu" }));
-    await user.click(within(bar).getByRole("link", { name: "Help and how it works" }));
-    expect(await screen.findByRole("heading", { level: 1, name: "How it works" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Practice mode and Realistic mode" })).toBeInTheDocument();
+    await user.click(
+      within(bar).getByRole("link", { name: "Help and how it works" }),
+    );
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "How it works" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Practice mode and Realistic mode" }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Your audio is never stored/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Replay the tour" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Replay the tour" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -121,24 +137,33 @@ describe("teaching empty states", () => {
     resetMockStories([]);
     renderApp("/stories");
     const empty = await screen.findByTestId("stories-empty");
-    expect(empty).toHaveTextContent("A story is one moment from your career, told in 5 parts");
-    expect(within(empty).getByRole("link", { name: "Build my first story" })).toHaveAttribute("href", "/coach/new");
+    expect(empty).toHaveTextContent(
+      "A story is one moment from your career, told in 5 parts",
+    );
+    expect(
+      within(empty).getByRole("link", { name: "Build my first story" }),
+    ).toHaveAttribute("href", "/coach/new");
   });
 });
 
 describe("motion", () => {
   it("UI-1: every R3 animation sits inside prefers-reduced-motion: no-preference, at 400 ms or less", () => {
     const section = styles.slice(styles.indexOf("R3 motion"));
-    const media = section.indexOf("@media (prefers-reduced-motion: no-preference)");
+    const media = section.indexOf(
+      "@media (prefers-reduced-motion: no-preference)",
+    );
     const keyframes = section.indexOf("@keyframes");
     expect(media).toBeGreaterThan(0);
     const before = section.slice(0, media);
     expect(before).not.toMatch(/animation:/);
     const block = section.slice(media, keyframes);
-    const durations = [...block.matchAll(/animation:\s*[\w-]+\s+(\d+)ms/g)].map((m) => Number(m[1]));
+    const durations = [...block.matchAll(/animation:\s*[\w-]+\s+(\d+)ms/g)].map(
+      (m) => Number(m[1]),
+    );
     expect(durations.length).toBeGreaterThan(5);
     // The mic pulse loops over 1.6 s but moves only in its first quarter (400 ms).
-    for (const d of durations) expect(d === 1600 || (d >= 150 && d <= 400)).toBe(true);
+    for (const d of durations)
+      expect(d === 1600 || (d >= 150 && d <= 400)).toBe(true);
     // Nothing in the live room.
     expect(block).not.toMatch(/\.room|\.live\b|live__/);
   });
