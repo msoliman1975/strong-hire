@@ -1,167 +1,174 @@
-"""Phase 2 end to end, all fake (PT06): two real users with both production flags on.
+"""LLM tracing end to end (LT06): one sim session through every service that traces it.
 
-One user consents to turn content and one does not. Each takes a text session. The traces land
-in an in-memory store that answers the same searches as MLflow (tags.org_id, tags.content), and
-the worker's delete job runs inline against it. Checks LT-16, LT-17, LT-18, LT-21, LT-22, LT-23,
-LT-24 and LT-25 together.
+All fake and in memory: the API's text channel, the worker jobs it queues (run inline), and the
+sim's judge, against the in-memory exporter. Checks the trace tree, the tags that tie it to the
+sim run, the redaction mode, and that a real user's session next to it makes no trace (LT-3).
 """
 
 from __future__ import annotations
 
 import json
-import re
-import uuid
-from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
 
-import httpx
 import pytest
-from fastapi import FastAPI
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-import strong_worker.account.jobs as account_jobs
-from strong_core.tracing import TraceRecord
-from strong_core.tracing.prod import delete_org_traces
+import strong_core.db.engine as engine_module
+import strong_core.sim as sim_module
+from strong_api.auth.settings import AppEnv, get_auth_settings
+from strong_core.config import get_settings
+from strong_core.gateway import FakeBackend, ModelGateway
+from strong_core.gateway.registry import fake_models_config
+from strong_core.tracing import SpanRecord
 from strong_core.tracing.testing import InMemoryExporter, trace_capture
+from strong_sim.cost import CostMeter, load_prices
+from strong_sim.judge import RULES
+from strong_sim.runner import _traced_judge
+from strong_sim.scenarios import Scenario
+from strong_sim.sessions import Conversation
+from strong_sim.transcript import Line
+from strong_worker.scoring import jobs as scoring_jobs
 
-from .conftest import InlineQueue, sign_in
-from .test_account import account_app, stripe
-from .test_sessions_api import create, ready_job
-from .test_tracing_consent import _flags
+from .conftest import sign_in
+from .test_sessions_api import ready_job
+from .test_sim_login import TOKEN, _app, _client, _env, _login
 
-__all__ = ["account_app", "stripe", "trace_capture"]
+__all__ = ["trace_capture"]
 
-ANSWER = "At Stripe I moved the ledger to Kafka; reach me at dev@example.com."
-FLAGS = {
-    "LLM_TRACING": "on",
-    "MLFLOW_TRACKING_URI": "http://mlflow:5000/mlflow",
-    "LLM_TRACING_PROD": "on",
-    "LLM_TRACING_PROD_CONTENT": "on",
+RUN = "20261105-e2e-run"
+ANSWER = "I moved the Acme billing ledger to Kafka and cut reconciliation time by 40 percent."
+CONFIG = {
+    "interview_type": "behavioral",
+    "difficulty": "realistic",
+    "mode": "realistic",
+    "duration_min": 45,
+    "level": "senior",
 }
 
 
-class CapturedStore:
-    """prod.TraceStore over the captured traces: the two searches the delete job makes."""
-
-    def __init__(self, exporter: InMemoryExporter) -> None:
-        self.exporter = exporter
-
-    def experiment_id(self, name: str) -> str | None:
-        return "prod"
-
-    def trace_ids(self, experiment_id: str, filter_string: str) -> list[str]:
-        org = re.search(r"tags\.org_id = '([^']+)'", filter_string)
-        assert org, filter_string
-        content_only = "tags.content = 'turns'" in filter_string
-        return [
-            t.trace_id
-            for t in self.exporter.traces
-            if _tags(t).get("org_id") == org.group(1)
-            and (not content_only or _tags(t).get("content") == "turns")
-        ]
-
-    def delete(self, experiment_id: str, trace_ids: list[str]) -> int:
-        before = len(self.exporter.traces)
-        self.exporter.traces[:] = [t for t in self.exporter.traces if t.trace_id not in trace_ids]
-        return before - len(self.exporter.traces)
-
-    def delete_before(self, experiment_id: str, before_ms: int) -> int:
-        raise AssertionError("retention is not part of this test")
+@pytest.fixture(autouse=True)
+def _clean(monkeypatch: pytest.MonkeyPatch) -> Any:
+    sim_module._sim_orgs.clear()
+    get_auth_settings.cache_clear()
+    yield
+    sim_module._sim_orgs.clear()
+    get_settings.cache_clear()
+    get_auth_settings.cache_clear()
 
 
-def _tags(trace: TraceRecord) -> dict[str, str]:
-    return trace.tags.as_tags()
-
-
-def _of(exporter: InMemoryExporter, org: str, name: str) -> list[TraceRecord]:
-    return [t for t in exporter.traces if _tags(t).get("org_id") == org and t.root.name == name]
-
-
-def _text(traces: list[TraceRecord]) -> str:
+def _dump(span: SpanRecord) -> str:
     return json.dumps(
-        [[s.attributes, s.inputs, s.outputs] for t in traces for s in t.spans()], default=str
+        {"a": span.attributes, "i": span.inputs, "o": span.outputs}, default=str, sort_keys=True
     )
 
 
-@pytest.fixture
-async def other(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
-    """A second real user, in their own org, who never consents."""
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, "bo@example.com")
-        yield http
+def _judge_gateway(fake_fixtures: Path) -> ModelGateway:
+    folder = fake_fixtures / "judge"
+    folder.mkdir(parents=True, exist_ok=True)
+    verdict = {"rules": [{"rule": r, "verdict": "pass", "reason": "ok"} for r in RULES]}
+    (folder / "JudgeVerdict.json").write_text(json.dumps(verdict), "utf-8")
+    return ModelGateway(fake_models_config(), fake=FakeBackend(fake_fixtures))
 
 
-async def _text_session(client: httpx.AsyncClient, fake_fixtures: Path) -> None:
-    job = await ready_job(client, fake_fixtures)
-    made = await create(client, job["id"], channel="text")
-    assert made.status_code == 201, made.text
-    sid = made.json()["id"]
-    assert (await client.post(f"/sessions/{sid}/text/open")).status_code == 200
-    turn = await client.post(f"/sessions/{sid}/text/turn", json={"text": ANSWER})
-    assert turn.status_code == 200, turn.text
-
-
-async def _org(client: httpx.AsyncClient) -> str:
-    return str((await client.get("/auth/me")).json()["user"]["org_id"])
-
-
-async def test_pt06_two_users_from_first_turn_to_account_deletion(
-    account_app: FastAPI,
-    client: httpx.AsyncClient,
-    other: httpx.AsyncClient,
-    fake_fixtures: Path,
-    queue: InlineQueue,
-    trace_capture: InMemoryExporter,
+async def test_lt06_a_sim_session_is_traced_across_api_worker_and_judge(
     monkeypatch: pytest.MonkeyPatch,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    queue: Any,
+    fake_fixtures: Path,
+    trace_capture: InMemoryExporter,
 ) -> None:
-    """LT-16 to LT-18, LT-21 to LT-25 in one flow."""
-    _flags(monkeypatch, **FLAGS)
-    store = CapturedStore(trace_capture)
+    """LT-2, LT-3, LT-4, LT-6, LT-7, LT-9, LT-14 together, for one redacted sim session."""
+    _env(
+        monkeypatch,
+        APP_ENV=AppEnv.STAGING.value,
+        SESSION_SECRET="k" * 40,
+        SIM_ENABLED="true",
+        SIM_TOKEN=TOKEN,
+        SIM_EMAIL="sim@example.com",
+    )
+    get_settings.cache_clear()
+    # The worker's lookup opens its own database session (in production, from DATABASE_URL).
+    monkeypatch.setattr(engine_module, "get_sessionmaker", lambda: sessionmaker)
+    headers = {"X-Sim-Run": RUN, "X-Sim-Scenario": "pasted-cv", "X-Sim-Trace-Content": "redacted"}
 
-    def delete(org_id: uuid.UUID, scope: Any) -> int:
-        return delete_org_traces(org_id, scope, store)
+    async for http in _client(_app(sessionmaker, queue)):
+        assert (await _login(http)).status_code == 204
+        job = await ready_job(http, fake_fixtures)
+        trace_capture.clear()
+        made = await http.post(
+            "/sessions",
+            json={"job_target_id": job["id"], "config": CONFIG, "channel": "text"},
+            headers=headers,
+        )
+        assert made.status_code == 201, made.text
+        sid = made.json()["id"]
+        assert (await http.post(f"/sessions/{sid}/text/open")).status_code == 200
+        for _ in range(2):
+            turn = await http.post(f"/sessions/{sid}/text/turn", json={"text": ANSWER})
+            assert turn.status_code == 200, turn.text
+        queue.run_jobs = False  # scoring is queued on end; run it as the worker would
+        assert (await http.post(f"/sessions/{sid}/end")).status_code == 200
+        queue.run_jobs = True
+        (function, _, kwargs) = queue.enqueued[-1]
+        assert function == "score_session"
+        await scoring_jobs.score_session(queue.ctx, **kwargs)
 
-    monkeypatch.setattr(account_jobs, "delete_org_traces", delete)
+    # A real user's session next to it, with tracing on and the sim headers sent (LT-3).
+    before = len(trace_capture.traces)
+    _env(monkeypatch, SIM_ENABLED="true", SIM_EMAIL="sim@example.com")  # local: dev login
+    get_settings.cache_clear()
+    async for http in _client(_app(sessionmaker, queue)):
+        await sign_in(http, "jane@example.com")
+        real_job = await ready_job(http, fake_fixtures)
+        real = await http.post(
+            "/sessions",
+            json={"job_target_id": real_job["id"], "config": {**CONFIG, "duration_min": 10},
+                  "channel": "text"},
+            headers=headers,
+        )  # fmt: skip
+        assert real.status_code == 201, real.text
+        real_sid = real.json()["id"]
+        assert (await http.post(f"/sessions/{real_sid}/text/open")).status_code == 200
+        turn = await http.post(f"/sessions/{real_sid}/text/turn", json={"text": ANSWER})
+        assert turn.status_code == 200, turn.text
+    assert len(trace_capture.traces) == before, "a real user's session was traced"
 
-    ana, bo = await _org(client), await _org(other)
-    assert ana != bo
-    assert (
-        await client.put("/account/tracing-consent", json={"tracing_consent": True})
-    ).status_code == 200
-    trace_capture.clear()
-    await _text_session(client, fake_fixtures)
-    await _text_session(other, fake_fixtures)
+    # The sim's judge, as the runner calls it, in its own trace.
+    scenario = Scenario(id="pasted-cv", quality="strong", candidate_name="Ada Venn", cv_text="CV")
+    conv = Conversation()
+    conv.lines.extend(
+        [Line(speaker="interviewer", text="Tell me about a migration.", start_ms=0, end_ms=900),
+         Line(speaker="candidate", text=ANSWER, start_ms=2000, end_ms=9000)]
+    )  # fmt: skip
+    verdict = await _traced_judge(
+        scenario, conv, _judge_gateway(fake_fixtures), CostMeter(load_prices()), sid, RUN
+    )
+    assert verdict.passed
 
-    # LT-16, LT-17, LT-18: both users' turns are traced as metadata, tagged with their org,
-    # with no text anywhere in them.
-    for org in (ana, bo):
-        turns = _of(trace_capture, org, "turn")
-        assert len(turns) == 2, org
-        assert all(_tags(t)["session_id"] for t in turns)
-        assert all(_tags(t)["content"] == "metadata" for t in turns)
-        dump = _text(turns)
-        assert "Kafka" not in dump and "Stripe" not in dump and "sha256" not in dump
-
-    # LT-21 to LT-23: content only for the consenting user, scrubbed, in its own trace.
-    assert _of(trace_capture, bo, "turn.content") == []
-    content = _of(trace_capture, ana, "turn.content")
-    assert len(content) == 2
-    assert all(_tags(t)["content"] == "turns" for t in content)
-    answer = content[1].root.inputs["candidate"]
-    assert "Kafka" in answer
-    assert "Stripe" not in answer and "dev@example.com" not in answer
-
-    # LT-24: withdrawal deletes the content through the job; the metadata stays.
-    assert (
-        await client.put("/account/tracing-consent", json={"tracing_consent": False})
-    ).status_code == 200
-    assert queue.enqueued[-1][0] == "delete_traces"
-    assert _of(trace_capture, ana, "turn.content") == []
-    assert len(_of(trace_capture, ana, "turn")) == 2
-    assert len(_of(trace_capture, bo, "turn")) == 2
-
-    # LT-25: deleting the account removes the rest of that org's traces, and only that org's.
-    assert (await client.delete("/account")).status_code == 202
-    assert [t for t in trace_capture.traces if _tags(t).get("org_id") == ana] == []
-    assert len(_of(trace_capture, bo, "turn")) == 2
+    traces = trace_capture.traces
+    by_name: dict[str, list[Any]] = {}
+    for t in traces:
+        by_name.setdefault(t.root.name, []).append(t)
+    assert set(by_name) == {"build_interviewer_brief", "turn", "score_session", "judge"}
+    assert [t.root.attributes["turn.index"] for t in by_name["turn"]] == [0, 1, 2]
+    services = {t.root.name: t.tags.service for t in traces}
+    assert services == {
+        "build_interviewer_brief": "worker",
+        "turn": "api",
+        "score_session": "worker",
+        "judge": "sim",
+    }
+    for t in traces:  # one session, one run, one content mode (LT-7, LT-14)
+        assert t.tags.session_id == sid and t.tags.sim_run_id == RUN
+        assert t.tags.content == "redacted"
+        assert all(c.name.startswith("gateway.") for c in t.root.children)
+        assert t.root.children, t.root.name
+    roles = {c.attributes["role"] for t in traces for c in t.root.children}
+    assert {"planner", "interviewer", "scorer", "judge"} <= roles
+    for t in traces:  # LT-4: no answer text anywhere in a redacted trace
+        for s in t.spans():
+            assert "Kafka" not in _dump(s) and "Acme" not in _dump(s), (t.root.name, s.name)
+    for t in by_name["turn"]:
+        calls = [c for c in t.root.children if c.name == "gateway.interviewer"]
+        assert calls and all("sha256" in str(c.inputs) for c in calls)
