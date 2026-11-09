@@ -127,6 +127,13 @@ class WorkerSettings:
             timeout=600,
             max_tries=account_jobs.DELETE_MAX_TRIES,
         ),
+        # LT-24 to LT-26: production LLM traces of a deleted account or a withdrawn consent.
+        func(
+            account_jobs.delete_traces,
+            keep_result=account_jobs.RESULT_TTL_S,
+            timeout=600,
+            max_tries=account_jobs.DELETE_MAX_TRIES,
+        ),
     ]
     cron_jobs: ClassVar[list[Any]] = [
         cron(

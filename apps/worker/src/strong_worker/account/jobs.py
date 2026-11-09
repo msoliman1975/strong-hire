@@ -4,10 +4,16 @@
 - delete_account_files: delete the original resume files of a deleted account. On a storage
   error it asks Arq to retry (up to DELETE_MAX_TRIES, about 7.5 hours in all, inside the 24-hour
   promise); the account rows are already gone.
+- delete_traces: delete an org's production LLM traces from MLflow (LT-24 to LT-26): scope
+  "content" when tracing consent is withdrawn, "all" when the account is deleted. Same retries.
+  The API writes `tracing.delete_requested` when it queues the job; this job writes
+  `tracing.traces_deleted` with the same request id. A request still without its success after
+  12 hours raises the "Trace deletion overdue" alert (strong_worker.alerts.readings).
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import uuid
 from dataclasses import dataclass
@@ -18,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_core.db import get_sessionmaker
 from strong_core.db.models import AuditLog
+from strong_core.tracing.prod import Scope, delete_org_traces
 from strong_worker.account.bundle import ExportTooLargeError, build_bundle
 from strong_worker.inputs.settings import get_inputs_settings
 from strong_worker.inputs.storage import FileStore, build_file_store
@@ -114,4 +121,40 @@ async def delete_account_files(ctx: dict[str, Any], org_id: str, refs: list[str]
     return {"outcome": "deleted", "files": len(refs)}
 
 
-FUNCTIONS = (export_account, delete_account_files)
+TRACES_REQUESTED = "tracing.delete_requested"
+TRACES_DELETED = "tracing.traces_deleted"
+TRACE_SCOPES: tuple[Scope, ...] = ("all", "content")
+
+
+async def delete_traces(
+    ctx: dict[str, Any], org_id: str, scope: str, request_id: str
+) -> dict[str, Any]:
+    """Delete the org's production traces (LT-24, LT-25), retried on any MLflow error (LT-26)."""
+    if scope not in TRACE_SCOPES:
+        raise ValueError(f"unknown trace scope {scope!r}")
+    checked: Scope = "all" if scope == "all" else "content"
+    account = _account(ctx)
+    try:
+        count = await asyncio.to_thread(delete_org_traces, uuid.UUID(org_id), checked)
+    except Exception as exc:
+        job_try = int(ctx.get("job_try", 1))
+        log.warning("trace delete for org %s failed (try %d): %s", org_id, job_try, exc)
+        if job_try < DELETE_MAX_TRIES:
+            raise Retry(defer=RETRY_DELAY_S * job_try) from exc
+        raise
+    async with account.sessionmaker() as db:
+        db.add(
+            AuditLog(
+                org_id=uuid.UUID(org_id),
+                actor="system",
+                action=TRACES_DELETED,
+                entity=f"org:{org_id}",
+                details_json={"scope": scope, "request_id": request_id, "traces": count},
+            )
+        )
+        await db.commit()
+    log.info("deleted %d %s traces of org %s", count, scope, org_id)
+    return {"outcome": "deleted", "scope": scope, "traces": count}
+
+
+FUNCTIONS = (export_account, delete_account_files, delete_traces)

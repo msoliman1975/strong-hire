@@ -12,6 +12,7 @@ Transcripts (turns) are kept.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -102,7 +103,38 @@ async def delete_old_ops_rows(
     return out
 
 
+PROD_CONTENT_RETENTION_DAYS = 30  # LT-27, D-14
+PROD_METADATA_RETENTION_DAYS = 90
+
+
+async def prune_production_traces() -> dict[str, int]:
+    """LT-27: real users' LLM traces in MLflow, while production tracing is on.
+
+    A failure is logged, never raised, so the database retention above still counts as done; the
+    next night tries again.
+    """
+    from strong_core.config import get_settings
+    from strong_core.tracing.prod import prune_prod
+
+    settings = get_settings()
+    if not (settings.llm_tracing_prod and settings.mlflow_tracking_uri):
+        return {}
+    try:
+        counts = await asyncio.to_thread(
+            prune_prod, PROD_CONTENT_RETENTION_DAYS, PROD_METADATA_RETENTION_DAYS
+        )
+    except Exception:
+        log.warning("pruning production traces failed; trying again tomorrow", exc_info=True)
+        return {"prod_traces_failed": 1}
+    return {f"prod_traces_{k}": v for k, v in counts.items()}
+
+
 async def trace_retention(ctx: dict[str, Any]) -> dict[str, int]:
-    """The Arq cron job: traces (R2), then the ops tables (OB-3..OB-5)."""
+    """The Arq cron job: traces (R2), then the ops tables (OB-3..OB-5), then real users' LLM
+    traces in MLflow (LT-27)."""
     maker = ctx.get(CTX_KEY) or get_sessionmaker()
-    return {"deleted": await delete_old_traces(maker), **await delete_old_ops_rows(maker)}
+    return {
+        "deleted": await delete_old_traces(maker),
+        **await delete_old_ops_rows(maker),
+        **await prune_production_traces(),
+    }
