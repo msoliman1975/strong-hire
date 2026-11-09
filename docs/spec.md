@@ -160,6 +160,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | PR-3 | Interview rehearsals: the user picks a job description and a CV, or adds one. For that pair, the app shows the earlier gap reports, debriefs and hire signals. In v2 the rehearsals page is replaced by PP-1. | P0 |
 | BL-1 | Stripe subscription, one plan, monthly minute cap, usage meter visible in the app. | P0 |
 | BL-2 | Free tier: unlimited gap analyses (rate limited) plus one free interview. | P0 |
+| BL-3 | A session that starts but ends with no answer from the candidate (no candidate turn: they left, or the microphone or speech-to-text never delivered a word) is not billed, does not use a free interview and is not scored. The debrief says so and suggests checking the microphone. The admin area shows it as "no answers", not as a scoring failure to retry, and it does not count as a technical failure (AO-6). | P0 |
 | AC-1 | Self-service export and full delete of account and all data. | P0 |
 | AC-2 | Training-data consent toggle, off by default, changeable any time. | P0 |
 | AC-3 | At the first sign-in, ask for a short profile: full name, years of experience and target level, plus optional current title, country, time zone and LinkedIn URL. No payment details. The user edits it under Account, Profile. | P0 |

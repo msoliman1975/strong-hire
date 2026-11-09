@@ -7,7 +7,7 @@ import logging
 import os
 import time
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from strong_api.billing.entitlements import count_free_interviews_used
 from strong_api.sessions import router as sessions_router  # the module
-from strong_api.sessions.failure import BRIEF_STALE_AFTER
+from strong_api.sessions.failure import BRIEF_STALE_AFTER, NO_ANSWERS
 from strong_api.sessions.settings import TextSessionSettings, get_text_session_settings
 from strong_core.config import get_settings
 from strong_core.db.engine import async_database_url
@@ -187,6 +187,68 @@ async def test_bl2_ending_an_unstarted_session_uses_no_free_interview(
     assert again["status"] == "failed"
     queue.run_jobs = True
     assert (await create(client, job["id"])).status_code == 201
+
+
+async def test_bl3_a_session_without_answers_is_not_billed_or_scored(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    queue: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """BL-3: the interviewer greeted, the candidate never answered. The end marks it failed with
+    its own reason; no minutes, no scoring, no free interview used, and no retry."""
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    opened = (await client.post(f"/sessions/{sid}/text/open")).json()
+    assert [t["speaker"] for t in opened["turns"]] == ["interviewer"]
+    async with sessionmaker() as db:  # a minute in, so the old rule would have billed one
+        row = await db.get(InterviewSession, uuid.UUID(sid))
+        assert row is not None and row.started_at is not None
+        row.started_at = datetime.now(UTC) - timedelta(seconds=70)
+        await db.commit()
+    queue.run_jobs = False
+
+    ended = (await client.post(f"/sessions/{sid}/end")).json()
+    assert ended["status"] == "failed" and ended["minutes_billed"] == 0
+    assert ended["failure_reason"] == f"{NO_ANSWERS} Nothing was counted or billed."
+    assert "score_session" not in [name for name, _, _ in queue.enqueued]
+    again = (await client.post(f"/sessions/{sid}/end")).json()  # safe to call twice
+    assert again["minutes_billed"] == 0 and again["failure_reason"] == ended["failure_reason"]
+
+    listed = (await client.get(f"/job-targets/{job['id']}/sessions")).json()
+    assert [s["failure_reason"] for s in listed] == [ended["failure_reason"]]
+    assert (await client.get(f"/sessions/{sid}")).json()["failure_reason"] == ended[
+        "failure_reason"
+    ]
+    debrief = (await client.get(f"/sessions/{sid}/debrief")).json()
+    assert debrief["status"] == "not_started"
+    assert debrief["session"]["failure_reason"] == ended["failure_reason"]
+    scoring = await client.post(f"/sessions/{sid}/scoring")
+    assert scoring.status_code == 409
+    async with sessionmaker() as db:
+        row = await db.get(InterviewSession, uuid.UUID(sid))
+        assert row is not None
+        assert await count_free_interviews_used(db, row.org_id) == 0
+
+
+async def test_bl3_an_earlier_billed_session_without_answers_keeps_its_minutes(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """BL-3: a session from before BL-3 that was billed and then failed scoring gets the
+    no-answers reason, without the claim that nothing was billed."""
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    await client.post(f"/sessions/{sid}/text/open")
+    async with sessionmaker() as db:
+        row = await db.get(InterviewSession, uuid.UUID(sid))
+        assert row is not None
+        row.status, row.ended_at, row.minutes_billed = SessionStatus.FAILED, datetime.now(UTC), 2
+        await db.commit()
+    record = (await client.get(f"/sessions/{sid}")).json()
+    assert record["failure_reason"] == NO_ANSWERS
+    assert record["minutes_billed"] == 2
 
 
 async def test_bl2_free_plan_allows_two_started_mini_interviews(
@@ -358,12 +420,31 @@ async def test_voice_join_rules(
 
 
 async def test_internal_end_needs_the_shared_token(
-    client: httpx.AsyncClient, fake_fixtures: Path, queue: Any
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    queue: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
 ) -> None:
-    """The voice agent ends a started session: it is billed and scored. Others get 403."""
+    """The voice agent ends a started session with an answer: it is billed and scored (BL-3).
+    Others get 403."""
     job = await ready_job(client, fake_fixtures)
     sid = (await create(client, job["id"])).json()["id"]
     await client.post(f"/sessions/{sid}/voice/join")
+    async with sessionmaker() as db:  # the voice agent saves turns before it ends the session
+        row = await db.get(InterviewSession, uuid.UUID(sid))
+        assert row is not None
+        db.add(
+            TurnRow(
+                org_id=row.org_id,
+                session_id=row.id,
+                speaker=Speaker.CANDIDATE,
+                phase=Phase.INTRO,
+                text="Hi, happy to be here.",
+                start_ms=0,
+                end_ms=2000,
+            )
+        )
+        await db.commit()
     url = f"/internal/sessions/{sid}/end"
     assert (await client.post(url, json={})).status_code == 403
     wrong = {"X-Internal-Token": "guess"}
