@@ -45,6 +45,7 @@ from strong_api.gap.settings import get_gap_settings
 from strong_api.inputs.deps import Queue
 from strong_api.inputs.queue import RUN_GAP_ANALYSIS
 from strong_api.scoring.router import start_scoring
+from strong_api.sessions.failure import has_answers, has_answers_clause
 from strong_core import runtime_settings as rs
 from strong_core.config import get_settings
 from strong_core.db.models import (
@@ -766,8 +767,10 @@ async def _emails(db: AsyncSession, org_ids: set[uuid.UUID]) -> dict[uuid.UUID, 
     return {org: email for org, email in rows.tuples()}
 
 
-def _scoring_retryable(row: InterviewSession, now: datetime) -> bool:
-    info = m.failure_info(row, now)
+def _scoring_retryable(row: InterviewSession, now: datetime, *, answered: bool = True) -> bool:
+    """A failed or stuck scoring with answers to score. A session without any answer (BL-3)
+    can never be scored, so it is not retryable."""
+    info = m.failure_info(row, now, answered=answered)
     return info is not None and info.kind in ("scoring_failed", "stuck_scoring")
 
 
@@ -801,6 +804,7 @@ async def _job_lists(db: AsyncSession, now: datetime) -> tuple[list[OpsJob], lis
                 (
                     (s.status == SessionStatus.FAILED)
                     & s.started_at.is_not(None)
+                    & has_answers_clause()  # BL-3: no answers is not a scoring job
                     & (func.coalesce(s.ended_at, s.created_at) >= since)
                 )
                 | ((s.status == SessionStatus.SCORING) & m.stuck_clause(now)),
@@ -923,7 +927,7 @@ async def retry_job(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
     if await db.scalar(select(Scorecard.id).where(Scorecard.session_id == session.id)):
         raise HTTPException(status.HTTP_409_CONFLICT, "This session is already scored")
-    if not _scoring_retryable(session, now):
+    if not _scoring_retryable(session, now, answered=await has_answers(db, session.id)):
         raise HTTPException(status.HTTP_409_CONFLICT, "This scoring is not failed or stuck")
     audit_action(
         db,

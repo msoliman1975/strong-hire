@@ -74,7 +74,13 @@ from strong_api.scoring.router import (
     _owned_target,
     start_scoring,
 )
-from strong_api.sessions.failure import brief_is_stale, failure_reason
+from strong_api.sessions.failure import (
+    answered_session_ids,
+    answered_unless_failed,
+    brief_is_stale,
+    failure_reason,
+    has_answers,
+)
 from strong_api.sessions.schemas import (
     CoachRequest,
     CreateSessionRequest,
@@ -134,7 +140,9 @@ FLUSH_TIMEOUT_S = 30.0  # the most a request waits for trace rows still being sa
 router = APIRouter(tags=["sessions"])
 
 
-def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecord:
+def _record(
+    session: InterviewSession, target: JobTarget | None, *, answered: bool = True
+) -> SessionRecord:
     return SessionRecord(
         id=session.id,
         job_target_id=session.job_target_id,
@@ -146,7 +154,7 @@ def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecor
         started_at=session.started_at,
         ended_at=session.ended_at,
         minutes_billed=session.minutes_billed or 0,
-        failure_reason=failure_reason(session),
+        failure_reason=failure_reason(session, answered=answered),
         buyer=_buyer(session),
     )
 
@@ -322,7 +330,11 @@ async def get_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionRecord:
         session.status = SessionStatus.FAILED
         await db.commit()
         await db.refresh(session)
-    return _record(session, await db.get(JobTarget, session.job_target_id))
+    return _record(
+        session,
+        await db.get(JobTarget, session.job_target_id),
+        answered=await answered_unless_failed(db, session),
+    )
 
 
 @router.post("/sessions/{session_id}/repeat")
@@ -348,7 +360,19 @@ async def list_sessions(job_target_id: uuid.UUID, db: Db, me: Me) -> list[Sessio
         .where(InterviewSession.job_target_id == target.id, InterviewSession.org_id == me.org_id)
         .order_by(InterviewSession.created_at.desc(), InterviewSession.id.desc())
     )
-    return [_record(s, target) for s in rows]
+    sessions = list(rows)
+    answered = await answered_session_ids(
+        db,
+        (s.id for s in sessions if s.status == SessionStatus.FAILED and s.started_at is not None),
+    )
+    return [
+        _record(
+            s,
+            target,
+            answered=s.status != SessionStatus.FAILED or s.started_at is None or s.id in answered,
+        )
+        for s in sessions
+    ]
 
 
 async def _end(
@@ -368,6 +392,13 @@ async def _end(
         await db.commit()
         return
     session.ended_at = datetime.now(UTC)
+    if not await has_answers(db, session.id):
+        # BL-3: the candidate never answered. Nothing to score, so no minutes and no scoring,
+        # and the free interview is not used (the session is failed).
+        log.info("session %s ended without a candidate answer; not billed or scored", session.id)
+        session.status = SessionStatus.FAILED
+        await db.commit()
+        return
     await record_session_minutes(db, session)
     await start_scoring(db, queue, session)  # commits; sets status scoring
 
@@ -409,6 +440,7 @@ async def end_session(
     session_id: uuid.UUID, request: Request, db: Db, me: Me, queue: Queue
 ) -> SessionRecord:
     """End the session. Started sessions are billed and scored (FB-3); safe to call twice."""
+    # BL-3: only when the candidate answered at least once; see _end.
     session = await _owned_session(db, me, session_id)
     runner = _runners(request).pop(session.id, None)
     forget_turns(request, session.id)
@@ -418,7 +450,11 @@ async def end_session(
         )
     await _end(db, queue, session, runner)
     await db.refresh(session)
-    return _record(session, await db.get(JobTarget, session.job_target_id))
+    return _record(
+        session,
+        await db.get(JobTarget, session.job_target_id),
+        answered=await answered_unless_failed(db, session),
+    )
 
 
 # ---------------------------------------------------------------- text channel (PL-7)
