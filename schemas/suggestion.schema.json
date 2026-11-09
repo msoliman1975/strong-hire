@@ -269,6 +269,20 @@
           "description": "The role it is under: title, company.",
           "title": "Role"
         },
+        "same_as": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CS-2: the first story_idea suggestion of the same achievement, on another resume. Null when this is the first one, or before the matcher ran.",
+          "title": "Same As"
+        },
         "skills": {
           "description": "Likely skills. Empty when the worker call failed.",
           "items": {

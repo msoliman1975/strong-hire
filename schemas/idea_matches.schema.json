@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "IdeaMatch": {
+      "additionalProperties": false,
+      "description": "CS-2: the matcher's answer for one new resume line.",
+      "properties": {
+        "line": {
+          "description": "Index of the line in the new lines list.",
+          "minimum": 0,
+          "title": "Line",
+          "type": "integer"
+        },
+        "same_as": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Index of the earlier item that tells the same work; null when none does.",
+          "title": "Same As"
+        }
+      },
+      "required": [
+        "line"
+      ],
+      "title": "IdeaMatch",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/idea_matches.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "CS-2: which new resume lines describe the same work as an earlier idea or story.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/IdeaMatch"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "title": "IdeaMatches",
+  "type": "object"
+}

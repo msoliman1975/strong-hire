@@ -137,6 +137,30 @@ class StoryIdeaPayload(StoryIdea):
     """RM-4: the payload of a story idea suggestion."""
 
     kind: Literal["story_idea"] = "story_idea"
+    same_as: UUID | None = Field(
+        default=None,
+        description=(
+            "CS-2: the first story_idea suggestion of the same achievement, on another resume. "
+            "Null when this is the first one, or before the matcher ran."
+        ),
+    )
+
+
+class IdeaMatch(Contract):
+    """CS-2: the matcher's answer for one new resume line."""
+
+    line: int = Field(ge=0, description="Index of the line in the new lines list.")
+    same_as: int | None = Field(
+        default=None,
+        ge=0,
+        description="Index of the earlier item that tells the same work; null when none does.",
+    )
+
+
+class IdeaMatches(Contract):
+    """CS-2: which new resume lines describe the same work as an earlier idea or story."""
+
+    items: list[IdeaMatch] = Field(default_factory=list)
 
 
 class StoryReviewNote(Contract):
