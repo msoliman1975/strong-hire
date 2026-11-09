@@ -2,8 +2,9 @@
 # STACK_TARGET=server; do not use it alone. See docs/hosting.md.
 #   - Caddy is the only public entry: https://$DOMAIN (web and /api), https://admin.$DOMAIN
 #     (the admin app and its own /api) and https://rtc.$DOMAIN (LiveKit signaling). LiveKit media also uses 7881/tcp and 7882/udp.
-#   - https://mlflow.$DOMAIN (LLM traces, LT-12) behind basic auth, only when .env has
-#     LLM_TRACING=on: then ./scripts/profile.ps1 adds the obs profile.
+#   - LLM traces (LT-12, LT-28), only when .env has LLM_TRACING=on (./scripts/profile.ps1 then
+#     adds the obs profile): https://admin.$DOMAIN/mlflow/ for signed-in admins, and
+#     https://mlflow.$DOMAIN for the sim server with MLFLOW_SIM_TOKEN.
 #   - Other services publish no host ports, except the API and LiteLLM on 127.0.0.1 for
 #     ./scripts/profile.ps1 (health check, LiteLLM app key).
 #   - The API runs without --reload, in staging mode (no dev login, real session secret).
@@ -17,10 +18,6 @@ services:
     profiles: [core, all-in-one]
     environment:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
-      # LT-12: basic auth for https://mlflow.$DOMAIN. The default hash matches no known password,
-      # so the site stays closed until .env sets MLFLOW_BASIC_AUTH_HASH (docs/hosting.md).
-      MLFLOW_BASIC_AUTH_USER: ${MLFLOW_BASIC_AUTH_USER:-mlflow}
-      MLFLOW_BASIC_AUTH_HASH: ${MLFLOW_BASIC_AUTH_HASH:-$$2a$$14$$J7HH7DBOgeL.lQ5zAC..3eODGvqinN54HMqgcEpsXv3IF2pKyIlr.}
     ports: ["80:80", "443:443", "443:443/udp"]
     volumes:
       - caddy-data:/data
@@ -75,6 +72,9 @@ services:
       SIM_RESULTS_DIR: /sim-results
       # LT-3: the server never traces local dev sessions; sim sessions only, when LLM_TRACING=on.
       LLM_TRACING_DEV: "off"
+      MLFLOW_TRACKING_URI: http://mlflow:5000/mlflow   # LT-28: MLflow runs under /mlflow
+      # LT-28: Caddy asks /admin/mlflow-auth; the sim server's bearer token. Empty: admins only.
+      MLFLOW_SIM_TOKEN: ${MLFLOW_SIM_TOKEN:-}
     volumes:
       # Saved sim runs, read-only, so the admin area can serve sim voice recordings (P13).
       - /srv/stronghire/sim:/sim-results:ro
@@ -108,7 +108,7 @@ services:
       REPO_ROOT: /app
       # LT-10: admin sims log their MLflow run here when LLM_TRACING=on.
       LLM_TRACING: ${LLM_TRACING:-off}
-      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_TRACKING_URI: http://mlflow:5000/mlflow
       MLFLOW_EXPERIMENT: ${MLFLOW_EXPERIMENT:-sim}
     volumes:
       - /srv/stronghire/sim:/sim-results
@@ -141,6 +141,7 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
       LLM_TRACING_DEV: "off"   # LT-3
+      MLFLOW_TRACKING_URI: http://mlflow:5000/mlflow   # LT-28: MLflow runs under /mlflow
     volumes:
       - uploads-data:/data/uploads
       # OB-5: the metrics sampler reads the Postgres volume's disk use (host.disk_pct, pgdata).
@@ -181,14 +182,18 @@ services:
       SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
       SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
       LLM_TRACING_DEV: "off"   # LT-3
+      MLFLOW_TRACKING_URI: http://mlflow:5000/mlflow
     restart: unless-stopped
 
-  # LLM traces (LT-12): reached by api, worker, voice and sim at http://mlflow:5000, and from
-  # outside only through Caddy at https://mlflow.$DOMAIN with basic auth. No host port.
+  # LLM traces (LT-12, LT-28): under the /mlflow prefix, reached by api, worker, voice and sim at
+  # http://mlflow:5000/mlflow, and from outside only through Caddy after /admin/mlflow-auth.
+  # Caddy sends Host mlflow:5000; the admin host is the only origin whose browser POSTs it accepts.
   mlflow:
     ports: !reset []
     environment:
-      MLFLOW_ALLOWED_HOSTS: mlflow,mlflow:5000,mlflow.${DOMAIN}
+      MLFLOW_ALLOWED_HOSTS: mlflow,mlflow:5000
+      MLFLOW_STATIC_PREFIX: /mlflow
+      MLFLOW_CORS_ALLOWED_ORIGINS: https://admin.${DOMAIN}
     mem_limit: 1g
     restart: unless-stopped
 

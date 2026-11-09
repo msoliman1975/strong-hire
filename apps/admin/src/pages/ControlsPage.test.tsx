@@ -297,6 +297,51 @@ describe("Controls page", () => {
     expect(opsState(mockStore.db).values.v2_enabled).toBe(false);
   });
 
+  it("LT-19, AA-6: pauses production tracing with a reason, and resumes it", async () => {
+    const user = await openControls();
+    const panel = screen.getByRole("region", {
+      name: "Production tracing (LT-19)",
+    });
+    expect(within(panel).getByText("Running")).toBeInTheDocument();
+    expect(
+      within(panel).getByRole("link", { name: "Open the traces in MLflow" }),
+    ).toHaveAttribute("href", "/mlflow/");
+    await user.click(
+      within(panel).getByRole("button", { name: "Pause production tracing" }),
+    );
+    const dialog = screen.getByRole("dialog", {
+      name: "Pause production tracing",
+    });
+    const confirm = within(dialog).getByRole("button", {
+      name: "Pause tracing",
+    });
+    expect(confirm).toBeDisabled();
+    await user.type(
+      within(dialog).getByLabelText(/Reason/),
+      "MLflow disk nearly full",
+    );
+    await user.click(confirm);
+    expect(await opsBanner()).toHaveTextContent("Production tracing paused");
+    expect(opsState(mockStore.db).values.llm_tracing_paused).toBe(true);
+    expect(within(panel).getByText("Paused")).toBeInTheDocument();
+    expect(
+      within(panel).getByText(/Last changed by admin@example.com/),
+    ).toBeInTheDocument();
+
+    await user.click(
+      within(panel).getByRole("button", { name: "Resume production tracing" }),
+    );
+    const back = screen.getByRole("dialog", {
+      name: "Resume production tracing",
+    });
+    await user.type(within(back).getByLabelText(/Reason/), "disk cleaned");
+    await user.click(
+      within(back).getByRole("button", { name: "Resume tracing" }),
+    );
+    await screen.findByText("Every control is at its default.");
+    expect(opsState(mockStore.db).values.llm_tracing_paused).toBe(false);
+  });
+
   it("the Shell banner shows on other pages too", async () => {
     signInAdmin();
     opsState(mockStore.db).values = {

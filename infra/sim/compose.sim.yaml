@@ -52,12 +52,12 @@ services:
       SIM_UPLOAD_KEY: /keys/upload_key
       SIM_COST_LIMIT_USD: ${SIM_COST_LIMIT_USD:-5}
       SIM_CANDIDATE_MIN_INTERVAL_S: ${SIM_CANDIDATE_MIN_INTERVAL_S:-0}
-      # LT-13: the main server's MLflow, through Caddy with basic auth. sim-run.ps1 fills these
-      # only when STRONGHIRE_MLFLOW_PASSWORD is set; empty means the run logs nothing to MLflow.
+      # LT-13, LT-28: the main server's MLflow, through Caddy with a bearer token (MLflow sends
+      # MLFLOW_TRACKING_TOKEN as Authorization: Bearer). sim-run.ps1 fills these only when
+      # STRONGHIRE_MLFLOW_TOKEN is set; empty means the run logs nothing to MLflow.
       LLM_TRACING: ${LLM_TRACING:-off}
       MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-}
-      MLFLOW_TRACKING_USERNAME: ${MLFLOW_TRACKING_USERNAME:-}
-      MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD:-}
+      MLFLOW_TRACKING_TOKEN: ${MLFLOW_TRACKING_TOKEN:-}
       MLFLOW_EXPERIMENT: sim
     volumes:
       - ${SIM_RUNS_DIR:-/opt/sim/runs}:/runs

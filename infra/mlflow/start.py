@@ -7,6 +7,11 @@ with app tables. Artifacts go to /mlflow/artifacts (a volume). Settings come fro
     MLFLOW_DB                  database name (default mlflow)
     MLFLOW_ALLOWED_HOSTS       Host headers the server answers (DNS-rebinding guard)
     MLFLOW_WORKERS             server worker processes (default 2)
+    MLFLOW_STATIC_PREFIX       optional path prefix: /mlflow on the server (LT-28), where the UI
+                               is https://admin.$DOMAIN/mlflow/ and clients use
+                               http://mlflow:5000/mlflow
+    MLFLOW_CORS_ALLOWED_ORIGINS
+                               optional origins whose browser POSTs MLflow accepts (admin host)
 """
 
 from __future__ import annotations
@@ -48,7 +53,7 @@ def ensure_database(host: str, user: str, password: str, name: str) -> None:
 
 def server_args(host: str, user: str, password: str, name: str) -> list[str]:
     store = f"postgresql+psycopg://{user}:{password}@{host}:5432/{name}"
-    return [
+    args = [
         "mlflow",
         "server",
         "--backend-store-uri",
@@ -64,6 +69,13 @@ def server_args(host: str, user: str, password: str, name: str) -> list[str]:
         "--allowed-hosts",
         env("MLFLOW_ALLOWED_HOSTS"),
     ]
+    prefix = os.environ.get("MLFLOW_STATIC_PREFIX")
+    if prefix:
+        args += ["--static-prefix", prefix]
+    origins = os.environ.get("MLFLOW_CORS_ALLOWED_ORIGINS")
+    if origins:
+        args += ["--cors-allowed-origins", origins]
+    return args
 
 
 def main() -> None:

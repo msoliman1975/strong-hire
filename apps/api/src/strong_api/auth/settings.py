@@ -65,6 +65,10 @@ class AuthSettings(BaseSettings):
     # use the text channel.
     sim_enabled: bool = False
     sim_token: SecretStr | None = None
+    # LT-28: the sim server's bearer token for https://mlflow.$DOMAIN
+    # (strong_api.admin.mlflow_auth).
+    # Unset: no token passes, so only signed-in admins reach MLflow.
+    mlflow_sim_token: SecretStr | None = None
     sim_email: str = "sim@getstronghire.com"
     sim_daily_budget_usd: float = Field(
         default=5.0, description="Used when the sim LiteLLM key does not report its own limit."
