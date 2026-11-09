@@ -162,6 +162,7 @@ async def run_session(
     ctx.add_shutdown_callback(timings.close)
     if recorder is not None:
         recorder.on_turn = timings.add
+        recorder.turns_source = lambda: interview.runner.turns  # LT-21
 
         @agent_session.on("conversation_item_added")
         def _on_item(event: Any) -> None:

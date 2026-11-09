@@ -6,6 +6,7 @@ import io
 import math
 import wave
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 from strong_core.config import Settings
 from strong_core.gateway import Message, Role, build_gateway
@@ -152,3 +153,110 @@ async def test_lt3_an_untraced_session_gets_no_turn_hook(trace_capture: InMemory
         assert collector is None
         await gateway.transcribe(_wav(0.5))
     assert trace_capture.traces == []
+
+
+# --- LT-21, LT-24: voice turn content (phase 2) ---------------------------------------------------
+
+
+def _turn(speaker: str, text: str, at: int) -> Any:
+    from strong_core.schemas import Phase, Speaker, Turn
+
+    return Turn(speaker=Speaker(speaker), phase=Phase.CORE, text=text, start_ms=at, end_ms=at + 1)
+
+
+PROD = TraceTags(
+    session_id="s-prod",
+    org_id="00000000-0000-4000-8000-0000000000b1",
+    service="voice",
+    content="metadata",
+    turn_content=True,
+)
+
+
+def _content_rig(
+    monkeypatch: Any, *, allowed: bool, tags: TraceTags = PROD
+) -> tuple[LatencyRecorder, FakeJobContext, list[Any]]:
+    import strong_voice.agent as agent_module
+    from strong_core.tracing.scrub import Scrubber
+
+    async def consent(org_id: Any, db: Any = None) -> bool:
+        return allowed
+
+    async def scrubber(db: Any, org_id: Any) -> Scrubber:
+        return Scrubber(names=["Jane Roe"], companies=["Acme"])
+
+    class Session:
+        async def __aenter__(self) -> None:
+            return None
+
+        async def __aexit__(self, *a: Any) -> None:
+            return None
+
+    monkeypatch.setattr(agent_module, "turn_content_allowed", consent)
+    monkeypatch.setattr(agent_module.Scrubber, "for_org", staticmethod(scrubber))
+    monkeypatch.setattr(agent_module, "get_sessionmaker", lambda: Session)
+    transcript: list[Any] = []
+    recorder = LatencyRecorder(None, session="session-x", profile="fake")
+    recorder.turns_source = lambda: transcript
+    return recorder, FakeJobContext(), transcript
+
+
+async def test_lt21_a_consenting_users_voice_turn_keeps_scrubbed_text(
+    trace_capture: InMemoryExporter, monkeypatch: Any
+) -> None:
+    """LT-21: the turn's transcript and reply, scrubbed, in a turn.content trace with the turn's
+    index; the metadata turn trace holds no text; audio is never kept."""
+    recorder, ctx, transcript = _content_rig(monkeypatch, allowed=True)
+    with trace_context(PROD), collect_turns(flush_on_exit=False) as collector:
+        assert collector is not None
+        trace_turns(ctx, recorder, collector)  # type: ignore[arg-type]
+        transcript += [
+            _turn("candidate", "I'm Jane Roe; at Acme I cut latency in half.", 0),
+            _turn("interviewer", "How did you measure that, Jane?", 10),
+        ]
+        recorder.on_message("user", USER)
+        recorder.on_message("assistant", ASSISTANT)
+        for callback in ctx.on_shutdown:
+            await callback()  # drains the content task
+    content = [t for t in trace_capture.traces if t.root.name == "turn.content"]
+    (kept,) = content
+    assert kept.root.attributes["turn.index"] == 1 and kept.root.attributes["turn.kind"] == "voice"
+    assert kept.root.inputs == {"candidate": "I'm [name]; at [company] I cut latency in half."}
+    assert kept.root.outputs == {"interviewer": "How did you measure that, [name]?"}
+    assert kept.tags.as_tags()["content"] == "turns"
+    turns = [t for t in trace_capture.traces if t.root.name == "turn"]
+    assert "latency in half" not in str([[s.inputs, s.outputs] for t in turns for s in t.spans()])
+
+
+async def test_lt24_withdrawn_consent_keeps_no_voice_text(
+    trace_capture: InMemoryExporter, monkeypatch: Any
+) -> None:
+    """LT-24: consent read at each turn; off means no content, even mid-session."""
+    recorder, ctx, transcript = _content_rig(monkeypatch, allowed=False)
+    with trace_context(PROD), collect_turns(flush_on_exit=False) as collector:
+        assert collector is not None
+        trace_turns(ctx, recorder, collector)  # type: ignore[arg-type]
+        transcript.append(_turn("candidate", "An answer.", 0))
+        recorder.on_message("user", USER)
+        recorder.on_message("assistant", ASSISTANT)
+        for callback in ctx.on_shutdown:
+            await callback()
+    assert [t.root.name for t in trace_capture.traces] == ["turn"]
+
+
+async def test_lt21_no_voice_text_without_turn_content(
+    trace_capture: InMemoryExporter, monkeypatch: Any
+) -> None:
+    """LT-21: a session whose tags do not allow content (no consent, or a sim session) keeps
+    none, and consent is not even read."""
+    no_content = TraceTags(session_id="s", org_id=PROD.org_id, content="metadata")
+    recorder, ctx, transcript = _content_rig(monkeypatch, allowed=True, tags=no_content)
+    with trace_context(no_content), collect_turns(flush_on_exit=False) as collector:
+        assert collector is not None
+        trace_turns(ctx, recorder, collector)  # type: ignore[arg-type]
+        transcript.append(_turn("candidate", "An answer.", 0))
+        recorder.on_message("user", USER)
+        recorder.on_message("assistant", ASSISTANT)
+        for callback in ctx.on_shutdown:
+            await callback()
+    assert [t.root.name for t in trace_capture.traces] == ["turn"]
