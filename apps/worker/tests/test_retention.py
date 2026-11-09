@@ -18,10 +18,11 @@ from strong_core.db.models import (
     InterviewSession,
     JobTarget,
     OpsSample,
+    Story,
     Turn,
     VoiceTurnTiming,
 )
-from strong_core.schemas import Difficulty, InterviewType, Mode, Phase, Speaker
+from strong_core.schemas import Difficulty, InterviewType, Mode, Phase, Speaker, StorySource
 from strong_worker import retention
 from strong_worker.main import WorkerSettings
 
@@ -159,3 +160,42 @@ async def test_ob3_ob4_ob5_ops_rows_past_retention_are_deleted_in_batches(
         assert await db.scalar(select(func.count()).select_from(OpsSample)) == 2
         assert await db.scalar(select(func.count()).select_from(ErrorEvent)) == 2
         assert await db.scalar(select(func.count()).select_from(ErrorGroup)) == 1
+
+
+async def test_cs16_stories_deleted_over_30_days_ago_are_purged(
+    sessionmaker: Maker, account: tuple[uuid.UUID, uuid.UUID]
+) -> None:
+    """CS-16: a story deleted more than 30 days ago is removed; a newer delete and a live or
+    archived story stay (CS-15: still restorable)."""
+    org_id, user_id = account
+    now = datetime.now(UTC)
+    when = {
+        "purged": now - timedelta(days=31),
+        "restorable": now - timedelta(days=10),
+        "live": None,
+    }
+    async with sessionmaker() as db:
+        for title, deleted_at in when.items():
+            db.add(
+                Story(
+                    org_id=org_id,
+                    user_id=user_id,
+                    title=title,
+                    source=StorySource.MANUAL,
+                    deleted_at=deleted_at,
+                )
+            )
+        db.add(
+            Story(
+                org_id=org_id,
+                user_id=user_id,
+                title="archived",
+                source=StorySource.MANUAL,
+                archived_at=now - timedelta(days=90),
+            )
+        )
+        await db.commit()
+    assert await retention.purge_deleted_stories(sessionmaker, now=now) == 1
+    async with sessionmaker() as db:
+        titles = set(await db.scalars(select(Story.title)))
+    assert titles == {"restorable", "live", "archived"}
