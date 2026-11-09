@@ -666,6 +666,7 @@ TRACE_RETENTION_DAYS = 90  # a worker cron job deletes older interviewer traces 
 OPS_SAMPLE_RETENTION_DAYS = 30  # OB-5: older ops_samples rows are deleted daily
 ERROR_EVENT_RETENTION_DAYS = 30  # OB-4: older error_events rows go; error_groups stay
 VOICE_TIMING_RETENTION_DAYS = 90  # OB-3: like traces
+STORY_RESTORE_DAYS = 30  # CS-15, CS-16: a deleted story is restorable this long, then purged
 
 
 class InterviewerTrace(Base):
