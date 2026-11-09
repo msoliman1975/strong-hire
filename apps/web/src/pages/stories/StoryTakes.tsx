@@ -51,7 +51,7 @@ export function takesTrend(oldestFirst: TakeOut[]): string | null {
   if (strongerEach) return `${lengths}Stronger each time.`;
   const diff = takeAverage(last) - takeAverage(first);
   if (diff > 0) return `${lengths}Stronger than your first take.`;
-  if (diff < 0) return `${lengths}Not as strong as your first take yet. Try the coach notes.`;
+  if (diff < 0) return `${lengths}Not as strong as your first take yet. Try Strova's notes.`;
   return `${lengths}About as strong as your first take.`;
 }
 
@@ -118,7 +118,7 @@ export function StoryTakes({ story }: { story: Story }) {
       {takes.isPending && <Loading label="Loading the takes" />}
       {takes.isError && <ErrorNotice error={takes.error} />}
       {takes.data && list.length === 0 && canPractice && (
-        <p className="muted">Each take is one telling of the story, scored on its skills. Spoken takes come from your coach.</p>
+        <p className="muted">Each take is one telling of the story, scored on its skills. Spoken takes come from your sessions with Strova.</p>
       )}
       {list.length > 0 && (
         <ol className="plain-list story-takes__list" aria-label="Takes, oldest first">

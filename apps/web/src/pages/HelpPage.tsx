@@ -36,7 +36,7 @@ export function HelpPage() {
         <h3>Build your stories</h3>
         <p>
           A story is one moment from your career, told in five parts: context, stakes, your action, the result and what
-          you learned. Your coach asks questions and fills the parts from your own words. Then you practice it in
+          you learned. Strova asks questions and fills the parts from your own words. Then you practice it in
           takes, typed or spoken, and each take is scored on the story's skills from 1 to 4.
         </p>
         <h3>Prep for an interview</h3>

@@ -359,7 +359,7 @@ async def _turn(
     db: AsyncSession, session: CoachSession, text: str, timeout_s: float
 ) -> CoachTurnResult:
     if session.status != CoachSessionStatus.ACTIVE:
-        raise HTTPException(status.HTTP_409_CONFLICT, "The coach session has ended.")
+        raise HTTPException(status.HTTP_409_CONFLICT, "Your session with Strova has ended.")
     story = await _story(db, session)
     if story is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The story was deleted; end the session.")
@@ -466,7 +466,7 @@ async def set_coach_style(
     """CO-5: gentle or direct. Only the style section of the prompt changes."""
     session = await _owned(db, me, session_id)
     if session.status != CoachSessionStatus.ACTIVE:
-        raise HTTPException(status.HTTP_409_CONFLICT, "The coach session has ended.")
+        raise HTTPException(status.HTTP_409_CONFLICT, "Your session with Strova has ended.")
     session.style = body.style
     await db.commit()
     return session_out(session)
@@ -522,7 +522,7 @@ async def join_coach_voice(
     connection: the room stays the same and the coach goes on from the last turn."""
     session = await _owned(db, me, session_id, lock=True)
     if session.status != CoachSessionStatus.ACTIVE:
-        raise HTTPException(status.HTTP_409_CONFLICT, "The coach session has ended.")
+        raise HTTPException(status.HTTP_409_CONFLICT, "Your session with Strova has ended.")
     if session.channel != SessionChannel.VOICE:
         await ensure_sessions_open(db, SessionChannel.VOICE)  # OC-2, OC-3: a new voice start
         session.channel = SessionChannel.VOICE

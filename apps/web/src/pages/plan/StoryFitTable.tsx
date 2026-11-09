@@ -97,7 +97,7 @@ function StoryFitBody({ view, jobId }: { view: StoryFitView; jobId: string }) {
                 {r.story ? (
                   <Link to={storyPath(r.story.id)}>{r.story.title}</Link>
                 ) : (
-                  <Link to={newCoachPath({ skill: r.competency, job: jobId })}>Build it with the coach</Link>
+                  <Link to={newCoachPath({ skill: r.competency, job: jobId })}>Build it with Strova</Link>
                 )}
                 <span className="muted small plan-story-fit__reason">{r.reason}</span>
               </td>

@@ -322,7 +322,7 @@ describe("live session page", () => {
     await user.click(screen.getByRole("button", { name: "I am ready" }));
     expect(voice.sent).toEqual([{ prep: 3 }, "ready"]);
 
-    say("core", ["Great. Go ahead."]);
+    say("core", ["Go ahead."]);
     expect(screen.queryByTestId("prep-timer")).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Connected");
   });

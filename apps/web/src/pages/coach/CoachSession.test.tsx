@@ -122,7 +122,7 @@ describe("coach session", () => {
     await user.type(screen.getByRole("textbox", { name: "Your reply" }), "The platform team wanted us to wait a quarter.");
     await user.click(screen.getByRole("button", { name: "Send" }));
 
-    const log = screen.getByRole("log", { name: "Conversation with your coach" });
+    const log = screen.getByRole("log", { name: "Conversation with Strova" });
     expect(await within(log).findByText("Why did it matter?")).toBeInTheDocument();
     expect(within(log).getAllByTestId("coach-turn").map((t) => t.dataset.speaker)).toEqual(["coach", "candidate", "coach"]);
     expect(screen.getByRole("textbox", { name: "Your reply" })).toHaveValue("");
@@ -195,7 +195,7 @@ describe("coach session", () => {
     );
     const user = userEvent.setup();
     renderAt("/coach/new?style=classic");
-    await user.click(await screen.findByRole("button", { name: "Talk to the coach" }));
+    await user.click(await screen.findByRole("button", { name: "Talk to Strova" }));
     expect(await screen.findByText(/paused|unavailable/i)).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Your reply" })).toBeEnabled();
   });
@@ -203,9 +203,9 @@ describe("coach session", () => {
   it("CO-6: the mic joins the coach's voice room and the coach speaks", async () => {
     const user = userEvent.setup();
     renderAt("/coach/new?style=classic");
-    await user.click(await screen.findByRole("button", { name: "Talk to the coach" }));
+    await user.click(await screen.findByRole("button", { name: "Talk to Strova" }));
     expect(await screen.findByText(/Tell me about one time you led a hard change/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Stop talking to the coach" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Stop talking to Strova" })).toBeEnabled();
   });
 
   it("CO-2: a session that ended says so and takes no more turns", async () => {
@@ -236,7 +236,7 @@ describe("voice-first coach (canvas A1)", () => {
     const user = userEvent.setup();
     renderAt("/coach/new?style=classic");
     expect(await screen.findByRole("button", { name: "Type instead" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Talk to the coach" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Talk to Strova" })).toBeInTheDocument();
     expect(screen.getByText("Tap to talk")).toBeInTheDocument();
     expect(screen.queryByRole("textbox", { name: "Your reply" })).toBeNull();
 
@@ -248,7 +248,7 @@ describe("voice-first coach (canvas A1)", () => {
 
   it("CO-6: the mic on Home (?voice=1) starts talking at once", async () => {
     renderAt("/coach/new?style=classic&voice=1");
-    expect(await screen.findByRole("button", { name: "Stop talking to the coach" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Stop talking to Strova" })).toBeInTheDocument();
     expect(await screen.findByText(/Tell me about one time you led a hard change/)).toBeInTheDocument();
   });
 });
@@ -285,7 +285,7 @@ describe("workbench takes and versions", () => {
   it("CO-2: an empty part on the story page opens a coach session on the story", async () => {
     renderAt("/stories/s1");
     const parts = await screen.findByRole("region", { name: "Story parts" });
-    expect(within(parts).getAllByRole("link", { name: "Add it with the coach" })[0]).toHaveAttribute(
+    expect(within(parts).getAllByRole("link", { name: "Add it with Strova" })[0]).toHaveAttribute(
       "href",
       "/coach/new?story=s1",
     );

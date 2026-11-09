@@ -278,7 +278,7 @@ export function CountdownBadge({ days }: { days: number }) {
   );
 }
 
-/** The coach's mark: a violet ring with a dot. Decorative; the "Your coach" label names it. */
+/** The coach's mark: a violet ring with a dot. Decorative; the "Strova" label names it. */
 export function CoachMark({ size = 40, tone = "light" }: { size?: number; tone?: "light" | "dark" }) {
   return (
     <svg className="coach-mark" data-tone={tone} width={size} height={size} viewBox="0 0 22 22" aria-hidden="true">
@@ -292,7 +292,7 @@ export function CoachMark({ size = 40, tone = "light" }: { size?: number; tone?:
 /** The coach's one-sentence message with its mark, as on Home and the debrief. */
 export function CoachLine({
   children,
-  label = "Your coach",
+  label = "Strova",
   tone = "light",
   actions,
 }: {

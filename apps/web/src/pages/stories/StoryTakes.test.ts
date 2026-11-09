@@ -30,7 +30,7 @@ describe("takes trend", () => {
 
   it("CO-7: otherwise compares the last take with the first, and says nothing for one take", () => {
     expect(takesTrend([take("a", [2]), take("b", [1]), take("c", [3])])).toBe("Stronger than your first take.");
-    expect(takesTrend([take("a", [3]), take("b", [2])])).toBe("Not as strong as your first take yet. Try the coach notes.");
+    expect(takesTrend([take("a", [3]), take("b", [2])])).toBe("Not as strong as your first take yet. Try Strova's notes.");
     expect(takesTrend([take("a", [3]), take("b", [3])])).toBe("About as strong as your first take.");
     expect(takesTrend([take("a", [3])])).toBeNull();
   });

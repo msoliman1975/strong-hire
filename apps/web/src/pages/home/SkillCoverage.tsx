@@ -93,7 +93,7 @@ export function SkillCoverage({ stories }: { stories: Story[] }) {
                 <Link className="home-coverage__link" to={missingSkillPath(skill)}>
                   <Pill state="gap">
                     {competencyLabel(skill)} <span className="home-coverage__state">{coverageLabel[state]}</span>
-                    <span className="visually-hidden">. Build a story for it with the coach</span>
+                    <span className="visually-hidden">. Build a story for it with Strova</span>
                   </Pill>
                 </Link>
               ) : (

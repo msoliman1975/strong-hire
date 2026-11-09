@@ -218,7 +218,7 @@ export function coachHandlers(store?: MockStore) {
       const entry = sessions.get(String(params.id));
       if (!entry) return notFound("Coach session");
       if (entry.session.status !== "active") {
-        return HttpResponse.json({ detail: "The coach session has ended." }, { status: 409 });
+        return HttpResponse.json({ detail: "Your session with Strova has ended." }, { status: 409 });
       }
       const { text } = (await request.json()) as { text: string };
       const story = findStory(entry.session.story_id);
