@@ -20,6 +20,18 @@ class ConsentOut(BaseModel):
     training_consent: bool
 
 
+class TracingConsentIn(BaseModel):
+    """LT-20: let the team review this user's interview turns (D-12)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    tracing_consent: bool
+
+
+class TracingConsentOut(BaseModel):
+    tracing_consent: bool
+
+
 def _blank_to_none(value: object) -> object:
     if isinstance(value, str):
         value = value.strip()

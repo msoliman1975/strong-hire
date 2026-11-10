@@ -20,6 +20,8 @@ function renderAt(path: string) {
     created_at: "2026-10-01T10:00:00Z",
     full_name: null,
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockSignIn(mockStore, "admin@example.com");
   const user = userEvent.setup();

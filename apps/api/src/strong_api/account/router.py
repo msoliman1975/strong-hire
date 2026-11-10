@@ -3,6 +3,7 @@
 GET    /account/profile                    the profile asked for at the first sign-in
 PUT    /account/profile                    save it; the first save completes the profile
 PUT    /account/consent                    change the consent; each change goes to AuditLog
+PUT    /account/tracing-consent            LT-20: the tracing consent; 404 until gate 2 is met
 POST   /account/export                     start an export (background job)
 GET    /account/export/{id}                export status
 GET    /account/export/{id}/download       the zip bundle; works once
@@ -36,14 +37,18 @@ from strong_api.account.schemas import (
     PlanSettingsIn,
     ProfileIn,
     ProfileOut,
+    TracingConsentIn,
+    TracingConsentOut,
 )
 from strong_api.account.settings import AccountSettings
+from strong_api.account.traces import request_trace_deletion
 from strong_api.auth import CurrentUser
 from strong_api.auth.deps import DbSession
 from strong_api.auth.settings import AuthSettings
 from strong_api.billing.entitlements import get_subscription
 from strong_api.billing.router import Stripe
 from strong_api.inputs.deps import Queue
+from strong_core.config import get_settings
 from strong_core.db.models import AuditLog, User
 
 log = logging.getLogger(__name__)
@@ -145,6 +150,37 @@ def build_router(auth_settings: AuthSettings) -> APIRouter:
             user.training_consent = body.training_consent
             await db.commit()
         return ConsentOut(training_consent=user.training_consent)
+
+    @router.put("/tracing-consent")
+    async def set_tracing_consent(
+        db: DbSession, user: CurrentUser, queue: Queue, body: TracingConsentIn
+    ) -> TracingConsentOut:
+        """LT-20, LT-24: let the team review my interview turns, off by default (D-12).
+
+        404 while LLM_TRACING_PROD_CONTENT is off (gate 2). Turning it off stops content from the
+        next turn and queues deletion of the content already kept, within 24 hours."""
+        if not get_settings().llm_tracing_prod_content:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Not Found")
+        before = bool(user.tracing_consent)
+        if before != body.tracing_consent:
+            user.tracing_consent = body.tracing_consent
+            user.tracing_consent_at = datetime.now(UTC)
+            db.add(
+                AuditLog(
+                    org_id=user.org_id,
+                    actor=_actor(user.id),
+                    action="account.tracing_consent_changed",
+                    entity=f"user:{user.id}",
+                    details_json={
+                        "tracing_consent_from": before,
+                        "tracing_consent_to": body.tracing_consent,
+                    },
+                )
+            )
+            if before and not body.tracing_consent:
+                await request_trace_deletion(db, queue, user.org_id, "content", _actor(user.id))
+            await db.commit()
+        return TracingConsentOut(tracing_consent=bool(user.tracing_consent))
 
     async def _export_request(db: DbSession, user: CurrentUser, export_id: str) -> AuditLog:
         try:
@@ -300,6 +336,8 @@ def build_router(auth_settings: AuthSettings) -> APIRouter:
                 refs=refs,
             )
 
+        # LT-25: every production LLM trace of the org, within 24 hours (D-18).
+        await request_trace_deletion(db, queue, org_id, "all", _actor(user_id))
         result = await delete_org_rows(db, org_id)
         await redact_audit_actor(db, org_id, email, _actor(user_id))
         db.add(

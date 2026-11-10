@@ -17,6 +17,7 @@ from strong_api.admin.auto_profiles import router as auto_profiles_router
 from strong_api.admin.content import router as content_router
 from strong_api.admin.controls import router as controls_router
 from strong_api.admin.identity import ADMIN_LINK_SALT, AdminAuth, seed_admins
+from strong_api.admin.mlflow_auth import router as mlflow_auth_router
 from strong_api.admin.ops import router as ops_router
 from strong_api.admin.overview import router as overview_router
 from strong_api.admin.part1 import router as part1_router
@@ -51,6 +52,7 @@ ROUTERS: list[APIRouter] = [
     auto_profiles_router,
     part2_router,
     part3_router,
+    mlflow_auth_router,
 ]
 
 

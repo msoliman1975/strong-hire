@@ -55,6 +55,8 @@ describe("site banner (OC-4)", () => {
       created_at: "2026-10-01T10:00:00Z",
       full_name: "Ana",
       profile_complete: true,
+      tracing_consent: false,
+      tracing_consent_available: false,
     };
     mockStore.db.auth = { status: "signed_in", email: "ana@example.com", userEmail: "ana@example.com" };
     setBanner("Voice interviews are down.", "critical", Date.now() + HOUR);

@@ -168,12 +168,12 @@ so the UI groups a session's turns and jobs together.
 ## How to compare two prompt versions
 
 1. Make sure tracing is on (`docs/hosting.md`, "LLM tracing (MLflow)") and
-   `STRONGHIRE_MLFLOW_PASSWORD` is set on your PC.
+   `STRONGHIRE_MLFLOW_TOKEN` is set on your PC.
 2. Run a suite on the current prompts: `./infra/sim/sim-run.ps1 -Suite text-smoke`.
 3. Deploy the prompt change (a new `prompts/<role>/<name>.v<N+1>.txt`), then run the same suite
    again. Use the same suite and the same scenarios, so the runs differ only in the change.
-4. Open `https://mlflow.getstronghire.com`, experiment `sim`, tick both runs, and click
-   **Compare**.
+4. Open `https://admin.getstronghire.com/mlflow/` (signed in to the admin app), experiment
+   `sim`, tick both runs, and click **Compare**.
    - **Params** show what changed: `<role>.prompt_refs`, `<role>.alias`, `<role>.tier`,
      `model_profile`, `git_sha`.
    - **Metrics** show the effect:

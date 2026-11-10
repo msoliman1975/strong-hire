@@ -557,6 +557,46 @@ function V2Control({ settings, ask }: { settings: OpsSettings; ask: (c: Change) 
   );
 }
 
+function TracingControl({ settings, ask }: { settings: OpsSettings; ask: (c: Change) => void }) {
+  const paused = settings.values.llm_tracing_paused;
+  return (
+    <section className="panel control" aria-labelledby="ctl-tracing">
+      <h2 id="ctl-tracing">Production tracing (LT-19)</h2>
+      <p>
+        <State on={paused} onLabel="Paused" offLabel="Running" /> While paused, new sessions of real users are not
+        traced to MLflow. Sim traces go on, and no trace is deleted. It only matters when production tracing is on
+        for this server.
+      </p>
+      <p className="small">
+        <a href="/mlflow/">Open the traces in MLflow</a> (every trace you open is audited, LT-29).
+      </p>
+      <LastChanged settings={settings} keyName="llm_tracing_paused" />
+      <button
+        type="button"
+        className={paused ? "btn btn--small btn--primary" : "btn btn--small btn--danger-outline"}
+        onClick={() =>
+          ask({
+            key: "llm_tracing_paused",
+            value: !paused,
+            title: paused ? "Resume production tracing" : "Pause production tracing",
+            summary: paused ? (
+              <p>New sessions of real users are traced again, as the server settings say.</p>
+            ) : (
+              <p>
+                New sessions of real users will not be traced. Sessions already traced keep their traces until
+                retention deletes them.
+              </p>
+            ),
+            confirmLabel: paused ? "Resume tracing" : "Pause tracing",
+          })
+        }
+      >
+        {paused ? "Resume production tracing" : "Pause production tracing"}
+      </button>
+    </section>
+  );
+}
+
 function ModelProfilePanel() {
   const models = useOpsModels();
   return (
@@ -684,6 +724,7 @@ export function ControlsPage() {
             <BannerControl settings={settings.data} ask={ask} />
             <CustomAccessControl settings={settings.data} ask={ask} />
             <V2Control settings={settings.data} ask={ask} />
+            <TracingControl settings={settings.data} ask={ask} />
             <SimControl
               key={`sim-${settings.data.values.sim_max_live_sessions}`}
               settings={settings.data}

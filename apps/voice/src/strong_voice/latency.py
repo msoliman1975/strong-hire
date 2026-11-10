@@ -39,6 +39,8 @@ from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Any
 
+from strong_core.schemas import Turn
+
 log = logging.getLogger(__name__)
 
 GATE_P50_MS = 1000.0
@@ -126,6 +128,9 @@ class LatencyRecorder:
         # LT-6: the voice agent sets this to send each turn as an LLM trace. Same rule as
         # on_turn: it must not block, and an error in it is logged, never raised.
         self.trace_turn: Callable[[TurnLatency], None] | None = None
+        # LT-21: the interview's transcript so far (the runner's turns), set by run_session, so a
+        # consenting user's turn text can be kept with its trace. None outside an interview.
+        self.turns_source: Callable[[], Sequence[Turn]] | None = None
         self._pending_user: Mapping[str, Any] | None = None
         self._last_stt_s: float | None = None
 

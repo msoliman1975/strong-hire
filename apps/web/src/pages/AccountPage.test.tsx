@@ -1,6 +1,6 @@
 /**
  * Account page against the mocks of the real P9 endpoints. Requirement IDs: AC-2 (consent toggle),
- * AC-1 (export and delete), BL-1 (plan, minutes and cancellation with the exit survey).
+ * AC-1 (export and delete), LT-20 and LT-24 (tracing consent), BL-1 (plan, minutes and cancellation with the exit survey).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -9,7 +9,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
-import { CONSENT_LABEL } from "../components/ConsentSwitch";
+import { CONSENT_LABEL, TRACING_CONSENT_LABEL } from "../components/ConsentSwitch";
 import { refreshUsage } from "../mocks/handlers";
 import { mockStore, server } from "../mocks/node";
 
@@ -23,6 +23,8 @@ function signedIn(email = "ana@example.com") {
     created_at: "2026-10-01T10:00:00Z",
     full_name: "Ana Lopez",
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email, userEmail: email };
 }
@@ -101,6 +103,27 @@ describe("account page", () => {
     await user.click(await screen.findByRole("button", { name: "Prepare export" }));
     const link = await screen.findByRole("link", { name: "Download export" });
     expect(link).toHaveAttribute("download", "strong-hire-export.zip");
+  });
+
+  it("LT-20: the tracing consent is hidden until the server offers it", async () => {
+    signedIn();
+    renderAccount();
+    expect(await screen.findByRole("switch", { name: CONSENT_LABEL })).toBeInTheDocument();
+    expect(screen.queryByRole("switch", { name: TRACING_CONSENT_LABEL })).not.toBeInTheDocument();
+  });
+
+  it("LT-20, LT-24: the tracing consent is off by default and saves both ways", async () => {
+    signedIn();
+    mockStore.db.users["ana@example.com"].tracing_consent_available = true;
+    const user = renderAccount();
+    const toggle = await screen.findByRole("switch", { name: TRACING_CONSENT_LABEL });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    await user.click(toggle);
+    await waitFor(() => expect(mockStore.db.users["ana@example.com"].tracing_consent).toBe(true));
+    expect(await screen.findByText(/from your next answer/)).toBeInTheDocument();
+    await user.click(screen.getByRole("switch", { name: TRACING_CONSENT_LABEL }));
+    await waitFor(() => expect(mockStore.db.users["ana@example.com"].tracing_consent).toBe(false));
+    expect(await screen.findByText(/deleted within 24 hours/)).toBeInTheDocument();
   });
 
   it("AC-2: the consent switch saves the new value", async () => {

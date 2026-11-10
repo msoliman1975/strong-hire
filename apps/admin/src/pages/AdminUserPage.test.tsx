@@ -27,6 +27,8 @@ function addUser(email: string, n: number, name: string | null) {
     created_at: `2026-10-0${n}T10:00:00Z`,
     full_name: name,
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
 }
 

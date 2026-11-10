@@ -14,7 +14,6 @@ from strong_core.config import find_repo_root
 
 REPO = find_repo_root()
 INFRA = REPO / "infra"
-BCRYPT = re.compile(r"^\$2[aby]\$\d\d\$[./A-Za-z0-9]{53}$")
 
 
 class _ComposeLoader(yaml.SafeLoader):
@@ -102,11 +101,27 @@ def test_lt12_python_services_have_tracing_off_by_default() -> None:
 
 
 def test_lt12_server_service_is_capped_and_unpublished() -> None:
-    """LT-12: on the server, no host port, 1 GB, and the public host name allowed."""
+    """LT-12, LT-28: on the server, no host port, 1 GB, under /mlflow, and only the internal
+    host name: Caddy sends Host mlflow:5000, and only the admin origin may POST from a browser."""
     svc = _compose(INFRA / "compose.server.yaml")["services"]["mlflow"]
     assert svc["ports"] == []
     assert svc["mem_limit"] == "1g"
-    assert "mlflow.${DOMAIN}" in svc["environment"]["MLFLOW_ALLOWED_HOSTS"].split(",")
+    env = svc["environment"]
+    assert env["MLFLOW_ALLOWED_HOSTS"].split(",") == ["mlflow", "mlflow:5000"]
+    assert env["MLFLOW_STATIC_PREFIX"] == "/mlflow"
+    assert env["MLFLOW_CORS_ALLOWED_ORIGINS"] == "https://admin.${DOMAIN}"
+
+
+def test_lt28_server_services_use_the_prefixed_uri() -> None:
+    """LT-28: every server service that sends traces uses http://mlflow:5000/mlflow; only the API
+    gets the sim token, which it checks for Caddy."""
+    services = _compose(INFRA / "compose.server.yaml")["services"]
+    for name in ("api", "worker", "voice", "sim"):
+        uri = services[name]["environment"]["MLFLOW_TRACKING_URI"]
+        assert uri == "http://mlflow:5000/mlflow", name
+    assert services["api"]["environment"]["MLFLOW_SIM_TOKEN"] == "${MLFLOW_SIM_TOKEN:-}"
+    for name in ("worker", "voice", "sim", "caddy"):
+        assert "MLFLOW_SIM_TOKEN" not in services[name].get("environment", {}), name
 
 
 def test_lt12_server_never_traces_dev_sessions() -> None:
@@ -119,40 +134,49 @@ def test_lt12_server_never_traces_dev_sessions() -> None:
 def test_lt12_server_sim_service_logs_to_the_local_mlflow() -> None:
     """LT-10, LT-12: admin sims reach MLflow inside the server network, in the sim experiment."""
     env = _compose(INFRA / "compose.server.yaml")["services"]["sim"]["environment"]
-    assert env["MLFLOW_TRACKING_URI"] == "http://mlflow:5000"
+    assert env["MLFLOW_TRACKING_URI"] == "http://mlflow:5000/mlflow"
     assert env["MLFLOW_EXPERIMENT"] == "${MLFLOW_EXPERIMENT:-sim}"
     assert env["LLM_TRACING"] == "${LLM_TRACING:-off}"
 
 
-def test_lt12_caddy_site_is_behind_basic_auth() -> None:
-    """LT-12: mlflow.$DOMAIN asks for a password; no other site proxies to mlflow."""
+def test_lt28_caddy_sends_every_mlflow_request_through_the_api_check() -> None:
+    """LT-12, LT-28: mlflow.$DOMAIN and admin.$DOMAIN/mlflow/ both ask /admin/mlflow-auth
+    before they proxy; no other site proxies to mlflow; no site uses basic auth."""
     sites = _caddy_sites()
-    site = sites["mlflow.{$DOMAIN}"]
-    assert "basic_auth {" in site
-    assert "reverse_proxy mlflow:5000" in site
-    assert "noindex" in site
+    for addr in ("mlflow.{$DOMAIN}", "admin.{$DOMAIN}"):
+        site = sites[addr]
+        auth = site.index("forward_auth api:8000 {")
+        assert "uri /admin/mlflow-auth" in site[auth:], addr
+        assert auth < site.index("reverse_proxy mlflow:5000"), addr
+        assert "basic_auth" not in site, addr
+    assert "rewrite * /mlflow{uri}" in sites["mlflow.{$DOMAIN}"]
+    assert "noindex" in sites["mlflow.{$DOMAIN}"]
     others = [
-        addr for addr, body in sites.items() if addr != "mlflow.{$DOMAIN}" and "mlflow" in body
+        addr
+        for addr, body in sites.items()
+        if addr not in ("mlflow.{$DOMAIN}", "admin.{$DOMAIN}") and "mlflow" in body
     ]
     assert not others, others
-
-
-def test_lt12_default_password_hash_is_closed_and_consistent() -> None:
-    """LT-12: with no hash in .env, Caddy still starts and the site stays closed."""
-    site = _caddy_sites()["mlflow.{$DOMAIN}"]
-    match = re.search(
-        r"\{\$MLFLOW_BASIC_AUTH_USER:mlflow\} \{\$MLFLOW_BASIC_AUTH_HASH:([^}]+)\}", site
-    )
-    assert match, "basic_auth needs defaults so Caddy validates without the variables"
-    default_hash = match.group(1)
-    assert BCRYPT.match(default_hash)
     caddy_env = _compose(INFRA / "compose.server.yaml")["services"]["caddy"]["environment"]
-    compose_default = (
-        caddy_env["MLFLOW_BASIC_AUTH_HASH"]
-        .removeprefix("${MLFLOW_BASIC_AUTH_HASH:-")
-        .removesuffix("}")
-    )
-    assert compose_default.replace("$$", "$") == default_hash
+    assert not [k for k in caddy_env if k.startswith("MLFLOW_")]
+
+
+def test_lt28_the_admin_csp_is_relaxed_for_mlflow_only() -> None:
+    """LT-28, AA-9: the strict site CSP stays; /mlflow/* replaces it with one that still allows
+    only same-origin scripts and requests."""
+    site = _caddy_sites()["admin.{$DOMAIN}"]
+    route = site[site.index("handle /mlflow/* {") :]
+    route = route[: route.index("\n\t}")]
+    csp = re.search(r'Content-Security-Policy "([^"]+)"', route)
+    assert csp, "the /mlflow/* route sets its own CSP"
+    rules = dict(part.strip().split(" ", 1) for part in csp.group(1).split(";"))
+    assert rules["script-src"] == "'self'"
+    assert rules["connect-src"] == "'self'"
+    assert rules["object-src"] == "'none'"
+    assert "defer" in route
+    assert "header_up -Cookie" in route
+    site_csp = site[: site.index("handle /mlflow/* {")]
+    assert "default-src 'self'; base-uri 'none'" in site_csp
 
 
 def test_lt12_start_script_uses_psycopg3_and_the_host_guard() -> None:
@@ -175,6 +199,19 @@ def test_lt12_start_script_uses_psycopg3_and_the_host_guard() -> None:
     assert opts["--artifacts-destination"] == "/mlflow/artifacts"
     assert opts["--allowed-hosts"] == "mlflow:5000"
     assert opts["--port"] == "5000"
+    assert "--static-prefix" not in opts  # local: no prefix
+
+
+def test_lt28_start_script_passes_the_prefix_and_origins(monkeypatch: Any) -> None:
+    """LT-28: the server's prefix and allowed browser origin reach `mlflow server`."""
+    start = _start_module()
+    monkeypatch.setenv("MLFLOW_ALLOWED_HOSTS", "mlflow:5000")
+    monkeypatch.setenv("MLFLOW_STATIC_PREFIX", "/mlflow")
+    monkeypatch.setenv("MLFLOW_CORS_ALLOWED_ORIGINS", "https://admin.example.com")
+    args = start.server_args("postgres", "u", "p", "mlflow")
+    opts = dict(zip(args[2::2], args[3::2], strict=True))
+    assert opts["--static-prefix"] == "/mlflow"
+    assert opts["--cors-allowed-origins"] == "https://admin.example.com"
 
 
 def test_lt12_every_mlflow_pin_matches_the_server_image() -> None:
@@ -208,15 +245,18 @@ def test_lt11_dev_ps1_has_the_obs_profile_and_prunes_dev_traces() -> None:
     assert "(Get-EnvValues)['LLM_TRACING'] -eq 'on'" in profile
 
 
-def test_lt13_sim_server_gets_credentials_only_when_set() -> None:
-    """LT-13: the sim server logs to the main server's MLflow only with the optional secret."""
+def test_lt13_sim_server_gets_the_token_only_when_set() -> None:
+    """LT-13, LT-28: the sim server logs to the main server's MLflow only with the optional
+    token, sent as a bearer token; no password."""
     env = _compose(INFRA / "sim/compose.sim.yaml")["services"]["sim"]["environment"]
-    for key in ("MLFLOW_TRACKING_URI", "MLFLOW_TRACKING_USERNAME", "MLFLOW_TRACKING_PASSWORD"):
+    for key in ("MLFLOW_TRACKING_URI", "MLFLOW_TRACKING_TOKEN"):
         assert env[key] == f"${{{key}:-}}"
+    assert "MLFLOW_TRACKING_PASSWORD" not in env and "MLFLOW_TRACKING_USERNAME" not in env
     assert env["MLFLOW_EXPERIMENT"] == "sim"
     run = (INFRA / "sim/sim-run.ps1").read_text(encoding="utf-8")
-    block = run[run.index("if ($mlflowPassword) {") :]
+    block = run[run.index("if ($mlflowToken) {") :]
     block = block[: block.index("}")]
     assert '"MLFLOW_TRACKING_URI=https://mlflow.$mlflowDomain"' in block
-    assert '"MLFLOW_TRACKING_PASSWORD=$mlflowPassword"' in block
-    assert "Get-OptionalUserSecret 'STRONGHIRE_MLFLOW_PASSWORD'" in run
+    assert '"MLFLOW_TRACKING_TOKEN=$mlflowToken"' in block
+    assert "Get-OptionalUserSecret 'STRONGHIRE_MLFLOW_TOKEN'" in run
+    assert "PASSWORD" not in block

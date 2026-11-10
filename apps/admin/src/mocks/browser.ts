@@ -41,6 +41,8 @@ function seed(db: MockDb): void {
     created_at: "2026-10-01T10:00:00Z",
     full_name: null,
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   });
   db.users["ana@example.com"] = user("ana@example.com", 1, true);
   db.users["admin@example.com"] = user("admin@example.com", 9, false);
