@@ -43,7 +43,7 @@ TAKE_YOUR_TIME = "Sure, take your time. Go ahead whenever you are ready."
 CHECK_IN = "No rush. Go ahead whenever you are ready, or ask me to repeat the question."
 MAX_PREP_MIN = 3
 PREP_OVER = "Time is up. Go ahead whenever you are ready."
-PREP_READY = "Great. Go ahead."
+PREP_READY = "Go ahead."
 
 
 def prep_line(minutes: int) -> str:
