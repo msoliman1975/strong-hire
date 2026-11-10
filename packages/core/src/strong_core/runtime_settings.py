@@ -48,6 +48,7 @@ class SettingKey(StrEnum):
     SIM_MAX_LIVE_SESSIONS = "sim_max_live_sessions"  # SM-3, SM-15
     CUSTOM_INTERVIEW_ACCESS = "custom_interview_access"  # CU-11
     V2_ENABLED = "v2_enabled"  # FL-1
+    LLM_TRACING_PAUSED = "llm_tracing_paused"  # LT-19
 
 
 class JobKind(StrEnum):
@@ -100,6 +101,10 @@ class RuntimeSettings(BaseModel):
     v2_enabled: bool = Field(
         default=False,
         description="FL-1: show the v2 screens that replace v1 screens. Off until launch.",
+    )
+    llm_tracing_paused: bool = Field(
+        default=False,
+        description="LT-19: stop tracing real users' sessions now. Sim tracing goes on.",
     )
 
 

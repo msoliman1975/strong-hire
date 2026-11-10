@@ -10397,6 +10397,12 @@ export interface components {
              * @default false
              */
             v2_enabled: boolean;
+            /**
+             * Llm Tracing Paused
+             * @description LT-19: stop tracing real users' sessions now. Sim tracing goes on.
+             * @default false
+             */
+            llm_tracing_paused: boolean;
         };
         /**
          * SampleQuestion
@@ -10825,7 +10831,7 @@ export interface components {
          * SettingKey
          * @enum {string}
          */
-        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions" | "custom_interview_access" | "v2_enabled";
+        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions" | "custom_interview_access" | "v2_enabled" | "llm_tracing_paused";
         /**
          * Severity
          * @enum {string}
