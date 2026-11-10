@@ -8,7 +8,9 @@ candidate's speech stops the agent's audio. The real interviewer logic arrives i
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import uuid
 from contextlib import ExitStack
 
 from livekit.agents import Agent, AgentSession, JobContext, JobProcess, llm
@@ -20,8 +22,10 @@ from strong_core.db import get_sessionmaker
 from strong_core.gateway import Role, get_gateway, make_db_usage_sink, set_usage_sink, usage_context
 from strong_core.ops.logs import log_context
 from strong_core.prompts import load_prompt
-from strong_core.tracing import TurnCollector, collect_turns
-from strong_core.tracing.sessions import maybe_trace, trace_tags_for
+from strong_core.schemas import Speaker
+from strong_core.tracing import TraceTags, TurnCollector, collect_turns, record_turn_content
+from strong_core.tracing.scrub import Scrubber
+from strong_core.tracing.sessions import maybe_trace, trace_tags_for, turn_content_allowed
 from strong_voice.coach_agent import coach_entrypoint
 from strong_voice.interview_agent import run_session
 from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder, TurnLatency, turn_attributes
@@ -118,16 +122,70 @@ async def entrypoint(ctx: JobContext) -> None:
 
 def trace_turns(ctx: JobContext, recorder: LatencyRecorder, collector: TurnCollector) -> None:
     """Send each turn of the interview as a `turn` trace with its timings (LT-6), and what is
-    left when the session ends."""
+    left when the session ends. For a real user who gave tracing consent, also the turn's text,
+    scrubbed, as a `turn.content` trace (LT-21), off the audio path."""
+    content = _TurnContent(collector.tags, recorder)
 
     def cut(row: TurnLatency) -> None:
         collector.cut("voice", row.turn, turn_attributes(row))
+        content.after_cut(row.turn)
 
     async def flush() -> None:
         collector.flush()
+        await content.drain()
 
     recorder.trace_turn = cut
     ctx.add_shutdown_callback(flush)
+
+
+class _TurnContent:
+    """The text of each voice turn since the last cut, for consenting users only (LT-21)."""
+
+    def __init__(self, tags: TraceTags, recorder: LatencyRecorder) -> None:
+        self.tags = tags
+        self.recorder = recorder
+        self.seen = 0
+        self.scrubber: Scrubber | None = None
+        self.tasks: set[asyncio.Task[None]] = set()
+
+    def after_cut(self, index: int) -> None:
+        source = self.recorder.turns_source
+        if not self.tags.turn_content or not self.tags.org_id or source is None:
+            return
+        try:
+            turns = list(source())
+            new, self.seen = turns[self.seen :], len(turns)
+            candidate = " ".join(t.text for t in new if t.speaker == Speaker.CANDIDATE)
+            interviewer = " ".join(t.text for t in new if t.speaker == Speaker.INTERVIEWER)
+            if not (candidate or interviewer):
+                return
+            task = asyncio.get_running_loop().create_task(
+                self._record(index, interviewer, candidate)
+            )
+            self.tasks.add(task)
+            task.add_done_callback(self.tasks.discard)
+        except Exception:
+            log.warning("could not keep the content of voice turn %d", index)
+
+    async def _record(self, index: int, interviewer: str, candidate: str) -> None:
+        """Consent is read again for each turn, so turning it off stops content from the next
+        turn (LT-24). Never raises (LT-31)."""
+        try:
+            org_id = uuid.UUID(str(self.tags.org_id))
+            if not await turn_content_allowed(org_id):
+                return
+            if self.scrubber is None:
+                async with get_sessionmaker()() as db:
+                    self.scrubber = await Scrubber.for_org(db, org_id)
+            record_turn_content(
+                self.tags, index, "voice", interviewer, candidate, self.scrubber.scrub
+            )
+        except Exception:
+            log.warning("could not keep the content of voice turn %d", index)
+
+    async def drain(self) -> None:
+        if self.tasks:
+            await asyncio.gather(*self.tasks, return_exceptions=True)
 
 
 async def spike_entrypoint(ctx: JobContext) -> None:
