@@ -233,7 +233,7 @@ async def _story_items(
     rows = list(
         await db.scalars(
             select(StoryRow)
-            .where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id)
+            .where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id, StoryRow.in_prep())
             .order_by(StoryRow.created_at, StoryRow.id)
         )
     )

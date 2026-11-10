@@ -97,9 +97,10 @@ def story_from_row(row: StoryRow) -> Story:
 async def load_user_stories(
     db: AsyncSession, org_id: uuid.UUID, user_id: uuid.UUID
 ) -> list[StoryRow]:
+    """The stories in prep (CS-14): not archived, not deleted."""
     rows = await db.scalars(
         select(StoryRow)
-        .where(StoryRow.org_id == org_id, StoryRow.user_id == user_id)
+        .where(StoryRow.org_id == org_id, StoryRow.user_id == user_id, StoryRow.in_prep())
         .order_by(StoryRow.created_at, StoryRow.id)
     )
     return list(rows)

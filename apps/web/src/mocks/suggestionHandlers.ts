@@ -132,6 +132,7 @@ export function sampleSuggestions(ids: {
         resume_line_ref: "roles[0].achievements[0]",
         skills: ["impact", "technical_depth"],
         missing_parts: ["stakes", "reflection"],
+        same_as: null,
       },
     },
     {
