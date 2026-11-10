@@ -155,7 +155,7 @@ export function CareerStoriesPage() {
         <div className="sx-row">
           <Strova mode="coaching" size={56} />
           <div>
-            <h1>Career stories</h1>
+            <h1>Career Stories with Strova</h1>
             <p className="sx-muted sx-small">The moments you'll tell in "tell me about a time…" questions.</p>
           </div>
         </div>

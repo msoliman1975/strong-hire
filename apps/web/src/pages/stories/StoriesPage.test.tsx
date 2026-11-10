@@ -123,7 +123,7 @@ describe("Career Stories (CS-5 to CS-17)", () => {
   it("CS-5, CS-8: stories come first, then the recommended rows; + New story crafts or writes", async () => {
     withRecommendations();
     renderAt("/stories");
-    expect(await screen.findByRole("heading", { level: 1, name: "Career stories" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Career Stories with Strova" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "+ New story" })).toHaveAttribute("href", "/coach/new");
     const more = screen.getByLabelText("More ways to start");
     expect(more.closest("details")).not.toHaveAttribute("open");
