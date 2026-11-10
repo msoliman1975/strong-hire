@@ -35,6 +35,29 @@ admin.{$DOMAIN} {
 	handle_path /api/* {
 		reverse_proxy api:8000
 	}
+	# LLM traces (LT-28, docs/llm-tracing/spec.md "Phase 2"): the MLflow UI and API, served by
+	# MLflow with --static-prefix /mlflow. Caddy first asks the API (forward_auth) whether this
+	# request has a live admin session (AA-3, AA-4); anything else gets the API's 401. The API also
+	# writes admin.trace_viewed when the request reads traces (LT-29). The MLflow UI needs inline
+	# styles, data: images and fonts and its own workers, so this path has its own CSP (deferred,
+	# so it replaces the site one and MLflow's own X-Frame-Options).
+	redir /mlflow /mlflow/
+	handle /mlflow/* {
+		route {
+			forward_auth api:8000 {
+				uri /admin/mlflow-auth
+			}
+			header {
+				Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'"
+				X-Frame-Options SAMEORIGIN
+				defer
+			}
+			reverse_proxy mlflow:5000 {
+				header_up Host {upstream_hostport}
+				header_up -Cookie
+			}
+		}
+	}
 	handle {
 		root * /srv-admin
 		try_files {path} /index.html
@@ -79,9 +102,11 @@ rtc.{$DOMAIN} {
 	reverse_proxy livekit:7880
 }
 
-# LLM traces (LT-12, docs/llm-tracing/spec.md): the MLflow UI and API, for admins and the sim
-# server. Basic auth on every request; the mlflow service runs only with LLM_TRACING=on (the obs
-# profile), so otherwise this answers 502 after the password check. Not linked from any app.
+# LLM traces for the sim server (LT-13, LT-28): it logs its runs here with
+# `Authorization: Bearer $MLFLOW_SIM_TOKEN` (MLflow sends MLFLOW_TRACKING_TOKEN that way), checked
+# by the same API endpoint as the admin path; an admin session cookie never reaches this host
+# (host-only on admin.). People use https://admin.$DOMAIN/mlflow/. The mlflow service runs only
+# with LLM_TRACING=on (the obs profile), so otherwise this answers 502 after the check.
 mlflow.{$DOMAIN} {
 	encode gzip
 	header {
@@ -92,10 +117,14 @@ mlflow.{$DOMAIN} {
 		X-Robots-Tag "noindex, nofollow"
 		-Server
 	}
-	basic_auth {
-		# The default hash matches no known password: the site stays closed until .env sets
-		# MLFLOW_BASIC_AUTH_HASH (docs/hosting.md, "LLM tracing (MLflow)").
-		{$MLFLOW_BASIC_AUTH_USER:mlflow} {$MLFLOW_BASIC_AUTH_HASH:$2a$14$J7HH7DBOgeL.lQ5zAC..3eODGvqinN54HMqgcEpsXv3IF2pKyIlr.}
+	route {
+		forward_auth api:8000 {
+			uri /admin/mlflow-auth
+		}
+		rewrite * /mlflow{uri}
+		reverse_proxy mlflow:5000 {
+			header_up Host {upstream_hostport}
+			header_up -Authorization
+		}
 	}
-	reverse_proxy mlflow:5000
 }
