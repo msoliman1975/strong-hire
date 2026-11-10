@@ -40,18 +40,13 @@ afterEach(() => setFeatureOverrides({}));
 
 async function seed() {
   const form = new FormData();
-  form.append(
-    "text",
-    "Backend engineer, Python and Go. Led the move of 30 services to PostgreSQL.",
-  );
+  form.append("text", "Backend engineer, Python and Go. Led the move of 30 services to PostgreSQL.");
   const { resume } = await resumesApi.upload(form);
   await resumesApi.get(resume.id);
   // A pasted resume gets the core default name "Resume <date>": a stored name the user can change,
   // not interface copy (U04 follow-up). Name it, so the test checks the copy only.
   await resumesApi.rename(resume.id, "Ana Lopez resume");
-  const { job_target: job } = await jobTargetsApi.create({
-    text: "Senior engineer, payments. ".repeat(5),
-  });
+  const { job_target: job } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
   await jobTargetsApi.get(job.id);
   return { resumeId: resume.id, jobId: job.id };
 }
@@ -89,29 +84,16 @@ describe("NV-2 terms", () => {
       "/help",
     ]) {
       const text = await textAt(path);
-      expect(
-        text.match(new RegExp(`.{0,60}${CV_WORD.source}.{0,40}`))?.[0] ?? null,
-        path,
-      ).toBeNull();
+      expect(text.match(new RegExp(`.{0,60}${CV_WORD.source}.{0,40}`))?.[0] ?? null, path).toBeNull();
       expect(text.length, path).toBeGreaterThan(200);
     }
   });
 
   it("RMAP-4: no v2 screen calls a resume main; it is the default resume", async () => {
     const { resumeId } = await seed();
-    for (const path of [
-      "/",
-      "/resumes",
-      `/resumes/${resumeId}`,
-      "/roles",
-      "/roles/new",
-    ]) {
+    for (const path of ["/", "/resumes", `/resumes/${resumeId}`, "/roles", "/roles/new"]) {
       const text = await textAt(path);
-      expect(
-        text.match(new RegExp(`.{0,40}(${MAIN_WORD.source}).{0,40}`))?.[0] ??
-          null,
-        path,
-      ).toBeNull();
+      expect(text.match(new RegExp(`.{0,40}(${MAIN_WORD.source}).{0,40}`))?.[0] ?? null, path).toBeNull();
     }
     expect(await textAt("/resumes")).toMatch(/Default/);
   });

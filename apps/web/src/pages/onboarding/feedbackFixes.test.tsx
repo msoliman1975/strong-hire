@@ -22,62 +22,37 @@ import { KEY_MAX } from "./resumeChecks";
 import { resumeIssueCounts } from "./resumeSummary";
 import { STEP_NOTES } from "./steps";
 
-const styles = readFileSync(
-  join(resolve(__dirname), "../../styles.css"),
-  "utf8",
-);
+const styles = readFileSync(join(resolve(__dirname), "../../styles.css"), "utf8");
 
 beforeEach(() => setFeatureOverrides({ v2_enabled: true }));
 afterEach(() => setFeatureOverrides({}));
 
 describe("accepted issues with a reason", () => {
   it("IN-12: stores the reason in the key and reads it back", () => {
-    expect(storedKey("dates.missing-start:acme/pm", "on-purpose")).toBe(
-      "dates.missing-start:acme/pm|why=on-purpose",
-    );
-    expect(storedKey("dates.missing-start:acme/pm")).toBe(
-      "dates.missing-start:acme/pm",
-    );
-    expect(
-      parseStoredKey("dates.missing-start:acme/pm|why=dont-remember"),
-    ).toEqual({
+    expect(storedKey("dates.missing-start:acme/pm", "on-purpose")).toBe("dates.missing-start:acme/pm|why=on-purpose");
+    expect(storedKey("dates.missing-start:acme/pm")).toBe("dates.missing-start:acme/pm");
+    expect(parseStoredKey("dates.missing-start:acme/pm|why=dont-remember")).toEqual({
       key: "dates.missing-start:acme/pm",
       reason: "dont-remember",
     });
-    expect(parseStoredKey("consistency.skills-missing:celery")).toEqual({
-      key: "consistency.skills-missing:celery",
-      reason: null,
-    });
+    expect(parseStoredKey("consistency.skills-missing:celery")).toEqual({ key: "consistency.skills-missing:celery", reason: null });
     // Too long for the API with the reason: accepted without it.
     const long = "x".repeat(KEY_MAX - 2);
     expect(storedKey(long, "on-purpose")).toBe(long);
   });
 
   it("IN-12: an accepted missing date stops counting as an issue on Resumes and Home", () => {
-    const cv = {
-      ...fixtureResume,
-      roles: [
-        fixtureResume.roles[0],
-        { ...fixtureResume.roles[1], start: null },
-      ],
-    };
+    const cv = { ...fixtureResume, roles: [fixtureResume.roles[0], { ...fixtureResume.roles[1], start: null }] };
     const record = { resume: cv, accepted_issues: [] } as unknown as ResumeOut;
     const before = resumeIssueCounts(record, "2026-10")!;
     const accepted = {
       ...record,
-      accepted_issues: [
-        {
-          key: "dates.missing-start:invoicely/software-engineer|why=on-purpose",
-          accepted_at: "2026-10-28T10:00:00Z",
-        },
-      ],
+      accepted_issues: [{ key: "dates.missing-start:invoicely/software-engineer|why=on-purpose", accepted_at: "2026-10-28T10:00:00Z" }],
     } as ResumeOut;
     const after = resumeIssueCounts(accepted, "2026-10")!;
     expect(after.open).toBe(before.open - 1);
     expect(after.accepted).toBe(1);
-    expect(acceptedKeySet(accepted.accepted_issues)).toEqual(
-      new Set(["dates.missing-start:invoicely/software-engineer"]),
-    );
+    expect(acceptedKeySet(accepted.accepted_issues)).toEqual(new Set(["dates.missing-start:invoicely/software-engineer"]));
   });
 });
 
@@ -125,9 +100,7 @@ function signedIn(email = "ana@example.com") {
 
 async function seed() {
   signedIn();
-  const { job_target: job } = await jobTargetsApi.create({
-    text: "Senior engineer, payments. ".repeat(5),
-  });
+  const { job_target: job } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
   await jobTargetsApi.get(job.id);
   const form = new FormData();
   form.append("text", "Backend engineer, seven years of Python.");
@@ -152,46 +125,23 @@ describe("the add flow's step bar", () => {
   it("IN-4: Add context says how the user got there, links back to done steps and offers Skip at the top", async () => {
     const { job, resume } = await seed();
     const user = renderAt(`/jobs/${job.id}/context?resume=${resume.id}`);
-    expect(
-      await screen.findByRole("heading", { name: "Add context (optional)" }),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId("steps-note")).toHaveTextContent(
-      STEP_NOTES.context,
-    );
+    expect(await screen.findByRole("heading", { name: "Add context (optional)" })).toBeInTheDocument();
+    expect(screen.getByTestId("steps-note")).toHaveTextContent(STEP_NOTES.context);
     const steps = screen.getByRole("list", { name: "Setup steps" });
-    expect(
-      within(steps).getByRole("link", { name: /^Job description \(done\)/ }),
-    ).toHaveAttribute("href", `/jobs/${job.id}/confirm`);
-    const cv = within(steps).getByRole("link", {
-      name: /^Your resume \(done\)/,
-    });
-    expect(cv).toHaveAttribute(
-      "href",
-      `/jobs/${job.id}/resume/${resume.id}/check`,
-    );
+    expect(within(steps).getByRole("link", { name: /^Job description \(done\)/ })).toHaveAttribute("href", `/jobs/${job.id}/confirm`);
+    const cv = within(steps).getByRole("link", { name: /^Your resume \(done\)/ });
+    expect(cv).toHaveAttribute("href", `/jobs/${job.id}/resume/${resume.id}/check`);
     // The current step is not a link.
-    expect(within(steps).getByText("Your plan").closest("li")).toHaveAttribute(
-      "aria-current",
-      "step",
-    );
-    expect(
-      within(steps).queryByRole("link", { name: /Your plan/ }),
-    ).not.toBeInTheDocument();
+    expect(within(steps).getByText("Your plan").closest("li")).toHaveAttribute("aria-current", "step");
+    expect(within(steps).queryByRole("link", { name: /Your plan/ })).not.toBeInTheDocument();
 
     // Skip sits under the title, before the form.
     const skip = screen.getByRole("button", { name: "Skip and open my plan" });
-    expect(
-      skip.compareDocumentPosition(screen.getByLabelText("Interview stage")) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expect(skip.compareDocumentPosition(screen.getByLabelText("Interview stage")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     await user.click(cv);
-    expect(
-      await screen.findByRole("heading", { name: "Check your resume" }),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId("steps-note")).toHaveTextContent(
-      STEP_NOTES.check,
-    );
+    expect(await screen.findByRole("heading", { name: "Check your resume" })).toBeInTheDocument();
+    expect(screen.getByTestId("steps-note")).toHaveTextContent(STEP_NOTES.check);
   });
 
   it("IN-4: pasting rich text into the recruiter notes keeps the links", async () => {
@@ -200,13 +150,8 @@ describe("the add flow's step bar", () => {
     const notes = await screen.findByLabelText("Notes from the recruiter");
     const html = 'Prep with <a href="https://example.com/prep">this doc</a>.';
     fireEvent.paste(notes, {
-      clipboardData: {
-        getData: (type: string) =>
-          type === "text/html" ? html : "Prep with this doc.",
-      },
+      clipboardData: { getData: (type: string) => (type === "text/html" ? html : "Prep with this doc.") },
     });
-    expect(notes).toHaveValue(
-      "Prep with [this doc](https://example.com/prep).",
-    );
+    expect(notes).toHaveValue("Prep with [this doc](https://example.com/prep).");
   });
 });

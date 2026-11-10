@@ -1,0 +1,11 @@
+The new resume lines, as a JSON list with their index:
+
+<untrusted_input>
+$lines
+</untrusted_input>
+
+The earlier items, as a JSON list with their index:
+
+<untrusted_input>
+$earlier
+</untrusted_input>

@@ -1,12 +1,16 @@
 """Story library endpoints (ST-1, ST-2, ST-6 notes, ST-8, ST-11, ST-13).
 
     GET    /stories                   ST-1: the user's stories, newest first; `?status=` and
-                                      `?skill=` filter
+                                      `?skill=` filter. Archived and deleted stories are left out
+                                      unless `?include=archived` or `?include=deleted` (CS-6)
     POST   /stories                   ST-1: create a draft story
     POST   /stories/from-answer       ST-2: save a debrief answer as a draft story
     GET    /stories/{id}              ST-1: one story
     PATCH  /stories/{id}              ST-1: change the title, the skills or any part
-    DELETE /stories/{id}              ST-1: delete a story
+    DELETE /stories/{id}              ST-1, CS-15: delete a story; restorable for 30 days
+    POST   /stories/{id}/restore      CS-15: undo a delete within 30 days
+    POST   /stories/{id}/archive      CS-13: archive a story (CS-14: out of prep)
+    POST   /stories/{id}/unarchive    CS-13: bring an archived story back
     GET    /stories/{id}/notes        ST-6: the story's fix notes, oldest first
     POST   /stories/{id}/notes        ST-6: append a fix note
     POST   /stories/{id}/review       ST-11: queue Strova's review (an open review suggestion)
@@ -16,7 +20,8 @@ Every story carries `display_status` (ST-8): draft, ready (all five parts filled
 A styled story (SC-1) carries its outline; it is Ready when its core slots are filled (SC-3).
 
 Stories belong to one user: every query filters by both `org_id` and `user_id`, and another
-user's story answers 404. Account export and delete (AC-1) cover stories and their notes through
+user's story answers 404. A deleted story answers 404 everywhere except restore (CS-15).
+Account export and delete (AC-1) cover stories and their notes through
 USER_OWNED_TABLES (strong_api.account.deletion, strong_worker.account.bundle); notes live on the
 story row (`notes_json`).
 
@@ -29,12 +34,12 @@ Error details are {"code", "message", ...}:
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime
-from typing import Annotated
+from datetime import UTC, datetime, timedelta
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Response, status
 from pydantic import ValidationError
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.queue import REVIEW_STORY
@@ -52,7 +57,7 @@ from strong_api.stories.schemas import (
     StoryOut,
     StoryPatch,
 )
-from strong_core.db.models import InterviewSession, JobTarget, Scorecard
+from strong_core.db.models import STORY_RESTORE_DAYS, InterviewSession, JobTarget, Scorecard
 from strong_core.db.models import Story as StoryRow
 from strong_core.db.models import Turn as TurnRow
 from strong_core.gateway import get_gateway
@@ -125,6 +130,8 @@ def story_out(row: StoryRow) -> StoryOut:
         outline=load_outline(row),
         created_at=row.created_at,
         updated_at=row.updated_at,
+        archived_at=row.archived_at,
+        deleted_at=row.deleted_at,
         display_status=display_status(row),
         flow_flags=visible_flags(row),
         hints=open_hints(row),
@@ -135,12 +142,14 @@ def _notes(row: StoryRow) -> list[StoryNote]:
     return [StoryNote.model_validate(n) for n in row.notes_json or []]
 
 
-async def _owned(db: Db, me: Me, story_id: uuid.UUID) -> StoryRow:
+async def _owned(db: Db, me: Me, story_id: uuid.UUID, *, deleted: bool = False) -> StoryRow:
+    """The user's story. A deleted one answers 404 unless `deleted` (restore only)."""
     row = await db.scalar(
         select(StoryRow).where(
             StoryRow.id == story_id,
             StoryRow.org_id == me.org_id,
             StoryRow.user_id == me.user_id,
+            StoryRow.deleted_at.is_not(None) if deleted else StoryRow.live(),
         )
     )
     if row is None:
@@ -165,9 +174,23 @@ async def list_stories(
         StoryStatus | None, Query(alias="status", description="Only drafts, or only proven.")
     ] = None,
     skill: Annotated[Competency | None, Query(description="Only stories with this tag.")] = None,
+    include: Annotated[
+        list[Literal["archived", "deleted"]] | None,
+        Query(description="CS-6: also list archived stories, or deleted ones (restorable)."),
+    ] = None,
 ) -> list[StoryOut]:
-    """ST-1: the user's stories, newest first."""
+    """ST-1: the user's stories, newest first. CS-6: archived and deleted stories only when
+    asked for with `include`; a deleted story is listed only while it can be restored."""
+    shown = set(include or [])
     query = select(StoryRow).where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id)
+    if "archived" not in shown:
+        query = query.where(StoryRow.archived_at.is_(None))
+    if "deleted" in shown:
+        query = query.where(
+            or_(StoryRow.deleted_at.is_(None), StoryRow.deleted_at > _restorable_since())
+        )
+    else:
+        query = query.where(StoryRow.live())
     if story_status is not None:
         query = query.where(StoryRow.status == story_status)
     rows = await db.scalars(query.order_by(StoryRow.created_at.desc(), StoryRow.id.desc()))
@@ -237,6 +260,7 @@ async def story_from_answer(body: StoryFromAnswerIn, db: Db, me: Me, queue: Queu
             StoryRow.user_id == me.user_id,
             StoryRow.source_session_id == session.id,
             StoryRow.source_question_ref == body.question_ref,
+            StoryRow.live(),
         )
     )
     if existing is not None:
@@ -363,12 +387,53 @@ async def edit_story(
 
 @router.delete("/stories/{story_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> Response:
-    """ST-1: delete a story and its notes. Debriefs that used it keep their scores."""
+    """ST-1, CS-15: delete a story. It is hidden at once and restorable for 30 days; the purge
+    job then removes it with its notes and takes (CS-16). Debriefs that used it keep their
+    scores."""
     row = await _owned(db, me, story_id)
-    await db.delete(row)
+    row.deleted_at = datetime.now(UTC)
     await db.commit()
     await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+def _restorable_since() -> datetime:
+    return datetime.now(UTC) - timedelta(days=STORY_RESTORE_DAYS)
+
+
+@router.post("/stories/{story_id}/restore")
+async def restore_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> StoryOut:
+    """CS-15: undo a delete. After 30 days the story is gone (404)."""
+    row = await _owned(db, me, story_id, deleted=True)
+    deleted_at = row.deleted_at
+    if deleted_at is not None and deleted_at.replace(tzinfo=UTC) <= _restorable_since():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Story not found")
+    row.deleted_at = None
+    saved = await _save(db, row)
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
+    return saved
+
+
+@router.post("/stories/{story_id}/archive")
+async def archive_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> StoryOut:
+    """CS-13: archive a story. CS-14: it leaves skill coverage, story-fit, Ask Strova and
+    Strova's picks, and keeps its takes, scores and Proven status."""
+    row = await _owned(db, me, story_id)
+    if row.archived_at is None:
+        row.archived_at = datetime.now(UTC)
+    saved = await _save(db, row)
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
+    return saved
+
+
+@router.post("/stories/{story_id}/unarchive")
+async def unarchive_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> StoryOut:
+    """CS-13: bring an archived story back into the list and into prep."""
+    row = await _owned(db, me, story_id)
+    row.archived_at = None
+    saved = await _save(db, row)
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
+    return saved
 
 
 # --- ST-6 notes ------------------------------------------------------------------------------
@@ -419,7 +484,7 @@ async def ask_about_stories(body: StoryAskIn, db: Db, me: Me) -> StoryAnswer:
     stories = list(
         await db.scalars(
             select(StoryRow)
-            .where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id)
+            .where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id, StoryRow.in_prep())
             .order_by(StoryRow.updated_at.desc(), StoryRow.id)
         )
     )

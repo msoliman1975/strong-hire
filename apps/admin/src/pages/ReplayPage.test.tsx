@@ -43,9 +43,7 @@ function renderAt(path: string) {
 async function openReplay(sessionId = MOCK_SIM_SESSION) {
   signInAdmin();
   const user = renderAt(`/simulations/replay/${sessionId}`);
-  expect(
-    await screen.findByRole("heading", { name: "Replay", level: 1 }),
-  ).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Replay", level: 1 })).toBeInTheDocument();
   return user;
 }
 
@@ -58,11 +56,7 @@ function audio(): HTMLAudioElement {
 /** Moves the player to `ms` the way the browser does: currentTime, then timeupdate. */
 function playTo(ms: number) {
   act(() => {
-    Object.defineProperty(audio(), "currentTime", {
-      value: ms / 1000,
-      configurable: true,
-      writable: true,
-    });
+    Object.defineProperty(audio(), "currentTime", { value: ms / 1000, configurable: true, writable: true });
     fireEvent(audio(), new Event("timeupdate"));
   });
 }
@@ -75,21 +69,15 @@ let played: number;
 
 beforeEach(() => {
   played = 0;
-  vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (
-    this: HTMLMediaElement,
-  ) {
+  vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
     played += 1;
     this.dispatchEvent(new Event("play"));
     return Promise.resolve();
   });
-  vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (
-    this: HTMLMediaElement,
-  ) {
+  vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
     this.dispatchEvent(new Event("pause"));
   });
-  vi.spyOn(HTMLMediaElement.prototype, "paused", "get").mockImplementation(
-    () => played === 0,
-  );
+  vi.spyOn(HTMLMediaElement.prototype, "paused", "get").mockImplementation(() => played === 0);
 });
 
 afterEach(() => vi.restoreAllMocks());
@@ -122,35 +110,20 @@ describe("replay helpers", () => {
 describe("Replay page", () => {
   it("SM-7, SM-9: player with speed, channels and markers; chips and p50/p90 in the header", async () => {
     await openReplay();
-    expect(audio()).toHaveAttribute(
-      "src",
-      expect.stringContaining(`/admin/sessions/${MOCK_SIM_SESSION}/audio`),
-    );
+    expect(audio()).toHaveAttribute("src", expect.stringContaining(`/admin/sessions/${MOCK_SIM_SESSION}/audio`));
     expect(screen.getByRole("group", { name: "Speed" })).toBeInTheDocument();
-    expect(
-      within(screen.getByRole("group", { name: "Channels" })).getByRole(
-        "button",
-        { name: "Mixed" },
-      ),
-    ).toHaveAttribute("aria-pressed", "true");
-    expect(
-      screen.getByRole("button", { name: "Slow turn at 0:31" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", {
-        name: /Judge: Repeated the question at 0:31/,
-      }),
-    ).toBeInTheDocument();
+    expect(within(screen.getByRole("group", { name: "Channels" })).getByRole("button", { name: "Mixed" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Slow turn at 0:31" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Judge: Repeated the question at 0:31/ })).toBeInTheDocument();
     const summary = screen.getByRole("region", { name: "Summary" });
     expect(summary).toHaveTextContent("1200 ms");
     expect(summary).toHaveTextContent("2000 ms");
     expect(summary).toHaveTextContent("1 of 3");
     const chips = document.querySelectorAll(".latency");
-    expect([...chips].map((c) => c.getAttribute("data-level"))).toEqual([
-      "ok",
-      "slow",
-      "bad",
-    ]);
+    expect([...chips].map((c) => c.getAttribute("data-level"))).toEqual(["ok", "slow", "bad"]);
     expect(screen.queryByText(/Times are approximate/)).not.toBeInTheDocument();
   });
 
@@ -181,9 +154,7 @@ describe("Replay page", () => {
     fireEvent.wheel(document.querySelector(".replay-transcript") as Element);
     const follow = screen.getByRole("button", { name: "Follow" });
     await user.click(follow);
-    expect(
-      screen.queryByRole("button", { name: "Follow" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Follow" })).not.toBeInTheDocument();
   });
 
   it("SM-10, SM-11: judge verdicts with time links, and the scorecard", async () => {
@@ -191,9 +162,7 @@ describe("Replay page", () => {
     const judge = screen.getByRole("region", { name: "Judge" });
     expect(within(judge).getByText("fail")).toBeInTheDocument();
     expect(within(judge).getByText("n/a")).toBeInTheDocument();
-    await user.click(
-      within(judge).getAllByRole("button", { name: "00:31" })[0],
-    );
+    await user.click(within(judge).getAllByRole("button", { name: "00:31" })[0]);
     expect(currentLine()).toHaveTextContent("Take your time.");
     const card = screen.getByRole("region", { name: "Scorecard" });
     expect(card).toHaveTextContent("Lean Hire");
@@ -213,9 +182,7 @@ describe("Replay page", () => {
     };
     await openReplay("text-run");
     expect(screen.getByText(/Times are approximate/)).toBeInTheDocument();
-    expect(
-      screen.getByText("A text interview: no recording."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("A text interview: no recording.")).toBeInTheDocument();
     expect(document.querySelector("audio")).toBeNull();
     expect(screen.getByText(/Not judged/)).toBeInTheDocument();
   });
@@ -224,31 +191,18 @@ describe("Replay page", () => {
     const state = simState(mockStore.db);
     state.replays[MOCK_SIM_SESSION] = {
       ...structuredClone(mockReplay),
-      scenario: {
-        ...mockReplay.scenario!,
-        custom_job: true,
-        custom_cv: true,
-        level: "mid",
-      },
-      inputs: {
-        job_text: "Data Engineer at Fjord Freight.",
-        cv_text: "Lena Ortiz, data engineer.",
-        level: "mid",
-      },
+      scenario: { ...mockReplay.scenario!, custom_job: true, custom_cv: true, level: "mid" },
+      inputs: { job_text: "Data Engineer at Fjord Freight.", cv_text: "Lena Ortiz, data engineer.", level: "mid" },
     };
     const user = await openReplay();
     const summary = screen.getByRole("region", { name: "Summary" });
     expect(summary).toHaveTextContent("Mid (given with the pasted job)");
-    const job = within(summary)
-      .getByText("Job posting")
-      .closest("details") as HTMLDetailsElement;
+    const job = within(summary).getByText("Job posting").closest("details") as HTMLDetailsElement;
     expect(job.open).toBe(false);
     await user.click(within(summary).getByText("Job posting"));
     expect(job.open).toBe(true);
     expect(job).toHaveTextContent("Data Engineer at Fjord Freight.");
-    expect(
-      within(summary).getByText("CV").closest("details"),
-    ).toHaveTextContent("Lena Ortiz");
+    expect(within(summary).getByText("CV").closest("details")).toHaveTextContent("Lena Ortiz");
   });
 
   it("SM-20: after Delete the replay says the texts are gone", async () => {
@@ -259,17 +213,11 @@ describe("Replay page", () => {
       inputs: null,
     };
     await openReplay();
-    expect(
-      screen.getByText("The pasted texts of this run were deleted."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("The pasted texts of this run were deleted.")).toBeInTheDocument();
   });
 
   it("SM-16: a replay that does not exist is an error, not a blank page", async () => {
-    await openReplay("00000000-0000-4000-8000-000000000999").catch(
-      () => undefined,
-    );
-    expect(
-      await screen.findByText("The replay could not be loaded."),
-    ).toBeInTheDocument();
+    await openReplay("00000000-0000-4000-8000-000000000999").catch(() => undefined);
+    expect(await screen.findByText("The replay could not be loaded.")).toBeInTheDocument();
   });
 });

@@ -17,8 +17,7 @@ import { setFirstRunGate } from "./gate";
 
 const USER_ID = "00000000-0000-4000-8000-0000000000a1";
 const EMAIL = "ana@example.com";
-const RESUME_TEXT =
-  "Backend engineer, Python and Go. Led the move of 30 services to PostgreSQL.";
+const RESUME_TEXT = "Backend engineer, Python and Go. Led the move of 30 services to PostgreSQL.";
 
 function Where() {
   const { pathname, search } = useLocation();
@@ -73,36 +72,21 @@ const where = () => screen.getByTestId("where").textContent ?? "";
 describe("first run", () => {
   it("ON-1: a user with no resume lands on Start, with the three inputs and the steps", async () => {
     const user = renderApp("/");
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: "Start with your resume",
-      }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Start with your resume" })).toBeInTheDocument();
     expect(where()).toBe("/start");
     const steps = screen.getByRole("list", { name: "Setup steps" });
-    expect(
-      within(steps)
-        .getAllByRole("listitem")
-        .map((li) => li.textContent),
-    ).toEqual(["Done: Profile", "Your resume", "Plan style"]);
-    expect(within(steps).getByText("Your resume")).toHaveAttribute(
-      "aria-current",
-      "step",
-    );
+    expect(within(steps).getAllByRole("listitem").map((li) => li.textContent)).toEqual([
+      "Done: Profile",
+      "Your resume",
+      "Plan style",
+    ]);
+    expect(within(steps).getByText("Your resume")).toHaveAttribute("aria-current", "step");
     // No rail during setup.
     expect(screen.queryByRole("navigation", { name: "Main" })).toBeNull();
     // 1 a file, 2 pasted text, 3 pasted LinkedIn experience (the same text path).
-    expect(screen.getByLabelText("Resume file")).toHaveAttribute(
-      "type",
-      "file",
-    );
-    expect(
-      screen.getByLabelText("Or paste your resume text"),
-    ).toBeInTheDocument();
-    await user.click(
-      screen.getByRole("button", { name: "Paste your LinkedIn experience" }),
-    );
+    expect(screen.getByLabelText("Resume file")).toHaveAttribute("type", "file");
+    expect(screen.getByLabelText("Or paste your resume text")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Paste your LinkedIn experience" }));
     const linkedin = screen.getByLabelText("Or paste your LinkedIn experience");
     await user.type(linkedin, RESUME_TEXT);
     await user.click(screen.getByRole("button", { name: "Read my resume" }));
@@ -111,12 +95,8 @@ describe("first run", () => {
 
   it("ON-1: Read my resume with nothing says what to add", async () => {
     const user = renderApp("/start");
-    await user.click(
-      await screen.findByRole("button", { name: "Read my resume" }),
-    );
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Choose a file or paste your resume first.",
-    );
+    await user.click(await screen.findByRole("button", { name: "Read my resume" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("Choose a file or paste your resume first.");
   });
 
   it("ON-2: the reading screen shows Strova analysing and moves on once the resume is read", async () => {
@@ -124,135 +104,66 @@ describe("first run", () => {
     form.append("text", RESUME_TEXT);
     const { resume, job } = await resumesApi.upload(form);
     // Keep the mock reading job running until the screen has been checked.
-    const task = Object.values(mockStore.db.tasks).find(
-      (t) => t.entityId === resume.id,
-    );
+    const task = Object.values(mockStore.db.tasks).find((t) => t.entityId === resume.id);
     if (task) task.readyAt = Date.now() + 60_000;
     const record = mockStore.db.resumes.find((r) => r.id === resume.id);
     if (record) Object.assign(record, { status: "pending", resume: null });
     renderApp(`/start/reading/${resume.id}?task=${job?.id ?? ""}`);
-    const heading = await screen.findByRole("heading", {
-      level: 1,
-      name: "Strova is reading your resume",
-    });
+    const heading = await screen.findByRole("heading", { level: 1, name: "Strova is reading your resume" });
     expect(heading.closest("[role=status]")).not.toBeNull();
-    expect(
-      screen.getByRole("img", { name: "Strova is analysing" }),
-    ).toHaveAttribute("width", "160");
+    expect(screen.getByRole("img", { name: "Strova is analysing" })).toHaveAttribute("width", "160");
     if (task) task.readyAt = 0;
-    await waitFor(() => expect(where()).toBe(`/start/ready/${resume.id}`), {
-      timeout: 4000,
-    });
+    await waitFor(() => expect(where()).toBe(`/start/ready/${resume.id}`), { timeout: 4000 });
   });
 
   it("ON-2: a refused file shows the reason and Try another file", async () => {
     const form = new FormData();
-    form.append(
-      "text",
-      "We are hiring a Senior Software Engineer. Requirements: 5 years of Python.",
-    );
+    form.append("text", "We are hiring a Senior Software Engineer. Requirements: 5 years of Python.");
     const { resume, job } = await resumesApi.upload(form);
     renderApp(`/start/reading/${resume.id}?task=${job?.id ?? ""}`);
-    expect(
-      await screen.findByRole(
-        "heading",
-        { name: "Strova could not read that resume" },
-        { timeout: 4000 },
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Strova could not read that resume" }, { timeout: 4000 })).toBeInTheDocument();
     expect(screen.getByRole("alert")).not.toBeEmptyDOMElement();
-    expect(
-      screen.getByRole("link", { name: "Try another file" }),
-    ).toHaveAttribute("href", "/start");
+    expect(screen.getByRole("link", { name: "Try another file" })).toHaveAttribute("href", "/start");
   });
 
   it("ON-3: the results show Breakdown, Resume issues and Story ideas collapsed, with counts and links", async () => {
     const resume = await addResume();
     const user = renderApp(`/start/ready/${resume.id}`);
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: "Here is what your resume shows",
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("img", { name: "Strova is coaching" }),
-    ).toHaveAttribute("width", "88");
+    expect(await screen.findByRole("heading", { level: 1, name: "Here is what your resume shows" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Strova is coaching" })).toHaveAttribute("width", "88");
     const folds = document.querySelectorAll("details");
     expect(folds).toHaveLength(3);
     for (const d of folds) expect(d).not.toHaveAttribute("open");
-    const titles = [...folds].map(
-      (d) => d.querySelector("summary h2")?.textContent,
-    );
+    const titles = [...folds].map((d) => d.querySelector("summary h2")?.textContent);
     expect(titles[0]).toMatch(/^\d+ roles? · \d+ achievements? · \d+ skills?$/);
-    await waitFor(() =>
-      expect(folds[1].querySelector("summary h2")?.textContent).toMatch(
-        /to look at$|^Nothing to fix$/,
-      ),
-    );
-    await waitFor(() =>
-      expect(folds[2].querySelector("summary h2")?.textContent).toMatch(
-        /^\d+ ideas?$/,
-      ),
-    );
+    await waitFor(() => expect(folds[1].querySelector("summary h2")?.textContent).toMatch(/to look at$|^Nothing to fix$/));
+    await waitFor(() => expect(folds[2].querySelector("summary h2")?.textContent).toMatch(/^\d+ ideas?$/));
     await user.click(within(folds[0] as HTMLElement).getByText("Show"));
     expect(folds[0]).toHaveAttribute("open");
-    expect(
-      within(folds[0] as HTMLElement).getByRole("link", {
-        name: "Open breakdown and issues",
-      }),
-    ).toHaveAttribute("href", `/start/check/${resume.id}`);
-    expect(
-      within(folds[2] as HTMLElement).getByRole("link", {
-        name: "Open Career Stories",
-      }),
-    ).toHaveAttribute("href", "/stories");
-    expect(
-      screen.getByText(/One more question, then you're in\./),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute(
+    expect(within(folds[0] as HTMLElement).getByRole("link", { name: "Open breakdown and issues" })).toHaveAttribute(
       "href",
-      "/start/plan-style",
+      `/start/check/${resume.id}`,
     );
+    expect(within(folds[2] as HTMLElement).getByRole("link", { name: "Open Career Stories" })).toHaveAttribute("href", "/stories");
+    expect(screen.getByText(/One more question, then you're in\./)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute("href", "/start/plan-style");
   });
 
   it("ON-4: breakdown and issues on one screen, with fix and accept, Back and Continue", async () => {
     const resume = await addResume();
     const record = mockStore.db.resumes.find((r) => r.id === resume.id);
-    if (record?.resume)
-      record.resume = { ...record.resume, summary: "Backend engineer." };
+    if (record?.resume) record.resume = { ...record.resume, summary: "Backend engineer." };
     const user = renderApp(`/start/check/${resume.id}`);
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: "Breakdown and issues",
-      }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Breakdown and issues" })).toBeInTheDocument();
     const breakdown = screen.getByRole("region", { name: "Breakdown" });
-    expect(
-      within(breakdown).getByRole("link", { name: "Edit" }),
-    ).toHaveAttribute("href", `/resumes/${resume.id}/check`);
+    expect(within(breakdown).getByRole("link", { name: "Edit" })).toHaveAttribute("href", `/resumes/${resume.id}/check`);
     const issues = screen.getByRole("region", { name: "Issues" });
     await within(issues).findByText("A very short summary");
-    expect(
-      within(issues).getByRole("link", { name: "Add to the summary" }),
-    ).toHaveAttribute("href", `/resumes/${resume.id}/check`);
-    await user.click(
-      within(issues).getAllByRole("button", { name: /^Accept/ })[0],
-    );
-    await waitFor(() =>
-      expect(
-        within(issues).getByText(/\d+ open · 1 accepted/),
-      ).toBeInTheDocument(),
-    );
-    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute(
-      "href",
-      "/start/plan-style",
-    );
-    expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute(
-      "href",
-      `/start/ready/${resume.id}`,
-    );
+    expect(within(issues).getByRole("link", { name: "Add to the summary" })).toHaveAttribute("href", `/resumes/${resume.id}/check`);
+    await user.click(within(issues).getAllByRole("button", { name: /^Accept/ })[0]);
+    await waitFor(() => expect(within(issues).getByText(/\d+ open · 1 accepted/)).toBeInTheDocument());
+    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute("href", "/start/plan-style");
+    expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute("href", `/start/ready/${resume.id}`);
   });
 
   it("ON-5: the plan style screen shows what the plan covers now and saves the style", async () => {
@@ -261,17 +172,11 @@ describe("first run", () => {
     const covers = await screen.findByTestId("covers-now");
     expect(covers).toHaveTextContent("Complete your stories");
     expect(covers).toHaveTextContent("Fix your resume findings");
-    expect(covers).toHaveTextContent(
-      "Mock interviews join your plan once you add a target role.",
-    );
+    expect(covers).toHaveTextContent("Mock interviews join your plan once you add a target role.");
     const weekly = screen.getByRole("button", { name: /Weekly plan/ });
-    const checklist = screen.getByRole("button", {
-      name: /Readiness checklist/,
-    });
+    const checklist = screen.getByRole("button", { name: /Readiness checklist/ });
     expect(weekly).toHaveAttribute("aria-pressed", "true");
-    expect(
-      screen.getByRole("button", { name: "Use the weekly plan" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Use the weekly plan" })).toBeInTheDocument();
     await user.click(checklist);
     expect(checklist).toHaveAttribute("aria-pressed", "true");
     await user.click(screen.getByRole("button", { name: "Use the checklist" }));
@@ -282,42 +187,21 @@ describe("first run", () => {
   it("ON-5: a user with a resume but no plan style resumes at the plan style screen", async () => {
     await addResume();
     renderApp("/");
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: "How do you like to work?",
-      }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "How do you like to work?" })).toBeInTheDocument();
     expect(where()).toBe("/start/plan-style");
   });
 
   it("ON-6: what first offers the two paths with the start-anywhere copy and the two links", async () => {
     await addResume();
     renderApp("/start/what-first");
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: "What would you like to do first?",
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Your resume and your plan are ready, so you can start anywhere\./,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /I'm applying to a role/ }),
-    ).toHaveTextContent("Add a target role");
+    expect(await screen.findByRole("heading", { level: 1, name: "What would you like to do first?" })).toBeInTheDocument();
+    expect(screen.getByText(/Your resume and your plan are ready, so you can start anywhere\./)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /I'm applying to a role/ })).toHaveTextContent("Add a target role");
     const craft = screen.getByRole("link", { name: /Build my stories/ });
     expect(craft).toHaveTextContent("Craft a story with Strova");
     expect(craft.getAttribute("href")).toMatch(/^\/coach\/new/);
-    expect(
-      screen.getByRole("link", { name: "fix my resume first" }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "go to Home" })).toHaveAttribute(
-      "href",
-      "/",
-    );
+    expect(screen.getByRole("link", { name: "fix my resume first" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "go to Home" })).toHaveAttribute("href", "/");
   });
 });
 
@@ -325,49 +209,22 @@ describe("resume pages", () => {
   it("RM-1: the resumes page is titled with the first name and marks the default resume", async () => {
     const first = await addResume();
     const second = await addResume();
-    if (mockStore.db.profiles[EMAIL])
-      mockStore.db.profiles[EMAIL].plan_style = "weekly";
-    else
-      mockStore.db.profiles[EMAIL] = {
-        ...(await import("../../mocks/handlers")).EMPTY_PROFILE,
-        plan_style: "weekly",
-      };
+    if (mockStore.db.profiles[EMAIL]) mockStore.db.profiles[EMAIL].plan_style = "weekly";
+    else mockStore.db.profiles[EMAIL] = { ...(await import("../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
     const user = renderApp("/resumes");
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "Ana's Resumes" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Ana's Resumes" })).toBeInTheDocument();
     const list = await screen.findByRole("list", { name: "Your resumes" });
     // RMAP-2: one list only, each card with Show details to the check page (RSD-3, D-1).
-    expect(
-      within(list).getAllByRole("link", { name: /^Show details/ }),
-    ).toHaveLength(2);
-    expect(within(list).queryAllByRole("link", { name: /^Open/ })).toHaveLength(
-      0,
-    );
-    expect(
-      screen.queryByRole("list", { name: "Saved resumes" }),
-    ).not.toBeInTheDocument();
+    expect(within(list).getAllByRole("link", { name: /^Show details/ })).toHaveLength(2);
+    expect(within(list).queryAllByRole("link", { name: /^Open/ })).toHaveLength(0);
+    expect(screen.queryByRole("list", { name: "Saved resumes" })).not.toBeInTheDocument();
     const main = screen.getByText("Default");
     const mainCard = main.closest("section") as HTMLElement;
     expect(mainCard).toHaveTextContent(first.name ?? "");
     // No role uses it: the roles tile is 0 (RSD-1).
-    await waitFor(() =>
-      expect(within(mainCard).getAllByRole("definition")[0]).toHaveTextContent(
-        "0",
-      ),
-    );
-    expect(
-      within(mainCard).queryByRole("button", { name: /as default$/ }),
-    ).not.toBeInTheDocument();
-    await user.click(
-      screen.getByRole("button", {
-        name: `Set ${second.name ?? ""} as default`,
-      }),
-    );
-    await waitFor(() =>
-      expect(screen.getByText("Default").closest("section")).toHaveTextContent(
-        second.name ?? "",
-      ),
-    );
+    await waitFor(() => expect(within(mainCard).getAllByRole("definition")[0]).toHaveTextContent("0"));
+    expect(within(mainCard).queryByRole("button", { name: /as default$/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: `Set ${second.name ?? ""} as default` }));
+    await waitFor(() => expect(screen.getByText("Default").closest("section")).toHaveTextContent(second.name ?? ""));
   });
 });

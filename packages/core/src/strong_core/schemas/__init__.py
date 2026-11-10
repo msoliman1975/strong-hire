@@ -186,6 +186,8 @@ from strong_core.schemas.stories import (
     section_slot_keys,
 )
 from strong_core.schemas.suggestions import (
+    IdeaMatch,
+    IdeaMatches,
     ImproveResumeLinePayload,
     MissingSkillPayload,
     NewStoryPayload,
@@ -242,6 +244,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "suggestion": Suggestion,
     "story_idea": StoryIdea,
     "story_ideas": StoryIdeas,
+    "idea_matches": IdeaMatches,
     "story_review": StoryReview,
     "story_part_edit": StoryPartEdit,
     "new_story_payload": NewStoryPayload,
@@ -326,6 +329,8 @@ __all__ = [
     "GeneralQuestion",
     "GeneralQuestionBank",
     "HireSignal",
+    "IdeaMatch",
+    "IdeaMatches",
     "ImproveResumeLinePayload",
     "InputCheck",
     "InterviewReadiness",

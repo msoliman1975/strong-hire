@@ -41,6 +41,7 @@ from strong_core.db.models import (
     SessionFeedback,
     StripeEvent,
     Subscription,
+    Turn,
     UsageEvent,
     User,
     VoiceTurnTiming,
@@ -54,6 +55,7 @@ from strong_core.schemas import (
     Phase,
     SessionChannel,
     SessionStatus,
+    Speaker,
     SubscriptionStatus,
     UsageComponent,
 )
@@ -178,6 +180,7 @@ async def _session(
     billed: int = 0,
     channel: SessionChannel = SessionChannel.VOICE,
     duration: int = 10,
+    answered: bool = False,
 ) -> InterviewSession:
     job = JobTarget(org_id=user.org_id, user_id=user.id, raw_text="Engineer")
     db.add(job)
@@ -199,6 +202,19 @@ async def _session(
     )
     db.add(row)
     await db.flush()
+    if answered:  # one candidate turn, so a failure after the end is a scoring failure (BL-3)
+        db.add(
+            Turn(
+                org_id=user.org_id,
+                session_id=row.id,
+                speaker=Speaker.CANDIDATE,
+                phase=Phase.CORE,
+                text="I led the migration.",
+                start_ms=1000,
+                end_ms=4000,
+            )
+        )
+        await db.flush()
     seed.sessions[key] = row
     return row
 
@@ -260,7 +276,9 @@ async def seed_all(maker: Maker) -> Seed:
         s5 = await _session(
             db, seed, "s5_stuck", u3, S.SCORING, d(15, 10), d(15, 10), d(15, 10, 30)
         )
-        await _session(db, seed, "s6_scoring", u4, S.FAILED, d(13, 9), d(13, 9), d(13, 9, 30))
+        await _session(
+            db, seed, "s6_scoring", u4, S.FAILED, d(13, 9), d(13, 9), d(13, 9, 30), answered=True
+        )
         await _session(
             db, seed, "s7_live", u3, S.IN_PROGRESS, d(15, 11, 50), d(15, 11, 50), duration=30
         )
@@ -600,6 +618,38 @@ async def test_ai1_ai4_status_filter_with_stuck_and_failure_reason(
     live = (await admin.get("/admin/sessions", params={"status": "in_progress"})).json()
     assert [s["failure_kind"] for s in live["sessions"]] == [None]
     assert (await admin.get("/admin/sessions", params={"status": "bogus"})).status_code == 422
+
+
+async def test_bl3_ai4_a_failed_session_without_answers_is_not_a_scoring_failure(
+    admin: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """BL-3, AI-4, AO-6, OB-13: a session that started and failed with no candidate turn is
+    "no_answers": not a technical failure, not in the scoring jobs and not retryable."""
+    seed = await seed_all(sessionmaker)
+    silent = seed.sessions["s6_scoring"]
+    async with sessionmaker() as db:
+        for turn in await db.scalars(select(Turn).where(Turn.session_id == silent.id)):
+            await db.delete(turn)
+        await db.commit()
+
+    failed = (await admin.get("/admin/sessions", params={"status": "failed"})).json()["sessions"]
+    row = next(s for s in failed if s["id"] == str(silent.id))
+    assert row["failure_kind"] == "no_answers"
+    assert row["failure_reason"].startswith("This interview ended before we got any answer")
+    assert "Nothing was counted or billed" in row["failure_reason"]  # minutes_billed is 0
+    detail = (await admin.get(f"/admin/sessions/{silent.id}")).json()
+    assert detail["session"]["failure_kind"] == "no_answers"
+
+    # AO-6: only the brief failure is left as a technical failure (it was 2 of 6).
+    q = (await admin.get("/admin/overview?range=7d")).json()["quality"]
+    assert q["failure_rate"]["value"] == 0.166667
+
+    jobs = (await admin.get("/admin/ops/jobs")).json()
+    assert [s["id"] for s in jobs["scorings"]] == [str(seed.sessions["s5_stuck"].id)]
+    retry = await admin.post(
+        f"/admin/ops/jobs/scoring/{silent.id}/retry", json={"reason": "try"}, headers=WRITE
+    )
+    assert retry.status_code == 409
 
 
 async def test_ai2_ai3_detail_cost_breakdown_and_turn_latency(

@@ -31,7 +31,8 @@ from strong_core.schemas import (
 # "not_ended": the interview has not ended yet (created, in progress or interrupted), so nothing
 # is being scored. The web app must not wait for a scorecard then.
 # "not_started": the session failed before it started (the interview plan could not be built, or
-# it was ended before the candidate joined). Nothing was scored, counted or billed.
+# it was ended before the candidate joined), or it ended without any answer from the candidate
+# (BL-3). There is nothing to score; session.failure_reason says which.
 DebriefStatus = Literal["not_ended", "not_started", "scoring", "ready", "failed"]
 TrendDirection = Literal["up", "down", "flat", "single"]
 

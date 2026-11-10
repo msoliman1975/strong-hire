@@ -38,36 +38,22 @@ function renderAt(path: string, v2: boolean) {
 describe("Question bank", () => {
   it("QB-1: v2 titles the Questions page Question bank, with Questions and My questions tabs", async () => {
     renderAt("/questions", true);
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "Question bank" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Question bank" })).toBeInTheDocument();
     const tabs = screen.getByRole("navigation", { name: "Question bank" });
-    expect(
-      within(tabs).getByRole("link", { name: "Questions" }),
-    ).toHaveAttribute("aria-current", "page");
-    expect(
-      within(tabs).getByRole("link", { name: "My questions" }),
-    ).toHaveAttribute("href", "/questions/mine");
+    expect(within(tabs).getByRole("link", { name: "Questions" })).toHaveAttribute("aria-current", "page");
+    expect(within(tabs).getByRole("link", { name: "My questions" })).toHaveAttribute("href", "/questions/mine");
   });
 
   it("CU-8: My questions is a tab of the Question bank in v2", async () => {
     renderAt("/questions/mine", true);
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "Question bank" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Question bank" })).toBeInTheDocument();
     const tabs = screen.getByRole("navigation", { name: "Question bank" });
-    expect(
-      within(tabs).getByRole("link", { name: "My questions" }),
-    ).toHaveAttribute("aria-current", "page");
+    expect(within(tabs).getByRole("link", { name: "My questions" })).toHaveAttribute("aria-current", "page");
   });
 
   it("FL-1: with v2 off the pages keep their v1 titles and no tabs", async () => {
     renderAt("/questions", false);
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "Questions" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("navigation", { name: "Question bank" }),
-    ).toBeNull();
+    expect(await screen.findByRole("heading", { level: 1, name: "Questions" })).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Question bank" })).toBeNull();
   });
 });
