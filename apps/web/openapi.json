@@ -18939,6 +18939,52 @@
         "title": "HireSignal",
         "description": "FB-1. Ordered from strongest to weakest."
       },
+      "IdeaMatch": {
+        "additionalProperties": false,
+        "description": "CS-2: the matcher's answer for one new resume line.",
+        "properties": {
+          "line": {
+            "description": "Index of the line in the new lines list.",
+            "minimum": 0,
+            "title": "Line",
+            "type": "integer"
+          },
+          "same_as": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Index of the earlier item that tells the same work; null when none does.",
+            "title": "Same As"
+          }
+        },
+        "required": [
+          "line"
+        ],
+        "title": "IdeaMatch",
+        "type": "object"
+      },
+      "IdeaMatches": {
+        "additionalProperties": false,
+        "description": "CS-2: which new resume lines describe the same work as an earlier idea or story.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IdeaMatch"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "IdeaMatches",
+        "type": "object"
+      },
       "ImproveAccept": {
         "properties": {
           "edits": {
@@ -28939,6 +28985,32 @@
             ],
             "description": "SC-2: the outline of a styled story; null when classic."
           },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At",
+            "description": "CS-13: when it was archived; null when not archived."
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At",
+            "description": "CS-15: when it was deleted; restorable for 30 days."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -29408,6 +29480,19 @@
             "const": "story_idea",
             "title": "Kind",
             "default": "story_idea"
+          },
+          "same_as": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same As",
+            "description": "CS-2: the first story_idea suggestion of the same achievement, on another resume. Null when this is the first one, or before the matcher ran."
           }
         },
         "additionalProperties": false,
@@ -29807,6 +29892,32 @@
               }
             ],
             "description": "SC-2: the outline of a styled story; null when classic."
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At",
+            "description": "CS-13: when it was archived; null when not archived."
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At",
+            "description": "CS-15: when it was deleted; restorable for 30 days."
           },
           "created_at": {
             "type": "string",

@@ -7239,6 +7239,31 @@ export interface components {
          */
         HireSignal: "Strong Hire" | "Hire" | "Lean Hire" | "Lean No Hire" | "No Hire";
         /**
+         * IdeaMatch
+         * @description CS-2: the matcher's answer for one new resume line.
+         */
+        IdeaMatch: {
+            /**
+             * Line
+             * @description Index of the line in the new lines list.
+             */
+            line: number;
+            /**
+             * Same As
+             * @description Index of the earlier item that tells the same work; null when none does.
+             * @default null
+             */
+            same_as: number | null;
+        };
+        /**
+         * IdeaMatches
+         * @description CS-2: which new resume lines describe the same work as an earlier idea or story.
+         */
+        IdeaMatches: {
+            /** Items */
+            items?: components["schemas"]["IdeaMatch"][];
+        };
+        /**
          * ImproveAccept
          * @description SC-11: the edits from an improve that the user accepts; the rest are rejected.
          */
@@ -11322,6 +11347,16 @@ export interface components {
             /** @description SC-2: the outline of a styled story; null when classic. */
             outline?: components["schemas"]["StoryOutline"] | null;
             /**
+             * Archived At
+             * @description CS-13: when it was archived; null when not archived.
+             */
+            archived_at?: string | null;
+            /**
+             * Deleted At
+             * @description CS-15: when it was deleted; restorable for 30 days.
+             */
+            deleted_at?: string | null;
+            /**
              * Created At
              * Format: date-time
              */
@@ -11565,6 +11600,11 @@ export interface components {
              * @enum {string}
              */
             kind: "story_idea";
+            /**
+             * Same As
+             * @description CS-2: the first story_idea suggestion of the same achievement, on another resume. Null when this is the first one, or before the matcher ran.
+             */
+            same_as?: string | null;
         };
         /**
          * StoryIdeas
@@ -11709,6 +11749,16 @@ export interface components {
             style?: components["schemas"]["StoryStyle"] | null;
             /** @description SC-2: the outline of a styled story; null when classic. */
             outline?: components["schemas"]["StoryOutline"] | null;
+            /**
+             * Archived At
+             * @description CS-13: when it was archived; null when not archived.
+             */
+            archived_at?: string | null;
+            /**
+             * Deleted At
+             * @description CS-15: when it was deleted; restorable for 30 days.
+             */
+            deleted_at?: string | null;
             /**
              * Created At
              * Format: date-time

@@ -30,6 +30,9 @@ from strong_api.sessions.failure import (
     ENDED_BEFORE_START,
     brief_is_stale,
     failed_before_start,
+    failed_without_answers,
+    failure_reason,
+    has_answers_clause,
 )
 from strong_core.db.models import InterviewSession
 from strong_core.schemas import SessionStatus
@@ -178,16 +181,21 @@ def stuck_clause(now: datetime) -> ColumnElement[bool]:
 
 
 def technical_failure_clause() -> ColumnElement[bool]:
-    """AO-6: failed sessions, except the ones the candidate ended before they started."""
+    """AO-6: failed sessions, except the ones the candidate ended before they started and the
+    ones that ended without any answer from the candidate (BL-3)."""
     return and_(
         InterviewSession.status == SessionStatus.FAILED,
-        or_(InterviewSession.started_at.is_not(None), InterviewSession.ended_at.is_(None)),
+        or_(
+            and_(InterviewSession.started_at.is_not(None), has_answers_clause()),
+            InterviewSession.ended_at.is_(None),
+        ),
     )
 
 
 FailureKind = Literal[
     "brief_failed",
     "ended_before_start",
+    "no_answers",
     "scoring_failed",
     "brief_stale",
     "stuck_scoring",
@@ -204,12 +212,19 @@ class FailureInfo:
     reason: str
 
 
-def failure_info(row: InterviewSession, now: datetime) -> FailureInfo | None:
-    """AI-4: the derived failure reason (sessions/failure.py), plus stuck and scoring failures."""
+def failure_info(
+    row: InterviewSession, now: datetime, *, answered: bool = True
+) -> FailureInfo | None:
+    """AI-4: the derived failure reason (sessions/failure.py), plus stuck and scoring failures.
+
+    `answered`: the session has a candidate turn (sessions.failure.answered_session_ids). A
+    failed session without one is "no_answers" (BL-3), not a scoring failure to retry."""
     if failed_before_start(row):
         if row.ended_at is None:
             return FailureInfo("brief_failed", BRIEF_FAILED)
         return FailureInfo("ended_before_start", ENDED_BEFORE_START)
+    if failed_without_answers(row, answered):
+        return FailureInfo("no_answers", failure_reason(row, answered=False) or "")
     if row.status == SessionStatus.FAILED:
         return FailureInfo("scoring_failed", SCORING_FAILED)
     if brief_is_stale(row, now):
