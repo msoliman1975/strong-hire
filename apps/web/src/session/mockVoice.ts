@@ -18,7 +18,7 @@ const LINES: Record<"hint" | "redo" | "pause" | "resume" | "ready", string> = {
   redo: "Sure. Take a moment, then answer again.",
   pause: "",
   resume: "",
-  ready: "Great. Go ahead.",
+  ready: "Go ahead.",
 };
 
 const prepLine = (minutes: number) =>

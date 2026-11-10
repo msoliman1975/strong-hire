@@ -470,7 +470,7 @@ describe("story page (ST-14)", () => {
       expect(within(parts).getByText(label)).toBeInTheDocument();
     }
     // An empty part offers the coach.
-    expect(within(parts).getAllByRole("link", { name: "Add it with the coach" })[0]).toHaveAttribute(
+    expect(within(parts).getAllByRole("link", { name: "Add it with Strova" })[0]).toHaveAttribute(
       "href",
       "/coach/new?story=s1",
     );

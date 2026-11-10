@@ -34,7 +34,7 @@ describe("UI-1 shared pieces", () => {
 
   it("UI-1: the coach line is a labeled region with the message", () => {
     render(<CoachLine>Want to build one now?</CoachLine>);
-    expect(screen.getByRole("region", { name: "Your coach" })).toHaveTextContent("Want to build one now?");
+    expect(screen.getByRole("region", { name: "Strova" })).toHaveTextContent("Want to build one now?");
   });
 
   it("UI-1: the segmented control marks the chosen option", () => {

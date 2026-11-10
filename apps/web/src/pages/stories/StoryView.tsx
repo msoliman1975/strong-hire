@@ -37,7 +37,7 @@ export function StoryView({ storyId }: { storyId: string }) {
         <StoryHead story={s} editing={editing} onEdit={() => setEditing(true)} />
         {editing ? <StoryEditor story={s} onDone={() => setEditing(false)} /> : <StoryRead story={s} />}
       </article>
-      <aside className="studio__aside" aria-label="Takes and coach notes">
+      <aside className="studio__aside" aria-label="Takes and Strova's notes">
         <StoryTakes story={s} />
         <CoachNotes story={s} />
       </aside>
@@ -86,7 +86,7 @@ function StoryHead({ story, editing, onEdit }: { story: Story; editing: boolean;
             Edit story
           </button>
           <Link className="btn btn--quiet" to={newCoachPath({ story: story.id })}>
-            Work on it with the coach
+            Work on it with Strova
           </Link>
         </div>
       )}
@@ -133,7 +133,7 @@ export function StoryRead({ story }: { story: Story }) {
                 <p className="muted">
                   <i>Empty.</i>{" "}
                   <Link className="text-link" to={newCoachPath({ story: story.id })}>
-                    Add it with the coach
+                    Add it with Strova
                   </Link>
                 </p>
               )}
@@ -141,9 +141,9 @@ export function StoryRead({ story }: { story: Story }) {
           ))}
         </ol>
       ) : !hasWords ? (
-        <p className="muted">Fill in a part or record a take, and the coach can write the versions.</p>
+        <p className="muted">Fill in a part or record a take, and Strova can write the versions.</p>
       ) : write.isPending ? (
-        <Loading label="The coach is writing the versions" />
+        <Loading label="Strova is writing the versions" />
       ) : write.isError ? (
         <ErrorNotice error={write.error} title="The versions were not written" />
       ) : (

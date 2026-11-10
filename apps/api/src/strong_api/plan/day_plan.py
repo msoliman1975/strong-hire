@@ -178,7 +178,7 @@ def _skill(c: Competency) -> str:
 
 def story_item(item: StoryFitItem) -> DayPlanItem:
     if item.strength == StoryFitStrength.MISSING:
-        reason = f"No story shows {_skill(item.competency)} yet. Build one with the coach."
+        reason = f"No story shows {_skill(item.competency)} yet. Build one with Strova."
     else:
         reason = f"Your {_skill(item.competency)} story is thin. {item.reason}"
     return DayPlanItem(

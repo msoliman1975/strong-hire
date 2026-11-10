@@ -48,7 +48,7 @@ export function CoachStartPage() {
   const start = useMutation({
     mutationFn: async (body: StartCoachRequest) => {
       const detail = await coachApi.start(body);
-      // "Ask your coach" on Home: the question is the candidate's first message.
+      // "Ask Strova" on Home: the question is the candidate's first message.
       const ask = params.get("ask")?.trim();
       if (ask) await coachApi.turn(detail.session.id, ask);
       return detail;
@@ -73,7 +73,7 @@ export function CoachStartPage() {
   if (start.isError) {
     return (
       <div className="coach stack">
-        <ErrorNotice error={start.error} title="The coach session did not start" />
+        <ErrorNotice error={start.error} title="Your session with Strova did not start" />
         <p>
           <Link className="text-link" to={storiesPath}>
             Back to your stories
@@ -85,7 +85,7 @@ export function CoachStartPage() {
   if (!pick || start.isPending || start.isSuccess) {
     return (
       <div className="coach stack">
-        <Loading label="Starting your coach session" />
+        <Loading label="Starting your session with Strova" />
       </div>
     );
   }

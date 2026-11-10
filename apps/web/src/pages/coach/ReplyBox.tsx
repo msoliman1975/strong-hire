@@ -73,7 +73,7 @@ export function ReplyBox({
   return (
     <form
       className="craft-reply"
-      aria-label="Reply to your coach"
+      aria-label="Reply to Strova"
       onSubmit={(e) => {
         e.preventDefault();
         if (value.trim() && !busy) onSend();

@@ -178,6 +178,10 @@ acknowledges. The voice lives in a "Your voice, as Strova" block in `coach/turn`
 candidate's own words (story versions, suggest_tune, suggest_new_story, suggest_resume_line,
 improve_section, organize, rewrite_style) and the checks (check_turn, flow_check) do not take it.
 
+In the UI copy the interface names her: "Strova is thinking", "Talk to Strova", "Reply to Strova",
+never "the coach" or "your coach" (the feature can still be called a coaching session). Earned
+moments say what earned them, and the copy has no empty praise ("Great job", "Amazing") (SV-15).
+
 ## 5. Navigation and app shell
 
 Top bar: the Strong Hire logo (`BrandMark`) and name with "with Strova" (the lockup, section 4.5), the usage pill, and the profile button (initials)
@@ -441,6 +445,7 @@ section "v2.1 UX with Strova".
 - SV-12 Every loading state shows Strova's thinking ring (the zigzag ring from her thinking mode, drawn with 12 deeper teeth so it reads at 16 to 24 px) beside the loading text. Violet by default, teal for the interviewer. It turns once every 3 s and stops under reduced motion; the text is the status.
 - SV-13 Earned results carry a seal in the brand's ring shape and the celebrating green: Hire and Strong Hire show the verdict seal (a closed green ring with a check) beside the signal, in the debrief and wherever the check badge was; a Proven story shows the Proven seal (Strova's thinking zigzag, frozen and filled green, with a white check) beside the word Proven. Seals are decorative; the word carries the meaning.
 - SV-14 The coach prompts that speak to the candidate (turn, craft_turn, review, ask, suggest_tailor) open with "You are Strova" and carry her voice (section 4.6): candid, in the candidate's corner, and praise only when earned. Session prompts keep their no-praise rule.
+- SV-15 The UI copy names her Strova, never "the coach" or "your coach", and has no empty praise (section 4.6).
 - SV-8 The marketing site has the "Meet Strova" section with the animated avatar and the approved copy.
 - SV-9 Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged.
 

@@ -77,7 +77,7 @@ export function CoachSessionPage() {
   const detail = useCoachSession(sessionId);
   return (
     <div className="coach stack">
-      {detail.isPending && <Loading label="Loading the coach session" />}
+      {detail.isPending && <Loading label="Loading your session with Strova" />}
       {detail.isError && <ErrorNotice error={detail.error} />}
       {detail.data && <CoachSession key={detail.data.session.id} detail={detail.data} />}
     </div>
@@ -269,7 +269,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
       <div className={crafting ? "coach__body coach__body--craft" : "coach__body"}>
         <section className="card coach__chat" aria-label="Conversation">
           {/* The log wraps the list, so the turns keep their list semantics. */}
-          <div role="log" aria-live="polite" aria-label="Conversation with your coach">
+          <div role="log" aria-live="polite" aria-label="Conversation with Strova">
             <ol className="plain-list coach__turns">
               {detail.turns.map((t) => (
                 <li key={t.seq} className="coach-turn" data-speaker={t.speaker} data-testid="coach-turn">
@@ -312,7 +312,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
             </ol>
           </div>
           <p role="status" className="muted small coach__pending">
-            {turn.isPending ? "The coach is thinking" : ""}
+            {turn.isPending ? "Strova is thinking" : ""}
           </p>
           {turn.isError && <ErrorNotice error={turn.error} title="Your message was not sent" />}
           {ended ? (
@@ -323,7 +323,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
                 type="button"
                 className="coach__mic coach__mic--big"
                 data-live={voiceLive || undefined}
-                aria-label={voiceLive ? "Stop talking to the coach" : "Talk to the coach"}
+                aria-label={voiceLive ? "Stop talking to Strova" : "Talk to Strova"}
                 disabled={voice.status === "connecting"}
                 onClick={() => void (voiceLive ? voice.end() : voice.start())}
               >
@@ -335,9 +335,9 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
                   : !voiceLive
                     ? "Tap to talk"
                     : voice.activity === "speaking"
-                      ? "Your coach is talking"
+                      ? "Strova is talking"
                       : voice.activity === "thinking"
-                        ? "Your coach is thinking"
+                        ? "Strova is thinking"
                         : `Listening${listening !== null ? ` · ${clock(listening)}` : ""}`}
               </p>
               <button className="btn btn--secondary" type="button" onClick={() => setTyping(true)}>
@@ -358,7 +358,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
                 type="button"
                 className="coach__mic"
                 data-live={voiceLive || undefined}
-                aria-label={voiceLive ? "Stop talking to the coach" : "Talk to the coach"}
+                aria-label={voiceLive ? "Stop talking to Strova" : "Talk to Strova"}
                 disabled={voice.status === "connecting"}
                 onClick={() => void (voiceLive ? voice.end() : voice.start())}
               >
@@ -372,12 +372,12 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
               {voice.error && <p className="field-error">{voice.error}</p>}
             </ReplyBox>
           ) : (
-            <form className="coach__input" onSubmit={send} aria-label="Reply to your coach">
+            <form className="coach__input" onSubmit={send} aria-label="Reply to Strova">
               <button
                 type="button"
                 className="coach__mic"
                 data-live={voiceLive || undefined}
-                aria-label={voiceLive ? "Stop talking to the coach" : "Talk to the coach"}
+                aria-label={voiceLive ? "Stop talking to Strova" : "Talk to Strova"}
                 disabled={voice.status === "connecting"}
                 onClick={() => void (voiceLive ? voice.end() : voice.start())}
               >

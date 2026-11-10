@@ -43,7 +43,7 @@ describe("story fit table", () => {
     const table = await screen.findByTestId("story-fit");
     const conflict = within(table).getAllByRole("row")[3];
     expect(within(conflict).getByText("Missing")).toBeInTheDocument();
-    expect(within(conflict).getByRole("link", { name: "Build it with the coach" })).toHaveAttribute(
+    expect(within(conflict).getByRole("link", { name: "Build it with Strova" })).toHaveAttribute(
       "href",
       "/coach/new?skill=conflict_handling&job=j1",
     );

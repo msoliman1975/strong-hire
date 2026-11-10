@@ -272,7 +272,7 @@ test("build a story: craft with Strova; write it yourself, review, accept an edi
   if (await typeInstead.isVisible()) await typeInstead.click();
   await reply.fill("At Shoply I led the move of 30 services to PostgreSQL 15 with zero downtime.");
   await page.getByRole("button", { name: "Send" }).click();
-  await expect(page.getByRole("log", { name: "Conversation with your coach" })).toContainText("30 services");
+  await expect(page.getByRole("log", { name: "Conversation with Strova" })).toContainText("30 services");
   await expect(page.getByRole("complementary", { name: "Story taking shape" })).toBeVisible();
   await shot(page, "31-craft");
   await page.getByRole("button", { name: "Save and exit" }).click();
@@ -322,7 +322,7 @@ test("deep crafting: CARL, section by section, Ready, hint, flag, inline edit, i
   const say = async (text: string) => {
     await reply.fill(text);
     await page.getByRole("button", { name: "Send", exact: true }).click();
-    await expect(page.getByRole("log", { name: "Conversation with your coach" })).toContainText(text.slice(0, 20));
+    await expect(page.getByRole("log", { name: "Conversation with Strova" })).toContainText(text.slice(0, 20));
   };
   await page.getByRole("button", { name: "Skip this" }).click();
   const org = page.getByTestId("craft-slot").filter({ hasText: "Company and team" });

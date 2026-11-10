@@ -73,7 +73,7 @@ describe("UI-2 left rail nav", () => {
     // No Strova icons in the rail: the Rehearsals and Career Stories pages carry her in their headers.
     expect(nav.querySelectorAll("svg")).toHaveLength(0);
     // No separate coach button, and the dev text interview stays in the account menu.
-    expect(screen.queryByRole("link", { name: "Talk to your coach" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Talk to Strova" })).toBeNull();
     expect(within(nav).queryByRole("link", { name: /Text interview/ })).not.toBeInTheDocument();
   });
 
@@ -229,7 +229,7 @@ describe("SV-7, NV-3 v2 top bar and old routes", () => {
   it("FL-1: v1 keeps its rail footer, with no coach button", async () => {
     const user = renderShell(false);
     expect(await screen.findByText("Minutes")).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Talk to your coach" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Talk to Strova" })).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Account menu" }));
     const menu = screen.getByRole("button", { name: "Account menu" }).nextElementSibling as HTMLElement;
     expect(within(menu).getAllByRole("link").map((a) => a.textContent)).toEqual(["Account"]);

@@ -8,7 +8,7 @@ export interface CoachStart {
   skill?: string;
   /** The plan page whose story-fit gap opened the session. */
   job?: string;
-  /** A question typed on Home ("Ask your coach"): sent as the first message. */
+  /** A question typed on Home ("Ask Strova"): sent as the first message. */
   ask?: string;
   /** Opened from a mic button: the session page starts listening when voice is available (CO-6). */
   voice?: boolean;

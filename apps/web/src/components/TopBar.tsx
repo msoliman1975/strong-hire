@@ -1,7 +1,7 @@
 /**
  * The v2 top bar (canvas board R3 Shell): the greeting on the first visit, the updates bell, the
  * plan chip and the avatar menu. It replaces the plan meter and the account menu that sat at the
- * bottom of the rail. The rail keeps only the menu and "Talk to your coach".
+ * bottom of the rail. The rail keeps only the menu and "Talk to Strova".
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router";

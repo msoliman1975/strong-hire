@@ -205,7 +205,7 @@ h1:focus {
   font-weight: 600;
 }
 
-/* v2: "Talk to your coach", the dark button above the minutes meter. */
+/* v2: "Talk to Strova", the dark button above the minutes meter. */
 .rail__coach {
   display: flex;
   align-items: center;
@@ -3122,7 +3122,7 @@ dialog::backdrop {
   display: flex;
 }
 
-/* The rail under the top bar: only the menu and "Talk to your coach". */
+/* The rail under the top bar: only the menu and "Talk to Strova". */
 .rail.rail--v2 {
   top: 64px;
   height: calc(100vh - 64px);
