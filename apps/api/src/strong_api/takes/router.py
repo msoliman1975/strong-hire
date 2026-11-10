@@ -50,7 +50,10 @@ def take_job_id(take_id: uuid.UUID) -> str:
 async def _owned_story(db: AsyncSession, me: Me, story_id: uuid.UUID) -> StoryRow:
     story = await db.scalar(
         select(StoryRow).where(
-            StoryRow.id == story_id, StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id
+            StoryRow.id == story_id,
+            StoryRow.org_id == me.org_id,
+            StoryRow.user_id == me.user_id,
+            StoryRow.live(),
         )
     )
     if story is None:

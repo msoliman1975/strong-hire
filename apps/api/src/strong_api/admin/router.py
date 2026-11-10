@@ -58,6 +58,7 @@ from strong_api.auth.deps import DbSession
 from strong_api.auth.settings import AuthSettings
 from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import as_utc
+from strong_api.sessions.failure import answered_session_ids, has_answers
 from strong_core.db.models import (
     TRACE_RETENTION_DAYS,
     AuditLog,
@@ -147,8 +148,10 @@ def _session_out(
     card: Scorecard | None,
     cost: tuple[float | None, CostSource],
     now: datetime | None = None,
+    *,
+    answered: bool = True,
 ) -> AdminSession:
-    failure = m.failure_info(row, now or m.now_utc())
+    failure = m.failure_info(row, now or m.now_utc(), answered=answered)
     return AdminSession(
         id=row.id,
         user_id=user.id if user else None,
@@ -218,7 +221,10 @@ async def list_sessions(
         query = query.where(InterviewSession.status == SessionStatus(status_filter))
     rows = (await db.execute(query)).tuples().all()
     costs = await _costs(db, [r[0].id for r in rows])
-    sessions = [_session_out(s, u, c, costs[s.id], now) for s, u, c in rows]
+    answered = await answered_session_ids(db, (s.id for s, _, _ in rows))
+    sessions = [
+        _session_out(s, u, c, costs[s.id], now, answered=s.id in answered) for s, u, c in rows
+    ]
     per_day: dict[date, list[AdminSession]] = defaultdict(list)
     for item in sessions:
         created = as_utc(item.created_at)
@@ -470,7 +476,7 @@ async def get_session(
     """One interview. Transcript and traces only when the user's consent is on now."""
     row, user, card = await _find(db, session_id)
     cost = (await _costs(db, [row.id]))[row.id]
-    meta = _session_out(row, user, card, cost)
+    meta = _session_out(row, user, card, cost, answered=await has_answers(db, row.id))
     breakdown = await _cost_breakdown(db, row.id)
     turn_latency, latency_summary = await _latency(db, row.id)
     extra: dict[str, Any] = {

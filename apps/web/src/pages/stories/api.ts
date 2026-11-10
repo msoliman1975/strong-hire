@@ -1,6 +1,8 @@
 /**
  * The story library's endpoints (ST-1, used by ST-3 and ST-4): GET/POST /stories,
  * GET/PATCH /stories/{id}. The status is never set here; the API sets Proven (ST-7).
+ * CS-13 to CS-15: archive, unarchive, delete (soft) and restore. CS-5: the Recommended rows of
+ * Career Stories (GET /stories/recommendations).
  */
 import { useQuery } from "@tanstack/react-query";
 
@@ -34,21 +36,46 @@ export type SectionImprove = DeepRequired<S["SectionImprove"]>;
 export type SlotEdit = DeepRequired<S["SlotEdit"]>;
 export type OrganizeResult = DeepRequired<S["OrganizeResult"]>;
 export type StyleSwitchOut = DeepRequired<S["StyleSwitchOut"]>;
+export type StoryRecommendations = DeepRequired<S["StoryRecommendations"]>;
+export type RecommendedIdea = DeepRequired<S["RecommendedIdea"]>;
+export type RecommendedSkill = DeepRequired<S["RecommendedSkill"]>;
 
 export interface StoryFilter {
   status?: StoryStatus;
   skill?: Competency;
+  /** CS-6: archived and deleted stories are left out unless asked for. */
+  include?: ("archived" | "deleted")[];
 }
 
 export const storyKeys = {
   all: ["stories"] as const,
-  list: (filter: StoryFilter = {}) => ["stories", "list", filter.status ?? null, filter.skill ?? null] as const,
+  list: (filter: StoryFilter = {}) =>
+    ["stories", "list", filter.status ?? null, filter.skill ?? null, (filter.include ?? []).join(",")] as const,
   one: (id: string) => ["stories", "one", id] as const,
+  recommendations: ["stories", "recommendations"] as const,
 };
 
 export const storiesApi = {
   list: async (filter: StoryFilter = {}) =>
-    unwrap(await apiClient.GET("/stories", { params: { query: { status: filter.status, skill: filter.skill } } })) as Story[],
+    unwrap(
+      await apiClient.GET("/stories", {
+        params: { query: { status: filter.status, skill: filter.skill, include: filter.include } },
+      }),
+    ) as Story[],
+  /** CS-13: archive (out of the list and out of prep, CS-14) and bring back. */
+  archive: async (id: string) =>
+    unwrap(await apiClient.POST("/stories/{story_id}/archive", { params: { path: { story_id: id } } })) as Story,
+  unarchive: async (id: string) =>
+    unwrap(await apiClient.POST("/stories/{story_id}/unarchive", { params: { path: { story_id: id } } })) as Story,
+  /** CS-15: delete is soft; restore within 30 days. */
+  remove: async (id: string) => {
+    unwrap(await apiClient.DELETE("/stories/{story_id}", { params: { path: { story_id: id } } }));
+  },
+  restore: async (id: string) =>
+    unwrap(await apiClient.POST("/stories/{story_id}/restore", { params: { path: { story_id: id } } })) as Story,
+  /** CS-1 to CS-5, CS-11: resume ideas pooled across resumes, and job skill gaps. */
+  recommendations: async () =>
+    unwrap(await apiClient.GET("/stories/recommendations")) as StoryRecommendations,
   get: async (id: string) =>
     unwrap(await apiClient.GET("/stories/{story_id}", { params: { path: { story_id: id } } })) as Story,
   create: async (body: StoryIn) => unwrap(await apiClient.POST("/stories", { body })) as Story,
@@ -117,6 +144,9 @@ export const useStories = (filter: StoryFilter = {}) =>
   useQuery({ queryKey: storyKeys.list(filter), queryFn: () => storiesApi.list(filter) });
 
 export const useStory = (id: string) => useQuery({ queryKey: storyKeys.one(id), queryFn: () => storiesApi.get(id) });
+
+export const useStoryRecommendations = () =>
+  useQuery({ queryKey: storyKeys.recommendations, queryFn: storiesApi.recommendations });
 
 export const STORY_PARTS = ["context", "stakes", "action", "result", "reflection"] as const;
 

@@ -42,19 +42,13 @@ beforeEach(() => {
 afterEach(() => setFeatureOverrides({}));
 
 async function seed() {
-  const { job_target: job } = await jobTargetsApi.create({
-    text: "Senior engineer, payments. ".repeat(5),
-  });
+  const { job_target: job } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
   await jobTargetsApi.get(job.id);
   const form = new FormData();
   form.append("text", "Backend engineer, seven years of Python.");
   const { resume } = await resumesApi.upload(form);
   await resumesApi.get(resume.id);
-  return {
-    job,
-    resume,
-    record: mockStore.db.resumes.find((r) => r.id === resume.id)!,
-  };
+  return { job, resume, record: mockStore.db.resumes.find((r) => r.id === resume.id)! };
 }
 
 function Where() {
@@ -78,17 +72,9 @@ function renderAt(path: string) {
 }
 
 const ready = () => screen.findByRole("navigation", { name: "Steps" });
-const stepButton = (name: RegExp) =>
-  within(screen.getByRole("navigation", { name: "Steps" })).getByRole(
-    "button",
-    { name },
-  );
-const current = () =>
-  screen
-    .getByRole("navigation", { name: "Steps" })
-    .querySelector('[aria-current="step"]');
-const finding = () =>
-  within(screen.getByTestId("findings-step")).getByRole("article");
+const stepButton = (name: RegExp) => within(screen.getByRole("navigation", { name: "Steps" })).getByRole("button", { name });
+const current = () => screen.getByRole("navigation", { name: "Steps" }).querySelector('[aria-current="step"]');
+const finding = () => within(screen.getByTestId("findings-step")).getByRole("article");
 
 describe("RSD-7: the header", () => {
   it("RSD-7: the name, then Set as default; the dates and Used by N roles; Upload a new version and the primary action", async () => {
@@ -101,39 +87,21 @@ describe("RSD-7: the header", () => {
     await fetch(`${location.origin}/api/roles/${job.id}/interviews`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        interview_types: ["behavioral"],
-        resume_id: second.resume.id,
-      }),
+      body: JSON.stringify({ interview_types: ["behavioral"], resume_id: second.resume.id }),
     });
     const user = renderAt(`/resumes/${second.resume.id}/check`);
     await ready();
-    const name =
-      mockStore.db.resumes.find((r) => r.id === second.resume.id)?.name ?? "";
+    const name = mockStore.db.resumes.find((r) => r.id === second.resume.id)?.name ?? "";
     expect(screen.getByRole("heading", { level: 1, name })).toBeInTheDocument();
-    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(
-      /^Added [A-Z][a-z]{2} \d+(, \d{4})? · Not saved yet$/,
-    );
-    expect(await screen.findByTestId("used-by")).toHaveTextContent(
-      "Used by 1 role",
-    );
-    expect(
-      screen.getByRole("link", { name: "Upload a new version" }),
-    ).toHaveAttribute("href", "/start");
-    expect(
-      screen.getByRole("button", { name: "Use this resume for an interview" }),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/^Added [A-Z][a-z]{2} \d+(, \d{4})? · Not saved yet$/);
+    expect(await screen.findByTestId("used-by")).toHaveTextContent("Used by 1 role");
+    expect(screen.getByRole("link", { name: "Upload a new version" })).toHaveAttribute("href", "/start");
+    expect(screen.getByRole("button", { name: "Use this resume for an interview" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Set as default" }));
     expect(await screen.findByText("Default")).toBeInTheDocument();
-    await waitFor(() =>
-      expect(
-        mockStore.db.resumes.find((r) => r.id === second.resume.id)?.is_main,
-      ).toBe(true),
-    );
-    expect(mockStore.db.resumes.find((r) => r.id === resume.id)?.is_main).toBe(
-      false,
-    );
+    await waitFor(() => expect(mockStore.db.resumes.find((r) => r.id === second.resume.id)?.is_main).toBe(true));
+    expect(mockStore.db.resumes.find((r) => r.id === resume.id)?.is_main).toBe(false);
   });
 
   it("RSD-7: the default resume shows the Default chip, and the roles link is hidden at 0", async () => {
@@ -141,9 +109,7 @@ describe("RSD-7: the header", () => {
     renderAt(`/resumes/${resume.id}/check`);
     await ready();
     expect(screen.getByText("Default")).toHaveClass("sx-chip");
-    expect(
-      screen.queryByRole("button", { name: "Set as default" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Set as default" })).not.toBeInTheDocument();
     expect(screen.queryByTestId("used-by")).not.toBeInTheDocument();
   });
 
@@ -151,16 +117,9 @@ describe("RSD-7: the header", () => {
     const { resume, job } = await seed();
     renderAt(`/jobs/${job.id}/resume/${resume.id}/check`);
     await ready();
-    expect(
-      screen.getByRole("heading", { level: 1, name: "Check your resume" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getAllByRole("button", { name: "Continue to your interview plan" })
-        .length,
-    ).toBeGreaterThan(0);
-    expect(
-      screen.queryByRole("link", { name: "Upload a new version" }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Check your resume" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Continue to your interview plan" }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: "Upload a new version" })).not.toBeInTheDocument();
   });
 });
 
@@ -173,24 +132,11 @@ describe("RSD-8: the step list", () => {
     const names = within(nav)
       .getAllByRole("button")
       .map((b) => b.querySelector(".cvc-step__name")?.textContent);
-    expect(names).toEqual([
-      "Your career journey",
-      "Strova's findings",
-      "Stories to tell in interviews",
-      "Stronger resume lines",
-    ]);
-    expect(stepButton(/Your career journey/)).toHaveTextContent(
-      /\d+ roles? · \d+ years? · \d+ achievements?/,
-    );
-    expect(stepButton(/Strova's findings/)).toHaveTextContent(
-      /and the fixes she recommends · \d+ high/,
-    );
-    expect(stepButton(/Stories to tell/)).toHaveTextContent(
-      "Resume → Interview",
-    );
-    expect(stepButton(/Stronger resume lines/)).toHaveTextContent(
-      "Your stories → Resume",
-    );
+    expect(names).toEqual(["Your career journey", "Strova's findings", "Stories to tell in interviews", "Stronger resume lines"]);
+    expect(stepButton(/Your career journey/)).toHaveTextContent(/\d+ roles? · \d+ years? · \d+ achievements?/);
+    expect(stepButton(/Strova's findings/)).toHaveTextContent(/and the fixes she recommends · \d+ high/);
+    expect(stepButton(/Stories to tell/)).toHaveTextContent("Resume → Interview");
+    expect(stepButton(/Stronger resume lines/)).toHaveTextContent("Your stories → Resume");
     // No readiness bar (D-5).
     expect(screen.queryByRole("meter")).not.toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
@@ -199,14 +145,8 @@ describe("RSD-8: the step list", () => {
     await user.click(stepButton(/Your career journey/));
     expect(current()).toBe(stepButton(/Your career journey/));
     // Other params stay.
-    expect(screen.getByTestId("search")).toHaveTextContent(
-      "?task=t1&step=journey",
-    );
-    await waitFor(() =>
-      expect(
-        stepButton(/Stories to tell/).querySelector(".cvc-step__num"),
-      ).toHaveTextContent(/^\d+$/),
-    );
+    expect(screen.getByTestId("search")).toHaveTextContent("?task=t1&step=journey");
+    await waitFor(() => expect(stepButton(/Stories to tell/).querySelector(".cvc-step__num")).toHaveTextContent(/^\d+$/));
   });
 
   it("RSD-8: ?step= opens that step; without findings the page opens on the journey", async () => {
@@ -244,14 +184,10 @@ describe("RSD-9: the journey", () => {
     expect(items[1]).toHaveTextContent("Invoicely");
     expect(items[0]).toHaveAttribute("data-gap", "true");
     expect(items[0].querySelector(".cvc-tl__line--gap")).not.toBeNull();
-    const link = within(items[0]).getByRole("button", {
-      name: /^9-month gap · .* · see the fix$/,
-    });
+    const link = within(items[0]).getByRole("button", { name: /^9-month gap · .* · see the fix$/ });
     await user.click(link);
     expect(current()).toBe(stepButton(/Strova's findings/));
-    expect(
-      within(finding()).getByRole("heading", { name: /gap/i }),
-    ).toBeInTheDocument();
+    expect(within(finding()).getByRole("heading", { name: /gap/i })).toBeInTheDocument();
   });
 
   it("RSD-9: summary first, then the roles, then skills, education and certifications as three tiles", async () => {
@@ -267,19 +203,12 @@ describe("RSD-9: the journey", () => {
       within(view).getByRole("region", { name: "Certifications" }),
     ];
     for (let i = 1; i < order.length; i += 1) {
-      expect(
-        order[i - 1].compareDocumentPosition(order[i]) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
+      expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
-    expect(
-      screen.getByRole("region", { name: "Education" }).parentElement,
-    ).toHaveClass("cvc-pair");
-    expect(
-      screen.getByRole("button", {
-        name: /^Show the \d+ findings? for Software Engineer · Invoicely$/,
-      }),
-    ).toHaveTextContent(/^\d+ findings?$/);
+    expect(screen.getByRole("region", { name: "Education" }).parentElement).toHaveClass("cvc-pair");
+    expect(screen.getByRole("button", { name: /^Show the \d+ findings? for Software Engineer · Invoicely$/ })).toHaveTextContent(
+      /^\d+ findings?$/,
+    );
   });
 });
 
@@ -289,31 +218,20 @@ describe("RSD-10: Strova's findings", () => {
     record.resume!.roles[1].end = "2020-06";
     const user = renderAt(`/resumes/${resume.id}/check`);
     await ready();
-    const position = () =>
-      within(finding()).getByTestId("finding-position").textContent ?? "";
+    const position = () => within(finding()).getByTestId("finding-position").textContent ?? "";
     // The gap is the only date finding here, so it leads (medium); high ones would come first.
     expect(position()).toMatch(/^Finding 1 of (\d+) · (high|medium)$/);
     const total = Number(/of (\d+)/.exec(position())![1]);
-    expect(
-      within(finding()).getByRole("button", { name: "Previous finding" }),
-    ).toBeDisabled();
-    await user.click(
-      within(finding()).getByRole("button", { name: "Next finding" }),
-    );
+    expect(within(finding()).getByRole("button", { name: "Previous finding" })).toBeDisabled();
+    await user.click(within(finding()).getByRole("button", { name: "Next finding" }));
     expect(position()).toMatch(new RegExp(`^Finding 2 of ${total} · `));
-    await user.click(
-      within(finding()).getByRole("button", { name: "Previous finding" }),
-    );
+    await user.click(within(finding()).getByRole("button", { name: "Previous finding" }));
     expect(position()).toMatch(/^Finding 1 of/);
-    const rows = within(
-      screen.getByRole("list", { name: "Next findings" }),
-    ).getAllByRole("button");
+    const rows = within(screen.getByRole("list", { name: "Next findings" })).getAllByRole("button");
     expect(rows).toHaveLength(total - 1);
     await user.click(rows[rows.length - 1]);
     expect(position()).toMatch(new RegExp(`^Finding ${total} of ${total}`));
-    expect(
-      within(finding()).getByRole("button", { name: "Next finding" }),
-    ).toBeDisabled();
+    expect(within(finding()).getByRole("button", { name: "Next finding" })).toBeDisabled();
   });
 
   it("RSD-10: a gap shows both dates in Strova recommends, every accept reason, and the practice link", async () => {
@@ -322,118 +240,64 @@ describe("RSD-10: Strova's findings", () => {
     renderAt(`/resumes/${resume.id}/check`);
     await ready();
     const card = finding();
-    expect(
-      within(card).getByRole("heading", { name: /gap/i }),
-    ).toBeInTheDocument();
+    expect(within(card).getByRole("heading", { name: /gap/i })).toBeInTheDocument();
     expect(within(card).getByText("Strova recommends")).toBeInTheDocument();
-    expect(within(card).getByLabelText("Invoicely ended")).toHaveValue(
-      "2020-06",
-    );
-    expect(within(card).getByLabelText("Shoply started")).toHaveValue(
-      "2021-03",
-    );
-    expect(
-      within(card).getByRole("button", { name: "Save dates" }),
-    ).toBeInTheDocument();
-    expect(
-      within(card)
-        .getByRole("link", { name: /Practice "tell me about this gap"/ })
-        .getAttribute("href"),
-    ).toMatch(/^\/coach\/new\?ask=/);
+    expect(within(card).getByLabelText("Invoicely ended")).toHaveValue("2020-06");
+    expect(within(card).getByLabelText("Shoply started")).toHaveValue("2021-03");
+    expect(within(card).getByRole("button", { name: "Save dates" })).toBeInTheDocument();
+    expect(within(card).getByRole("link", { name: /Practice "tell me about this gap"/ }).getAttribute("href")).toMatch(/^\/coach\/new\?ask=/);
   });
 
   it("RSD-10: a skills finding offers Add {skills}, which saves and moves on", async () => {
     const { resume } = await seed();
     const user = renderAt(`/resumes/${resume.id}/check`);
     await ready();
-    await user.click(
-      within(screen.getByRole("list", { name: "Next findings" })).getByRole(
-        "button",
-        { name: /A skill missing from Skills/ },
-      ),
-    );
-    await user.click(
-      within(finding()).getByRole("button", { name: "Add Celery" }),
-    );
-    await waitFor(() =>
-      expect(mockStore.db.resumes[0].resume?.skills).toContain("Celery"),
-    );
-    expect(
-      screen.queryByRole("heading", { name: "A skill missing from Skills" }),
-    ).not.toBeInTheDocument();
+    await user.click(within(screen.getByRole("list", { name: "Next findings" })).getByRole("button", { name: /A skill missing from Skills/ }));
+    await user.click(within(finding()).getByRole("button", { name: "Add Celery" }));
+    await waitFor(() => expect(mockStore.db.resumes[0].resume?.skills).toContain("Celery"));
+    expect(screen.queryByRole("heading", { name: "A skill missing from Skills" })).not.toBeInTheDocument();
   });
 
   it("RSD-10: a finding with no form keeps a normal button (not full width) that opens its field on step 1", async () => {
     const { resume, record } = await seed();
     // A copy: the mock's fixture resume is shared with the other tests.
     record.resume = structuredClone(record.resume!);
-    record.resume.roles.push({
-      company: "Shoply",
-      title: "Software Engineer I",
-      start: "2019-01",
-      end: "2021-02",
-      achievements: ["Fixed checkout bugs"],
-      skills: [],
-    });
+    record.resume.roles.push({ company: "Shoply", title: "Software Engineer I", start: "2019-01", end: "2021-02", achievements: ["Fixed checkout bugs"], skills: [] });
     record.resume.roles[1].start = "2016-01";
     record.resume.roles[1].end = "2018-12";
     const user = renderAt(`/resumes/${resume.id}/check`);
     await ready();
-    await user.click(
-      within(screen.getByRole("list", { name: "Next findings" })).getByRole(
-        "button",
-        { name: /Shoply listed 2 times/ },
-      ),
-    );
-    const open = within(finding()).getByRole("button", {
-      name: "Open the role",
-    });
+    await user.click(within(screen.getByRole("list", { name: "Next findings" })).getByRole("button", { name: /Shoply listed 2 times/ }));
+    const open = within(finding()).getByRole("button", { name: "Open the role" });
     // The Strova recommends box is a column; the button sits in a row so it keeps its pill shape.
     expect(open.parentElement).toHaveClass("row");
     expect(open.parentElement?.parentElement).toHaveClass("cvc-recommends");
     await user.click(open);
     expect(current()).toBe(stepButton(/Your career journey/));
-    expect(
-      screen.getByRole("group", { name: /^Editing · Software Engineer/ }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: /^Editing · Software Engineer/ })).toBeInTheDocument();
   });
 
   it("RSD-10: with nothing open it says so and links to step 1", async () => {
     const { resume, record } = await seed();
     const { checkResume, thisMonth } = await import("../resumeChecks");
     const all = checkResume(record.resume!, { today: thisMonth(), job: null });
-    record.accepted_issues = all.map((i) => ({
-      key: i.key,
-      accepted_at: "2026-10-28T10:00:00Z",
-    }));
+    record.accepted_issues = all.map((i) => ({ key: i.key, accepted_at: "2026-10-28T10:00:00Z" }));
     const user = renderAt(`/resumes/${resume.id}/check?step=findings`);
     await ready();
-    expect(
-      screen.getByText("Nothing to fix. Your resume reads well."),
-    ).toBeInTheDocument();
-    await user.click(
-      screen.getByRole("button", { name: "See your career journey" }),
-    );
+    expect(screen.getByText("Nothing to fix. Your resume reads well.")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "See your career journey" }));
     expect(current()).toBe(stepButton(/Your career journey/));
   });
 
   it("RSD-10: findings are ordered high first, then in the order found", () => {
-    const f = (key: string, severity: ResumeIssue["severity"]) =>
-      ({ key, severity }) as ResumeIssue;
-    expect(
-      orderFindings([
-        f("a", "low"),
-        f("b", "high"),
-        f("c", "medium"),
-        f("d", "high"),
-      ]).map((i) => i.key),
-    ).toEqual(["b", "d", "a", "c"]);
-    const gap = {
-      group: "dates",
-      target: { section: "role", role: 0, field: "start" },
-      roles: [1, 0],
-      gap: { from: "a", to: "b" },
-    } as ResumeIssue;
+    const f = (key: string, severity: ResumeIssue["severity"]) => ({ key, severity }) as ResumeIssue;
+    expect(orderFindings([f("a", "low"), f("b", "high"), f("c", "medium"), f("d", "high")]).map((i) => i.key)).toEqual([
+      "b",
+      "d",
+      "a",
+      "c",
+    ]);
+    const gap = { group: "dates", target: { section: "role", role: 0, field: "start" }, roles: [1, 0], gap: { from: "a", to: "b" } } as ResumeIssue;
     expect(dateFields(gap)).toEqual([
       { role: 1, field: "end" },
       { role: 0, field: "start" },
@@ -447,23 +311,15 @@ describe("RSD-13: the career strip", () => {
     record.resume!.roles[1].end = "2020-06";
     const user = renderAt(`/resumes/${resume.id}/check`);
     await ready();
-    const strip = screen.getByRole("region", {
-      name: "Career journey at a glance",
-    });
+    const strip = screen.getByRole("region", { name: "Career journey at a glance" });
     const img = within(strip).getByRole("img");
-    expect(img).toHaveAccessibleName(
-      /^Timeline: Invoicely 2018 to 2020, gap, Shoply 2021 to now$/,
-    );
+    expect(img).toHaveAccessibleName(/^Timeline: Invoicely 2018 to 2020, gap, Shoply 2021 to now$/);
     expect(strip.querySelector(".cvc-strip__seg--gap")).not.toBeNull();
     // The roles of the current finding (the gap) are outlined.
     expect(strip.querySelectorAll("[data-outlined]")).toHaveLength(2);
-    await user.click(
-      within(strip).getByRole("button", { name: "Open and edit" }),
-    );
+    await user.click(within(strip).getByRole("button", { name: "Open and edit" }));
     expect(current()).toBe(stepButton(/Your career journey/));
-    expect(
-      screen.queryByRole("region", { name: "Career journey at a glance" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Career journey at a glance" })).not.toBeInTheDocument();
   });
 
   it("RSD-13: segments are sized by months, oldest first, with gaps over 3 months", () => {
@@ -476,15 +332,9 @@ describe("RSD-13: the career strip", () => {
       achievements: [],
       skills: [],
     });
-    const roles = [
-      role("Ledgerline", "2021-03", ""),
-      role("Kitepath", "2015-08", "2017-07"),
-      role("Studio Nine", "2014", "2015-03"),
-    ];
+    const roles = [role("Ledgerline", "2021-03", ""), role("Kitepath", "2015-08", "2017-07"), role("Studio Nine", "2014", "2015-03")];
     const built = careerSegments(roles, "2026-11")!;
-    expect(
-      built.segments.map((s) => `${s.kind}:${s.label}:${s.to - s.from}`),
-    ).toEqual([
+    expect(built.segments.map((s) => `${s.kind}:${s.label}:${s.to - s.from}`)).toEqual([
       "role:Studio Nine:14",
       "gap:gap:5",
       "role:Kitepath:23",
@@ -497,17 +347,10 @@ describe("RSD-13: the career strip", () => {
     expect(gapMonths(roles[1], roles[2])).toBe(5);
     expect(
       gapLabel(
-        {
-          target: { section: "role", role: 1, field: "start" },
-          roles: [2, 1],
-          gap: { from: "Mar 2015", to: "Aug 2015" },
-          detail: "",
-        } as unknown as ResumeIssue,
+        { target: { section: "role", role: 1, field: "start" }, roles: [2, 1], gap: { from: "Mar 2015", to: "Aug 2015" }, detail: "" } as unknown as ResumeIssue,
         roles,
       ),
     ).toBe("5-month gap · Mar 2015 to Aug 2015 · see the fix");
-    expect(journeyLine(roles, "2026-11")).toBe(
-      "3 roles · 13 years · 0 achievements",
-    );
+    expect(journeyLine(roles, "2026-11")).toBe("3 roles · 13 years · 0 achievements");
   });
 });
