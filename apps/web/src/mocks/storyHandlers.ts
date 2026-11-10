@@ -31,6 +31,8 @@ export function mockStory(changes: Partial<Story> & Pick<Story, "id" | "title">)
     outline: null,
     flow_flags: [],
     hints: [],
+    archived_at: null,
+    deleted_at: null,
     created_at: "2026-10-20T10:00:00Z",
     updated_at: "2026-10-20T10:00:00Z",
     display_status: "draft",

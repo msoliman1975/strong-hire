@@ -28,9 +28,17 @@ from strong_core.db.models import (
     MinuteGrant,
     Resume,
     Subscription,
+    Turn,
     User,
 )
-from strong_core.schemas import GapStatus, SessionChannel, SessionStatus, SubscriptionStatus
+from strong_core.schemas import (
+    GapStatus,
+    Phase,
+    SessionChannel,
+    SessionStatus,
+    Speaker,
+    SubscriptionStatus,
+)
 
 from .accounts_support import CUSTOMER_ID, FakeStripe, add_session, load_event, post_event
 from .conftest import AuthHarness, InlineQueue, RecordingEmailSender, sign_in, sign_in_admin
@@ -463,6 +471,17 @@ async def test_au7_suspend_blocks_requests_and_sign_in_and_ends_open_sessions(
     async with sessionmaker() as db:
         live = await add_session(db, dev.org_id, dev.id, status=SessionStatus.IN_PROGRESS)
         live.ended_at = None
+        db.add(  # an answer, so the end bills and scores it (BL-3)
+            Turn(
+                org_id=dev.org_id,
+                session_id=live.id,
+                speaker=Speaker.CANDIDATE,
+                phase=Phase.CORE,
+                text="I led the migration.",
+                start_ms=0,
+                end_ms=3000,
+            )
+        )
         waiting = await add_session(
             db, dev.org_id, dev.id, started=False, status=SessionStatus.CREATED
         )

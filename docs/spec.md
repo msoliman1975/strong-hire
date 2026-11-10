@@ -160,6 +160,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | PR-3 | Interview rehearsals: the user picks a job description and a CV, or adds one. For that pair, the app shows the earlier gap reports, debriefs and hire signals. In v2 the rehearsals page is replaced by PP-1. | P0 |
 | BL-1 | Stripe subscription, one plan, monthly minute cap, usage meter visible in the app. | P0 |
 | BL-2 | Free tier: unlimited gap analyses (rate limited) plus one free interview. | P0 |
+| BL-3 | A session that starts but ends with no answer from the candidate (no candidate turn: they left, or the microphone or speech-to-text never delivered a word) is not billed, does not use a free interview and is not scored. The debrief says so and suggests checking the microphone. The admin area shows it as "no answers", not as a scoring failure to retry, and it does not count as a technical failure (AO-6). | P0 |
 | AC-1 | Self-service export and full delete of account and all data. | P0 |
 | AC-2 | Training-data consent toggle, off by default, changeable any time. | P0 |
 | AC-3 | At the first sign-in, ask for a short profile: full name, years of experience and target level, plus optional current title, country, time zone and LinkedIn URL. No payment details. The user edits it under Account, Profile. | P0 |
@@ -435,7 +436,7 @@ The Resumes list and Target roles move to one shared card shell with three stat 
 
 ### LLM tracing with MLflow (LT)
 
-Every model call can be recorded as an MLflow trace. The goal is to compare prompt and model versions on the same sim scenarios, with latency and failures alongside. Phase 1 traces sim and dev traffic only; real users' traffic is never traced until phase 2 has its own consent, redaction, retention and deletion design. Spans copy the cost numbers of `usage_events`, which stays the source of truth for cost. The decisions D-1 to D-10 and the technical design are in `docs/llm-tracing/spec.md`; the build plan is `docs/llm-tracing/execution-plan.md`.
+Every model call can be recorded as an MLflow trace. The goal is to compare prompt and model versions on the same sim scenarios, with latency and failures alongside. Phase 1 (LT-1 to LT-15) traces sim and dev traffic only. Phase 2 (LT-16 to LT-31) adds real users' sessions: metadata for every session, and the interview turns' content only for users who opt in, each behind its own flag and legal gate. Spans copy the cost numbers of `usage_events`, which stays the source of truth for cost. The decisions D-1 to D-10 and the technical design are in `docs/llm-tracing/spec.md`; the build plan is `docs/llm-tracing/execution-plan.md`.
 
 | ID | Requirement | Priority |
 | --- | --- | --- |
@@ -454,7 +455,22 @@ Every model call can be recorded as an MLflow trace. The goal is to compare prom
 | LT-13 | The short-lived sim server sends its runs, traces and assessments to the main server's MLflow over HTTPS, with credentials from `infra/sim/.env`. A failing MLflow server never fails a sim run. | P0 |
 | LT-14 | The sim marks a session with `X-Sim-Run`, `X-Sim-Scenario` and `X-Sim-Trace-Content` when it creates it. The API honours them only for a sim user and stores them in `interview_sessions.trace_json` (contract `SessionTraceSettings`). A missing or invalid value means redacted. | P0 |
 | LT-15 | MLflow is imported only in `strong_core.tracing` and `strong_sim`. The gateway-rule test enforces it. | P0 |
-| LT-16 | Open item, not built in phase 1: tracing real users' traffic, behind a flag, after a design for consent, redaction, retention and deletion on account deletion (Law 25, CCPA). | P2 |
+| LT-16 | Phase 2: real users' sessions are traced behind two flags, both off by default: `LLM_TRACING_PROD` (metadata for every session) and `LLM_TRACING_PROD_CONTENT` (the consent toggle and content for those who opt in). Real users' traces go to the `prod` experiment, never `sim` or `dev` (D-11, D-17). | P1 |
+| LT-17 | A real user's spans are `metadata` mode: timings, tokens, cost, role, alias, tier, prompt refs, retries, error type, and message counts and lengths. No message text, no hash and no error message, with or without consent. A test proves a production span holds no text from the session. | P1 |
+| LT-18 | Every production trace is tagged with `org_id`, `session_id`, `service`, `release` and `model_profile`, so one query finds a user's traces after their rows are gone (D-18). | P1 |
+| LT-19 | `LLM_TRACING_SAMPLE` (0 to 1, default 1.0) decides per session, from a stable hash of the session id, so a session is traced whole or not at all. The runtime setting `llm_tracing_paused`, switched on the admin Controls page with a reason (AA-6), stops all production tracing within the settings cache time (10 s), without a deploy. Sim tracing is not affected. | P1 |
+| LT-20 | `users.tracing_consent` (with the time it last changed), off by default. The account page shows its toggle beside the training-data toggle (AC-2), with its own wording, only while `LLM_TRACING_PROD_CONTENT` is on. Every change writes `account.tracing_consent_changed` to the audit log. | P1 |
+| LT-21 | With consent, each interview turn (text or voice) also writes the interviewer's reply and the candidate's answer, from the session's turns, never from the prompt messages. Worker jobs stay metadata-only, even with consent (D-13). | P1 |
+| LT-22 | Content is scrubbed before it is stored: `scrub_text` (emails, phone numbers, URL queries), then the user's profile name as `[name]` and the company names in their resumes and job targets as `[company]`, case-insensitive on word boundaries. | P1 |
+| LT-23 | Content is a separate `turn.content` trace with the turn's tags plus `content=turns`, so withdrawal and retention remove content and keep the metadata `turn` trace. | P1 |
+| LT-24 | Turning consent off stops content capture from the next turn and queues deletion of the user's `turn.content` traces, done within 24 hours. | P1 |
+| LT-25 | Deleting an account (AC-1) queues deletion of all the org's production traces, metadata and content, done within 24 hours. | P1 |
+| LT-26 | Trace deletion is the `delete_traces` worker job, retried by Arq. A request still not done 12 hours after it was made raises an alert to `ALERT_EMAIL`. Success writes `tracing.traces_deleted` with the count to the audit log. | P1 |
+| LT-27 | The daily retention job deletes `prod` content traces older than 30 days and other `prod` traces older than 90 days. MLflow's database follows the 30-day backup rotation (D-14). | P1 |
+| LT-28 | People reach MLflow only at `admin.{$DOMAIN}/mlflow/`, where Caddy's `forward_auth` asks the API to check the admin session (AA-3, AA-4); no session, no access. The strict admin CSP (AA-9) is relaxed for `/mlflow/*` only. `mlflow.{$DOMAIN}` accepts only the sim machine token; its basic auth is removed. | P1 |
+| LT-29 | Each admin request that reads a production trace (get or search) writes `admin.trace_viewed` to the audit log with the admin and the trace or query (AA-6). | P1 |
+| LT-30 | The gates in `docs/llm-tracing/phase2-gates.md`: `LLM_TRACING_PROD` only after the privacy policy and retention schedule describe production tracing; `LLM_TRACING_PROD_CONTENT` only after the privacy lawyer approves the consent wording and the PIA update (D-17). | P1 |
+| LT-31 | Production tracing never changes what a real user sees or waits for. A failed lookup (consent, sample, pause, scrub data) means the session or turn is not traced, and the call goes on (fail closed). | P1 |
 
 ## Interviewer and scoring design
 
