@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_core.config import find_repo_root
 from strong_core.db.models import CompanyProfile as ProfileRow
-from strong_core.db.models import InterviewSession, JobTarget
+from strong_core.db.models import InterviewSession, JobTarget, Subscription
 from strong_core.db.models import ProgressSnapshot as SnapshotRow
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.db.models import Turn as TurnRow
@@ -31,6 +31,7 @@ from strong_core.schemas import (
     ScorerOutput,
     SessionStatus,
     Speaker,
+    SubscriptionStatus,
     Turn,
 )
 from strong_worker.main import WorkerSettings
@@ -569,6 +570,108 @@ async def test_failed_scoring_marks_the_session_failed(
         stored = await db.get(InterviewSession, session.id)
         assert stored is not None and stored.status == SessionStatus.FAILED
         assert await db.scalar(select(ScorecardRow)) is None
+
+
+async def _bill(
+    maker: async_sessionmaker[AsyncSession],
+    session: InterviewSession,
+    user_id: uuid.UUID,
+    *,
+    status: SubscriptionStatus | None = SubscriptionStatus.ACTIVE,
+    period_start: datetime | None = None,
+    used: int = 40,
+) -> None:
+    """Bill the session 30 minutes, as the API does when it ends, on a plan with `used` minutes."""
+    async with maker() as db:
+        stored = await db.get(InterviewSession, session.id)
+        assert stored is not None
+        stored.minutes_billed = 30
+        if status is not None:
+            db.add(
+                Subscription(
+                    org_id=session.org_id,
+                    user_id=user_id,
+                    stripe_customer_id="cus_test",
+                    status=status,
+                    period_start=period_start,
+                    minutes_used=used,
+                )
+            )
+        await db.commit()
+
+
+async def _billing(
+    maker: async_sessionmaker[AsyncSession], session: InterviewSession
+) -> tuple[int, int | None]:
+    async with maker() as db:
+        stored = await db.get(InterviewSession, session.id)
+        assert stored is not None
+        sub = await db.scalar(select(Subscription).where(Subscription.org_id == session.org_id))
+        return stored.minutes_billed, sub.minutes_used if sub else None
+
+
+async def _fail_scoring(
+    maker: async_sessionmaker[AsyncSession], session: InterviewSession, org_id: uuid.UUID
+) -> dict[str, Any]:
+    brief, turns = load_scripted("beh-01")
+    bad = scorecard_reply(brief, turns, 3, quote="Nothing like this was said")
+    return await jobs.score_session(
+        _job_ctx(maker, ScriptedBackend([bad])), str(session.id), str(org_id)
+    )
+
+
+async def test_bl4_failed_scoring_refunds_the_minutes_once(
+    sessionmaker: async_sessionmaker[AsyncSession], account: tuple[uuid.UUID, uuid.UUID]
+) -> None:
+    """BL-4: the debrief says the minutes are refunded. minutes_billed goes to 0 and the minutes
+    come off the paid plan. A second failure (a retry that fails before the API bills again, or
+    a duplicate job) refunds nothing more."""
+    org_id, user_id = account
+    session = await _make_session(sessionmaker, org_id, user_id)
+    await _bill(sessionmaker, session, user_id, period_start=datetime.now(UTC) - timedelta(days=3))
+
+    result = await _fail_scoring(sessionmaker, session, org_id)
+    assert result["outcome"] == "failed"
+    assert result["refunded_minutes"] == 30
+    assert await _billing(sessionmaker, session) == (0, 10)
+
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session.id)
+        assert stored is not None
+        stored.status = SessionStatus.SCORING
+        await db.commit()
+    again = await _fail_scoring(sessionmaker, session, org_id)
+    assert again["refunded_minutes"] == 0
+    assert await _billing(sessionmaker, session) == (0, 10)
+
+
+@pytest.mark.parametrize(
+    ("status", "period_days_ago", "used", "expected_used"),
+    [
+        (SubscriptionStatus.TRIALING, 3, 40, 10),  # trialing is paid
+        (SubscriptionStatus.ACTIVE, 3, 12, 0),  # never below 0
+        (SubscriptionStatus.ACTIVE, 0, 7, 7),  # started before this period: usage already reset
+        (SubscriptionStatus.CANCELED, 3, 40, 40),  # not a paid plan: nothing to give back
+        (None, 0, 0, None),  # free plan: a failed session already gives the free interview back
+    ],
+)
+async def test_bl4_the_refund_follows_the_plan_and_the_period(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    status: SubscriptionStatus | None,
+    period_days_ago: int,
+    used: int,
+    expected_used: int | None,
+) -> None:
+    """BL-4: minutes come off the paid plan only for a session of the current period."""
+    org_id, user_id = account
+    session = await _make_session(sessionmaker, org_id, user_id)
+    period_start = datetime.now(UTC) - timedelta(days=period_days_ago)
+    await _bill(sessionmaker, session, user_id, status=status, period_start=period_start, used=used)
+
+    result = await _fail_scoring(sessionmaker, session, org_id)
+    assert result["outcome"] == "failed"
+    assert await _billing(sessionmaker, session) == (0, expected_used)
 
 
 async def test_other_orgs_cannot_score_a_session(

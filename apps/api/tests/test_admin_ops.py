@@ -886,6 +886,60 @@ async def test_ob13_retry_reenqueues_the_same_jobs_and_is_audited(
     assert missing.status_code == 404
 
 
+@pytest.mark.parametrize(
+    ("period_start", "expected_used"),
+    [(d(1), 15), (d(14), 5)],  # started in this period: billed again; in an earlier one: not
+)
+async def test_bl4_retrying_a_refunded_scoring_bills_the_minutes_again(
+    admin: httpx.AsyncClient,
+    sessionmaker: Maker,
+    queue: InlineQueue,
+    period_start: datetime,
+    expected_used: int,
+) -> None:
+    """BL-4: the failed scoring refunded the session (minutes_billed 0). The admin retry bills
+    it again, to the plan only when the session started in the current period, and says so in
+    the audit row. If the retry fails too, the worker refunds again."""
+    seed = await seed_all(sessionmaker)
+    queue.run_jobs = False
+    failed = seed.sessions["s6_scoring"]  # 9:00 to 9:30 on a 10-minute session: 10 minutes
+    async with sessionmaker() as db:
+        user = seed.users["u4"]
+        db.add(
+            Subscription(
+                org_id=user.org_id,
+                user_id=user.id,
+                stripe_customer_id="cus_u4",
+                stripe_subscription_id="sub_u4",
+                status=SubscriptionStatus.ACTIVE,
+                period_start=period_start,
+                minutes_used=5,
+            )
+        )
+        await db.commit()
+
+    resp = await admin.post(
+        f"/admin/ops/jobs/scoring/{failed.id}/retry", json={"reason": "outage over"}, headers=WRITE
+    )
+    assert resp.status_code == 202, resp.text
+    async with sessionmaker() as db:
+        session = await db.get(InterviewSession, failed.id)
+        assert session is not None and session.minutes_billed == 10
+        sub = await db.scalar(select(Subscription).where(Subscription.org_id == failed.org_id))
+        assert sub is not None and sub.minutes_used == expected_used
+        audit = await db.scalar(select(AuditLog).where(AuditLog.action == "ops.job_retry"))
+        assert audit is not None and audit.details_json is not None
+        assert audit.details_json["rebilled_minutes"] == expected_used - 5
+
+
+def test_bl4_the_worker_refund_uses_the_same_paid_statuses() -> None:
+    """BL-4: the worker cannot import strong_api, so it repeats the paid statuses."""
+    from strong_api.billing.entitlements import PAID_STATUSES
+    from strong_worker.scoring.refund import PAID_STATUSES as WORKER_PAID
+
+    assert WORKER_PAID == PAID_STATUSES
+
+
 # --- Spend (OB-14, D-12) ----------------------------------------------------------------------
 
 

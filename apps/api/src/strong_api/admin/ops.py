@@ -38,7 +38,7 @@ from strong_api.admin.actions import ActionIn, AdminWrite, audit_action
 from strong_api.admin.deps import Admin
 from strong_api.admin.metrics import AdminMetric, not_measured
 from strong_api.auth.deps import DbSession
-from strong_api.billing.entitlements import as_utc
+from strong_api.billing.entitlements import as_utc, rebill_session_minutes
 from strong_api.devtools import LiteLLM, ModelUsage, fetch_model_usage
 from strong_api.gap.service import timed_out
 from strong_api.gap.settings import get_gap_settings
@@ -929,6 +929,9 @@ async def retry_job(
         raise HTTPException(status.HTTP_409_CONFLICT, "This session is already scored")
     if not _scoring_retryable(session, now, answered=await has_answers(db, session.id)):
         raise HTTPException(status.HTTP_409_CONFLICT, "This scoring is not failed or stuck")
+    # BL-4: the failed scoring refunded the minutes; the retry bills them again. If it fails
+    # again, the worker refunds them again. A stuck scoring was never refunded: no change.
+    rebilled = await rebill_session_minutes(db, session)
     audit_action(
         db,
         admin,
@@ -938,7 +941,7 @@ async def retry_job(
         reason=body.reason,
         before={"status": session.status.value},
         after={"status": SessionStatus.SCORING.value},
-        details={"kind": kind},
+        details={"kind": kind, "rebilled_minutes": rebilled},
     )
     arq_id = await start_scoring(db, queue, session)  # commits the audit row with the change
     await db.refresh(session)

@@ -6,7 +6,8 @@ The API (strong_api.scoring.start_scoring) sets the session to SCORING and enque
 - runs the scorer and stores one Scorecard row;
 - writes one ProgressSnapshot per competency, for Realistic sessions only (PR-1). A 10-minute
   mini interview gets a debrief but no snapshots: 3 questions are a practice signal, not a trend;
-- sets the session to COMPLETED, or FAILED with a reason when scoring is not possible;
+- sets the session to COMPLETED, or FAILED with a reason when scoring is not possible. A failed
+  scoring gives the session's minutes back (BL-4, strong_worker.scoring.refund);
 - then, as a separate step, matches each answer to the user's stories (ST-6, ST-7,
   strong_worker.scoring.stories). That step never changes or fails the stored scorecard.
 
@@ -41,6 +42,7 @@ from strong_core.sim import gateway_for_org
 from strong_worker.ops.context import job_context
 from strong_worker.pause import wait_if_paused
 from strong_worker.scoring.delivery import with_delivery
+from strong_worker.scoring.refund import refund_session_minutes
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
 from strong_worker.scoring.stories import run_story_step
 from strong_worker.suggestions.after_take import run_suggestion_step
@@ -198,9 +200,10 @@ async def _score(
 
 async def _fail(db: AsyncSession, session: InterviewSession, reason: str) -> dict[str, Any]:
     session.status = SessionStatus.FAILED
+    refunded = await refund_session_minutes(db, session)  # BL-4: the debrief promises it
     await db.commit()
     log.warning("session %s not scored: %s", session.id, reason)
-    return {"outcome": "failed", "reason": reason}
+    return {"outcome": "failed", "reason": reason, "refunded_minutes": refunded}
 
 
 FUNCTIONS = [score_session]
