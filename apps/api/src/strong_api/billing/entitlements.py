@@ -287,3 +287,27 @@ async def record_session_minutes(
     assert sub is not None
     sub.minutes_used = (sub.minutes_used or 0) + delta
     return delta
+
+
+async def rebill_session_minutes(db: AsyncSession, session: InterviewSession) -> int:
+    """BL-4: bill a session again when an admin retries its failed scoring.
+
+    A failed scoring gave the minutes back (strong_worker.scoring.refund): minutes_billed is 0
+    and, if the session started in the current period, they came off minutes_used. This undoes
+    exactly that: it sets minutes_billed again and adds the minutes to the paid plan only when
+    the session started in the current period. If the retry fails as well, the worker refunds
+    again. Safe to call more than once. The caller commits. Returns the minutes added to the plan.
+    """
+    minutes = session_minutes(session)
+    delta = minutes - (session.minutes_billed or 0)
+    session.minutes_billed = minutes
+    sub = await get_subscription(db, session.org_id)
+    if delta <= 0 or not is_paid(sub):
+        return 0
+    assert sub is not None
+    period_start = as_utc(sub.period_start)
+    started = as_utc(session.started_at)
+    if period_start is not None and started is not None and started < period_start:
+        return 0
+    sub.minutes_used = (sub.minutes_used or 0) + delta
+    return delta
