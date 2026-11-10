@@ -391,6 +391,20 @@
       "default": null,
       "title": "Action"
     },
+    "archived_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "CS-13: when it was archived; null when not archived.",
+      "title": "Archived At"
+    },
     "context": {
       "anyOf": [
         {
@@ -407,6 +421,20 @@
       "format": "date-time",
       "title": "Created At",
       "type": "string"
+    },
+    "deleted_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "CS-15: when it was deleted; restorable for 30 days.",
+      "title": "Deleted At"
     },
     "id": {
       "format": "uuid",

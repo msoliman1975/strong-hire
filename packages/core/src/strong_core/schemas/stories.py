@@ -439,6 +439,12 @@ class Story(Contract):
     outline: StoryOutline | None = Field(
         default=None, description="SC-2: the outline of a styled story; null when classic."
     )
+    archived_at: datetime | None = Field(
+        default=None, description="CS-13: when it was archived; null when not archived."
+    )
+    deleted_at: datetime | None = Field(
+        default=None, description="CS-15: when it was deleted; restorable for 30 days."
+    )
     created_at: datetime
     updated_at: datetime
 

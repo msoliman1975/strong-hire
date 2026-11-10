@@ -19,6 +19,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
+    ColumnElement,
     Date,
     DateTime,
     Double,
@@ -31,6 +32,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    and_,
     func,
     text,
 )
@@ -664,6 +666,7 @@ TRACE_RETENTION_DAYS = 90  # a worker cron job deletes older interviewer traces 
 OPS_SAMPLE_RETENTION_DAYS = 30  # OB-5: older ops_samples rows are deleted daily
 ERROR_EVENT_RETENTION_DAYS = 30  # OB-4: older error_events rows go; error_groups stay
 VOICE_TIMING_RETENTION_DAYS = 90  # OB-3: like traces
+STORY_RESTORE_DAYS = 30  # CS-15, CS-16: a deleted story is restorable this long, then purged
 
 
 class InterviewerTrace(Base):
@@ -1277,10 +1280,30 @@ class Story(Base):
     hints_json: Mapped[list[Any] | None] = mapped_column(
         comment="SC-8: skill hints (schemas.SkillHint) with their state"
     )
+    archived_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="CS-13: archived; left out of coverage, story-fit and Strova's picks (CS-14)",
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        index=True,
+        comment="CS-15: soft delete; restorable for 30 days, then purged (CS-16)",
+    )
     created_at: Mapped[datetime] = _created_at()
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
+
+    @classmethod
+    def live(cls) -> ColumnElement[bool]:
+        """CS-15: not deleted. Use in every query that shows or reads a user's stories."""
+        return cls.deleted_at.is_(None)
+
+    @classmethod
+    def in_prep(cls) -> ColumnElement[bool]:
+        """CS-14: not deleted and not archived: the stories coverage, story-fit, Ask Strova,
+        the coach and new suggestions use."""
+        return and_(cls.deleted_at.is_(None), cls.archived_at.is_(None))
 
 
 class CoachSession(Base):
