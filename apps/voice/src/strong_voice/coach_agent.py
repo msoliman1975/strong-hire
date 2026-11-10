@@ -32,12 +32,18 @@ from livekit.agents import Agent, AgentSession, JobContext, StopResponse, llm
 from livekit.agents.voice.room_io import RoomOptions
 
 from strong_core.db import get_sessionmaker
-from strong_core.gateway import make_db_usage_sink, set_usage_sink, usage_context
+from strong_core.gateway import get_gateway, make_db_usage_sink, set_usage_sink, usage_context
 from strong_core.ops.logs import log_context
 from strong_voice.coach import VoiceCoach, VoiceTake
 from strong_voice.coach_store import ApiCoach, coach_session_id_from_room, load_coach_session
 from strong_voice.interview_agent import COACH_TOPIC, SESSION_TOPIC, interviewer_attributes
 from strong_voice.plugins import GatewaySTT
+from strong_voice.radar import (
+    attach_radar,
+    gateway_complete,
+    get_radar_settings,
+    load_radar_stories,
+)
 from strong_voice.session_store import AgentApiSettings
 from strong_voice.settings import get_voice_settings
 from strong_voice.turns import CandidateTurns
@@ -143,6 +149,12 @@ async def run_coach(
         ctx.shutdown("coach session ended")
 
     agent = CoachAgent(coach, ended, publish)
+
+    # SR-1 spike: the story radar reads the captions in its own task, off the turn path.
+    if get_radar_settings().enabled:
+        stories = await load_radar_stories(get_sessionmaker(), session_id)
+        radar = attach_radar(agent_session, stories, gateway_complete(get_gateway()), publish)
+        ctx.add_shutdown_callback(radar.close)
 
     @agent_session.on("user_state_changed")
     def _on_user_state(event: Any) -> None:

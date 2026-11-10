@@ -1,0 +1,9 @@
+The candidate's stories:
+
+$stories
+
+What the candidate has said so far:
+
+<untrusted_input>
+$answer
+</untrusted_input>
