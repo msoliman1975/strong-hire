@@ -603,7 +603,7 @@ async def test_al2_stripe_silent_only_with_active_paid_subscriptions(
 
 async def test_al1_default_rules_seeded_once_and_edits_kept(sessionmaker: Maker) -> None:
     async with sessionmaker() as db:
-        assert await seed_default_rules(db) == len(DEFAULT_RULES) == 13
+        assert await seed_default_rules(db) == len(DEFAULT_RULES) == 14
     async with sessionmaker() as db:
         rule = await db.scalar(select(AlertRule).where(AlertRule.name == "Disk filling"))
         assert rule is not None and rule.threshold == 85 and rule.renotify_s == 24 * 3600
@@ -611,7 +611,7 @@ async def test_al1_default_rules_seeded_once_and_edits_kept(sessionmaker: Maker)
         await db.commit()
     await startup({"alerts": AlertsContext(sessionmaker=sessionmaker, sender=FakeSender())})
     async with sessionmaker() as db:
-        assert await db.scalar(select(func.count()).select_from(AlertRule)) == 13
+        assert await db.scalar(select(func.count()).select_from(AlertRule)) == 14
         rule = await db.scalar(select(AlertRule).where(AlertRule.name == "Disk filling"))
         assert rule is not None and rule.threshold == 70
         spend = await db.scalar(select(AlertRule).where(AlertRule.name == "Spend high"))
@@ -626,7 +626,7 @@ async def test_al1_default_rules_evaluate_without_errors(
     async with sessionmaker() as db:
         await seed_default_rules(db)
     result = await tick(sessionmaker, sender, 0)
-    assert result.errors == [] and result.evaluated == 13
+    assert result.errors == [] and result.evaluated == 14
 
 
 def test_al2_cron_runs_every_minute() -> None:

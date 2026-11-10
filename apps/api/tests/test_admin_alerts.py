@@ -184,7 +184,7 @@ async def test_al1_default_rules_cannot_be_deleted_or_renamed(
     async with sessionmaker() as db:
         await seed_default_rules(db)
     rules = (await admin.get("/admin/alerts/rules")).json()
-    assert len(rules) == 13 and all(r["is_default"] for r in rules)
+    assert len(rules) == 14 and all(r["is_default"] for r in rules)
     disk = next(r for r in rules if r["name"] == "Disk filling")
     url = f"/admin/alerts/rules/{disk['id']}"
     r = await admin.request("DELETE", url, json={"reason": "do not need"}, headers=H)
