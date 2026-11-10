@@ -1,6 +1,6 @@
 /**
  * Account page against the mocks of the real P9 endpoints. Requirement IDs: AC-2 (consent toggle),
- * AC-1 (export and delete), BL-1 (plan, minutes and cancellation with the exit survey).
+ * AC-1 (export and delete), LT-20 and LT-24 (tracing consent), BL-1 (plan, minutes and cancellation with the exit survey).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -9,10 +9,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
-import {
-  CONSENT_LABEL,
-  TRACING_CONSENT_LABEL,
-} from "../components/ConsentSwitch";
+import { CONSENT_LABEL, TRACING_CONSENT_LABEL } from "../components/ConsentSwitch";
 import { refreshUsage } from "../mocks/handlers";
 import { mockStore, server } from "../mocks/node";
 
@@ -61,42 +58,24 @@ function renderAccount() {
 describe("account page", () => {
   it("BL-2: a free user sees the free interviews left from the API", async () => {
     signedIn();
-    mockStore.db.usage = refreshUsage({
-      ...mockStore.db.usage,
-      free_interviews_total: 2,
-      free_interviews_left: 2,
-    });
+    mockStore.db.usage = refreshUsage({ ...mockStore.db.usage, free_interviews_total: 2, free_interviews_left: 2 });
     renderAccount();
-    expect(
-      await screen.findByText(/Free plan\. 2 of 2 free mini interviews left\./),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "See the monthly plan" }),
-    ).toHaveAttribute("href", "/upgrade");
-    expect(
-      screen.queryByRole("button", { name: "Cancel plan" }),
-    ).not.toBeInTheDocument();
+    expect(await screen.findByText(/Free plan\. 2 of 2 free mini interviews left\./)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "See the monthly plan" })).toHaveAttribute("href", "/upgrade");
+    expect(screen.queryByRole("button", { name: "Cancel plan" })).not.toBeInTheDocument();
   });
 
   it("BL-1: a paid user sees minutes and the renewal date, and cancels with the exit survey", async () => {
     signedIn();
     paid(120);
     const user = renderAccount();
-    expect(
-      await screen.findByText("120 of 300 used, 180 left"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("120 of 300 used, 180 left")).toBeInTheDocument();
     expect(screen.getByText("Renews on")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Cancel plan" }));
-    expect(
-      screen.getByRole("heading", { name: "Before you go" }),
-    ).toBeInTheDocument();
-    await user.click(
-      screen.getByRole("button", { name: "Continue to cancel" }),
-    );
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Answer both questions, or skip the survey.",
-    );
+    expect(screen.getByRole("heading", { name: "Before you go" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Continue to cancel" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("Answer both questions, or skip the survey.");
     expect(mockStore.db.exitSurveys).toEqual([]);
 
     const sent: string[] = [];
@@ -105,35 +84,23 @@ describe("account page", () => {
     });
     await user.click(screen.getByRole("radio", { name: "I got the job" }));
     await user.click(screen.getByRole("radio", { name: "Yes" }));
-    await user.type(
-      screen.getByLabelText("Anything else? (optional)"),
-      "Thank you",
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Continue to cancel" }),
-    );
+    await user.type(screen.getByLabelText("Anything else? (optional)"), "Thank you");
+    await user.click(screen.getByRole("button", { name: "Continue to cancel" }));
 
-    await waitFor(() =>
-      expect(mockStore.db.usage.cancel_at_period_end).toBe(true),
-    );
+    await waitFor(() => expect(mockStore.db.usage.cancel_at_period_end).toBe(true));
     expect(mockStore.db.exitSurveys).toEqual([
       { reason: "got_the_job", got_job: "yes", reason_detail: "Thank you" },
     ]);
     // The survey is saved first, then the portal opens at the cancellation step.
     expect(sent.filter((r) => r.includes("/billing/"))).toEqual(
-      expect.arrayContaining([
-        "POST /api/billing/exit-survey",
-        "POST /api/billing/portal",
-      ]),
+      expect.arrayContaining(["POST /api/billing/exit-survey", "POST /api/billing/portal"]),
     );
   });
 
   it("AC-1: export becomes a one-time download link", async () => {
     signedIn();
     const user = renderAccount();
-    await user.click(
-      await screen.findByRole("button", { name: "Prepare export" }),
-    );
+    await user.click(await screen.findByRole("button", { name: "Prepare export" }));
     const link = await screen.findByRole("link", { name: "Download export" });
     expect(link).toHaveAttribute("download", "strong-hire-export.zip");
   });
@@ -141,38 +108,22 @@ describe("account page", () => {
   it("LT-20: the tracing consent is hidden until the server offers it", async () => {
     signedIn();
     renderAccount();
-    expect(
-      await screen.findByRole("switch", { name: CONSENT_LABEL }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("switch", { name: TRACING_CONSENT_LABEL }),
-    ).not.toBeInTheDocument();
+    expect(await screen.findByRole("switch", { name: CONSENT_LABEL })).toBeInTheDocument();
+    expect(screen.queryByRole("switch", { name: TRACING_CONSENT_LABEL })).not.toBeInTheDocument();
   });
 
   it("LT-20, LT-24: the tracing consent is off by default and saves both ways", async () => {
     signedIn();
     mockStore.db.users["ana@example.com"].tracing_consent_available = true;
     const user = renderAccount();
-    const toggle = await screen.findByRole("switch", {
-      name: TRACING_CONSENT_LABEL,
-    });
+    const toggle = await screen.findByRole("switch", { name: TRACING_CONSENT_LABEL });
     expect(toggle).toHaveAttribute("aria-checked", "false");
     await user.click(toggle);
-    await waitFor(() =>
-      expect(mockStore.db.users["ana@example.com"].tracing_consent).toBe(true),
-    );
-    expect(
-      await screen.findByText(/from your next answer/),
-    ).toBeInTheDocument();
-    await user.click(
-      screen.getByRole("switch", { name: TRACING_CONSENT_LABEL }),
-    );
-    await waitFor(() =>
-      expect(mockStore.db.users["ana@example.com"].tracing_consent).toBe(false),
-    );
-    expect(
-      await screen.findByText(/deleted within 24 hours/),
-    ).toBeInTheDocument();
+    await waitFor(() => expect(mockStore.db.users["ana@example.com"].tracing_consent).toBe(true));
+    expect(await screen.findByText(/from your next answer/)).toBeInTheDocument();
+    await user.click(screen.getByRole("switch", { name: TRACING_CONSENT_LABEL }));
+    await waitFor(() => expect(mockStore.db.users["ana@example.com"].tracing_consent).toBe(false));
+    expect(await screen.findByText(/deleted within 24 hours/)).toBeInTheDocument();
   });
 
   it("AC-2: the consent switch saves the new value", async () => {
@@ -181,9 +132,7 @@ describe("account page", () => {
     const toggle = await screen.findByRole("switch", { name: CONSENT_LABEL });
     expect(toggle).toHaveAttribute("aria-checked", "false");
     await user.click(toggle);
-    expect(
-      await screen.findByText("Saved. Training-data use is on."),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Saved. Training-data use is on.")).toBeInTheDocument();
     expect(mockStore.db.users["ana@example.com"].training_consent).toBe(true);
   });
 });

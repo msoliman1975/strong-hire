@@ -222,7 +222,7 @@ async def reminder_for(db: AsyncSession, user: User, today: date) -> Reminder | 
         s
         for s in await db.scalars(
             select(StoryRow)
-            .where(StoryRow.org_id == user.org_id, StoryRow.user_id == user.id)
+            .where(StoryRow.org_id == user.org_id, StoryRow.user_id == user.id, StoryRow.in_prep())
             .order_by(StoryRow.created_at, StoryRow.id)
         )
         if 0 < sum(bool((getattr(s, p) or "").strip()) for p in PARTS) < len(PARTS)

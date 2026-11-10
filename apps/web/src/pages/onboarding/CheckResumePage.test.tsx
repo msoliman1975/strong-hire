@@ -33,9 +33,7 @@ function signedIn(email = "ana@example.com") {
 
 async function seed() {
   signedIn();
-  const { job_target: job } = await jobTargetsApi.create({
-    text: "Senior engineer, payments. ".repeat(5),
-  });
+  const { job_target: job } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
   await jobTargetsApi.get(job.id);
   const form = new FormData();
   form.append("text", "Backend engineer, seven years of Python.");
@@ -48,9 +46,7 @@ function renderCheck(jobId: string, resumeId: string) {
   const user = userEvent.setup();
   render(
     <QueryClientProvider client={createQueryClient()}>
-      <MemoryRouter
-        initialEntries={[`/jobs/${jobId}/resume/${resumeId}/check`]}
-      >
+      <MemoryRouter initialEntries={[`/jobs/${jobId}/resume/${resumeId}/check`]}>
         <AppRoutes />
       </MemoryRouter>
     </QueryClientProvider>,
@@ -61,10 +57,7 @@ function renderCheck(jobId: string, resumeId: string) {
 function recordPutBodies(): { resume: Resume }[] {
   const bodies: { resume: Resume }[] = [];
   server.events.on("request:start", async ({ request }) => {
-    if (
-      request.method === "PUT" &&
-      /\/api\/resumes\/[^/]+$/.test(request.url)
-    ) {
+    if (request.method === "PUT" && /\/api\/resumes\/[^/]+$/.test(request.url)) {
       bodies.push((await request.clone().json()) as { resume: Resume });
     }
   });
@@ -79,9 +72,7 @@ describe("validateResumeDraft", () => {
     draft.skills = "Python, Go, , Python";
     const { errors, resume } = validateResumeDraft(draft, fixtureResume);
     expect(errors).toEqual({});
-    expect(resume?.roles[0].achievements).toEqual(
-      fixtureResume.roles[0].achievements,
-    );
+    expect(resume?.roles[0].achievements).toEqual(fixtureResume.roles[0].achievements);
     expect(resume?.roles[0].end).toBeNull();
     expect(resume?.skills).toEqual(["Python", "Go"]);
     expect(resume?.summary).toBe(fixtureResume.summary);
@@ -98,12 +89,7 @@ describe("validateResumeDraft", () => {
     draft.roles[1].end = "2019-12";
     const { errors, resume } = validateResumeDraft(draft, fixtureResume);
     expect(resume).toBeNull();
-    expect(Object.keys(errors).sort()).toEqual([
-      "role-0-company",
-      "role-0-start",
-      "role-0-title",
-      "role-1-end",
-    ]);
+    expect(Object.keys(errors).sort()).toEqual(["role-0-company", "role-0-start", "role-0-title", "role-1-end"]);
   });
 
   it("accepts a year alone and rejects month 13", () => {
@@ -111,9 +97,7 @@ describe("validateResumeDraft", () => {
     draft.roles[0].start = "2021";
     expect(validateResumeDraft(draft, fixtureResume).errors).toEqual({});
     draft.roles[0].start = "2021-13";
-    expect(validateResumeDraft(draft, fixtureResume).errors).toHaveProperty(
-      "role-0-start",
-    );
+    expect(validateResumeDraft(draft, fixtureResume).errors).toHaveProperty("role-0-start");
   });
 });
 
@@ -122,12 +106,8 @@ describe("Check your CV page", () => {
     const { job, resume } = await seed();
     const puts = recordPutBodies();
     const user = renderCheck(job.id, resume.id);
-    expect(
-      await screen.findByRole("heading", { name: "Check your CV" }),
-    ).toBeInTheDocument();
-    const first = await screen.findByRole("group", {
-      name: "Software Engineer II at Shoply",
-    });
+    expect(await screen.findByRole("heading", { name: "Check your CV" })).toBeInTheDocument();
+    const first = await screen.findByRole("group", { name: "Software Engineer II at Shoply" });
     expect(within(first).getByLabelText("Company")).toHaveValue("Shoply");
 
     // The second achievement at Shoply belongs to Invoicely.
@@ -137,32 +117,18 @@ describe("Check your CV page", () => {
       }),
       "Software Engineer at Invoicely",
     );
-    const second = screen.getByRole("group", {
-      name: "Software Engineer at Invoicely",
-    });
-    expect(
-      within(second).getAllByRole("textbox", { name: /^Achievement \d/ }),
-    ).toHaveLength(2);
+    const second = screen.getByRole("group", { name: "Software Engineer at Invoicely" });
+    expect(within(second).getAllByRole("textbox", { name: /^Achievement \d/ })).toHaveLength(2);
     await user.click(
-      within(second).getByRole("button", {
-        name: "Remove achievement 1 at Software Engineer at Invoicely",
-      }),
+      within(second).getByRole("button", { name: "Remove achievement 1 at Software Engineer at Invoicely" }),
     );
-    await user.click(
-      screen.getByRole("button", { name: "Confirm and continue" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Confirm and continue" }));
 
-    expect(
-      await screen.findByRole("heading", { name: "Add context (optional)" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Add context (optional)" })).toBeInTheDocument();
     expect(puts).toHaveLength(1);
     const sent = puts[0].resume;
-    expect(sent.roles[0].achievements).toEqual([
-      "Built the refunds API used by 40,000 merchants",
-    ]);
-    expect(sent.roles[1].achievements).toEqual([
-      "Led migration of 30 services to PostgreSQL 15 with zero downtime",
-    ]);
+    expect(sent.roles[0].achievements).toEqual(["Built the refunds API used by 40,000 merchants"]);
+    expect(sent.roles[1].achievements).toEqual(["Led migration of 30 services to PostgreSQL 15 with zero downtime"]);
     expect(sent.education).toEqual(fixtureResume.education);
     expect(mockStore.db.resumes[0].confirmed_at).not.toBeNull();
   });
@@ -173,48 +139,22 @@ describe("Check your CV page", () => {
     const user = renderCheck(job.id, resume.id);
     await screen.findByRole("heading", { name: "Check your CV" });
     await user.click(await screen.findByRole("button", { name: "Add a job" }));
-    await user.click(
-      screen.getByRole("button", { name: "Confirm and continue" }),
-    );
-    expect(
-      await screen.findByText("Fix the fields marked in red, then confirm."),
-    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Confirm and continue" }));
+    expect(await screen.findByText("Fix the fields marked in red, then confirm.")).toBeInTheDocument();
     expect(screen.getByText("Enter the company.")).toBeInTheDocument();
     expect(puts).toHaveLength(0);
 
     const added = screen.getByRole("group", { name: "Job 3" });
     await user.type(within(added).getByLabelText("Company"), "Northwind Labs");
     await user.type(within(added).getByLabelText("Job title"), "Intern");
-    await user.type(
-      within(added).getByLabelText("Start (YYYY or YYYY-MM)"),
-      "2017-06",
-    );
-    await user.type(
-      within(added).getByLabelText("End (YYYY or YYYY-MM, empty if current)"),
-      "2017-09",
-    );
-    await user.click(
-      screen.getByRole("button", {
-        name: "Remove the job Software Engineer at Invoicely",
-      }),
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Confirm and continue" }),
-    );
+    await user.type(within(added).getByLabelText("Start (YYYY or YYYY-MM)"), "2017-06");
+    await user.type(within(added).getByLabelText("End (YYYY or YYYY-MM, empty if current)"), "2017-09");
+    await user.click(screen.getByRole("button", { name: "Remove the job Software Engineer at Invoicely" }));
+    await user.click(screen.getByRole("button", { name: "Confirm and continue" }));
 
-    expect(
-      await screen.findByRole("heading", { name: "Add context (optional)" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Add context (optional)" })).toBeInTheDocument();
     const sent = puts[0].resume;
-    expect(sent.roles.map((r) => r.company)).toEqual([
-      "Shoply",
-      "Northwind Labs",
-    ]);
-    expect(sent.roles[1]).toMatchObject({
-      title: "Intern",
-      start: "2017-06",
-      end: "2017-09",
-      achievements: [],
-    });
+    expect(sent.roles.map((r) => r.company)).toEqual(["Shoply", "Northwind Labs"]);
+    expect(sent.roles[1]).toMatchObject({ title: "Intern", start: "2017-06", end: "2017-09", achievements: [] });
   });
 });

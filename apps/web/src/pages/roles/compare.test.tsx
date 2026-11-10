@@ -40,11 +40,7 @@ beforeEach(() => {
     tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email: EMAIL, userEmail: EMAIL };
-  mockStore.db.profiles[EMAIL] = {
-    ...EMPTY_PROFILE,
-    plan_style: "weekly",
-    target_level: "senior",
-  };
+  mockStore.db.profiles[EMAIL] = { ...EMPTY_PROFILE, plan_style: "weekly", target_level: "senior" };
   setFeatureOverrides({ v2_enabled: true });
 });
 afterEach(() => setFeatureOverrides({}));
@@ -72,19 +68,13 @@ async function addResume(text: string) {
 }
 
 async function toInterviewsStep(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(
-    await screen.findByRole("button", { name: "paste the text" }),
-  );
+  await user.click(await screen.findByRole("button", { name: "paste the text" }));
   await user.click(screen.getByRole("textbox", { name: "Job posting text" }));
   await user.paste("Senior engineer, payments. ".repeat(10));
   await user.click(screen.getByRole("button", { name: "Read the posting" }));
   await screen.findByRole("textbox", { name: "Company" }, { timeout: 4000 });
   await user.click(screen.getByRole("button", { name: "Looks right" }));
-  await screen.findByRole(
-    "checkbox",
-    { name: /Behavioral/ },
-    { timeout: 4000 },
-  );
+  await screen.findByRole("checkbox", { name: /Behavioral/ }, { timeout: 4000 });
 }
 
 describe("resume comparison", () => {
@@ -92,77 +82,41 @@ describe("resume comparison", () => {
     await addResume("Backend engineer, Python and Go.");
     const user = renderApp("/roles/new");
     await toInterviewsStep(user);
-    expect(
-      screen.queryByRole("button", { name: "Compare my resumes" }),
-    ).toBeNull();
+    expect(screen.queryByRole("button", { name: "Compare my resumes" })).toBeNull();
   });
 
   it("RC-1, RC-3, RC-6: on Add a target role, compare, then Use this one picks the resume the role is created with", async () => {
-    const main = await addResume(
-      "Backend engineer, Python and Go. Led the move to PostgreSQL.",
-    );
-    const other = await addResume(
-      "Platform engineer, Kafka and Go. Ran the event pipeline.",
-    );
+    const main = await addResume("Backend engineer, Python and Go. Led the move to PostgreSQL.");
+    const other = await addResume("Platform engineer, Kafka and Go. Ran the event pipeline.");
     const user = renderApp("/roles/new");
     await toInterviewsStep(user);
-    expect(screen.getByText(/Measured against:/)).toHaveTextContent(
-      main.name ?? "",
-    );
+    expect(screen.getByText(/Measured against:/)).toHaveTextContent(main.name ?? "");
     // Nothing runs until the user asks (RC-1).
-    await user.click(
-      screen.getByRole("button", { name: "Compare my resumes" }),
-    );
-    const panel = screen.getByRole("region", {
-      name: "Which resume fits this role best",
-    });
-    await user.click(
-      within(panel).getByRole("button", { name: "Compare my resumes" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Compare my resumes" }));
+    const panel = screen.getByRole("region", { name: "Which resume fits this role best" });
+    await user.click(within(panel).getByRole("button", { name: "Compare my resumes" }));
     // RC-3: the pick and its reason, from the data.
-    expect(
-      await within(panel).findByTestId("comparison-reason"),
-    ).toHaveTextContent(`${other.name} fits best`);
+    expect(await within(panel).findByTestId("comparison-reason")).toHaveTextContent(`${other.name} fits best`);
     const rows = within(panel).getAllByTestId("compared-resume");
     expect(rows[0]).toHaveTextContent("Best fit");
     expect(rows[0]).toHaveTextContent(other.name ?? "");
     expect(rows[1]).toHaveTextContent("In use");
     // RC-6: nothing switched yet; the user's click does it.
-    expect(screen.getByText(/Measured against:/)).toHaveTextContent(
-      main.name ?? "",
-    );
-    await user.click(
-      within(rows[0]).getByRole("button", { name: "Use this one" }),
-    );
-    expect(screen.getByText(/Measured against:/)).toHaveTextContent(
-      other.name ?? "",
-    );
+    expect(screen.getByText(/Measured against:/)).toHaveTextContent(main.name ?? "");
+    await user.click(within(rows[0]).getByRole("button", { name: "Use this one" }));
+    expect(screen.getByText(/Measured against:/)).toHaveTextContent(other.name ?? "");
     await user.click(screen.getByRole("button", { name: "Create the role" }));
-    await waitFor(
-      () =>
-        expect(screen.getByTestId("where").textContent).toMatch(
-          /^\/roles\/(?!new$)[^/]+$/,
-        ),
-      {
-        timeout: 4000,
-      },
-    );
-    const resumesUsed = new Set(
-      (mockStore.db.interviews ?? []).map((i) => i.resume_id),
-    );
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/(?!new$)[^/]+$/), {
+      timeout: 4000,
+    });
+    const resumesUsed = new Set((mockStore.db.interviews ?? []).map((i) => i.resume_id));
     expect(resumesUsed).toEqual(new Set([other.id]));
   });
 
   it("RC-4, RC-5, RC-6, RC-8: the role page compares on demand, adds a covered line, offers a story for the rest and moves the role", async () => {
-    const main = await addResume(
-      "Backend engineer, Python and Go. Led the move to PostgreSQL.",
-    );
-    const other = await addResume(
-      "Platform engineer, Kafka and Go. Ran the event pipeline.",
-    );
-    const { job_target: created } = await jobTargetsApi.create({
-      text: "Senior engineer, payments. ".repeat(5),
-    });
+    const main = await addResume("Backend engineer, Python and Go. Led the move to PostgreSQL.");
+    const other = await addResume("Platform engineer, Kafka and Go. Ran the event pipeline.");
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
     const job = await jobTargetsApi.get(created.id);
     await fetch(`${location.origin}/api/roles/${job.id}/interviews`, {
       method: "POST",
@@ -172,142 +126,84 @@ describe("resume comparison", () => {
     const user = renderApp(`/roles/${job.id}`);
     const card = await screen.findByTestId("compare-resumes");
     expect(card).toHaveTextContent("Compare your resumes for this role");
-    await user.click(
-      within(card).getByRole("button", { name: "Compare my resumes" }),
-    );
-    await user.click(
-      await within(card).findByRole("button", { name: "Compare my resumes" }),
-    );
+    await user.click(within(card).getByRole("button", { name: "Compare my resumes" }));
+    await user.click(await within(card).findByRole("button", { name: "Compare my resumes" }));
     // RC-8: saved on the role, summarized in one line.
     await waitFor(() => expect(card).toHaveTextContent(`Compared 2 resumes`));
     expect(card).toHaveTextContent(`${other.name} fit best`);
 
     // RC-4: the gap the main resume covers names it and its line; Add to resume copies it.
     const gaps = within(card).getAllByTestId("comparison-gap");
-    const covered = gaps.find((g) =>
-      g.textContent?.includes("Kafka is not shown"),
-    ) as HTMLElement;
+    const covered = gaps.find((g) => g.textContent?.includes("Kafka is not shown")) as HTMLElement;
     expect(covered).toHaveTextContent(`${main.name} shows this: “Kafka”`);
     expect(covered).not.toHaveTextContent("Your ");
-    await user.click(
-      within(covered).getByRole("button", { name: "Add to resume" }),
-    );
-    await waitFor(() =>
-      expect(covered).toHaveTextContent(`Added to ${other.name}`),
-    );
-    expect(
-      within(covered).queryByRole("button", { name: "Add to resume" }),
-    ).toBeNull();
+    await user.click(within(covered).getByRole("button", { name: "Add to resume" }));
+    await waitFor(() => expect(covered).toHaveTextContent(`Added to ${other.name}`));
+    expect(within(covered).queryByRole("button", { name: "Add to resume" })).toBeNull();
 
     // RC-5: a gap no resume covers opens a coach session for the role with the gap.
-    const uncovered = gaps.find((g) =>
-      g.textContent?.includes("No payments experience"),
-    ) as HTMLElement;
+    const uncovered = gaps.find((g) => g.textContent?.includes("No payments experience")) as HTMLElement;
     expect(uncovered).toHaveTextContent("None of your resumes shows this.");
-    const craft = within(uncovered).getByRole("link", {
-      name: "Craft a story",
-    });
+    const craft = within(uncovered).getByRole("link", { name: "Craft a story" });
     const href = new URL(craft.getAttribute("href") ?? "", "http://x");
     expect(href.pathname).toBe("/coach/new");
     expect(href.searchParams.get("job")).toBe(job.id);
-    expect(href.searchParams.get("ask")).toContain(
-      "Payments or financial systems",
-    );
+    expect(href.searchParams.get("ask")).toContain("Payments or financial systems");
 
     // RC-6: Use this one moves the role to the recommended resume.
     const best = within(card).getAllByTestId("compared-resume")[0];
-    await user.click(
-      within(best).getByRole("button", { name: "Use this one" }),
-    );
-    await waitFor(() =>
-      expect(
-        within(card).getAllByTestId("compared-resume")[0],
-      ).toHaveTextContent("In use"),
-    );
+    await user.click(within(best).getByRole("button", { name: "Use this one" }));
+    await waitFor(() => expect(within(card).getAllByTestId("compared-resume")[0]).toHaveTextContent("In use"));
   });
 
   it("RC-4: Dismiss hides a covered hint", async () => {
     await addResume("Backend engineer, Python and Go.");
     await addResume("Platform engineer, Kafka and Go.");
-    const { job_target: created } = await jobTargetsApi.create({
-      text: "Senior engineer, payments. ".repeat(5),
-    });
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
     const user = renderApp(`/roles/${created.id}`);
     const card = await screen.findByTestId("compare-resumes");
-    await user.click(
-      within(card).getByRole("button", { name: "Compare my resumes" }),
-    );
-    await user.click(
-      await within(card).findByRole("button", { name: "Compare my resumes" }),
-    );
+    await user.click(within(card).getByRole("button", { name: "Compare my resumes" }));
+    await user.click(await within(card).findByRole("button", { name: "Compare my resumes" }));
     await within(card).findByTestId("comparison-reason");
     expect(within(card).getAllByTestId("comparison-gap")).toHaveLength(2);
     await user.click(within(card).getByRole("button", { name: "Dismiss" }));
-    await waitFor(() =>
-      expect(within(card).getAllByTestId("comparison-gap")).toHaveLength(1),
-    );
+    await waitFor(() => expect(within(card).getAllByTestId("comparison-gap")).toHaveLength(1));
   });
 
   it("RC-4, RC-5: a line the resume already has is not offered again; a listed skill is not called missing", async () => {
     await addResume("Backend engineer, Python and Go.");
     await addResume("Platform engineer, Kafka and Go.");
-    const { job_target: created } = await jobTargetsApi.create({
-      text: "Senior engineer, payments. ".repeat(5),
-    });
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
     await compareApi.start(created.id);
     patchMockComparison(created.id, (c) => ({
       ...c,
       gaps: [
-        {
-          ...c.gaps[0],
-          source: c.gaps[0].source && {
-            ...c.gaps[0].source,
-            can_add: false,
-            in_resume: true,
-          },
-        },
+        { ...c.gaps[0], source: c.gaps[0].source && { ...c.gaps[0].source, can_add: false, in_resume: true } },
         { ...c.gaps[1], listed_in: ["Platform resume", "Payments resume"] },
       ],
     }));
     const user = renderApp(`/roles/${created.id}`);
     const card = await screen.findByTestId("compare-resumes");
     await user.click(await within(card).findByRole("button", { name: "Open" }));
-    const [present, listed] =
-      await within(card).findAllByTestId("comparison-gap");
+    const [present, listed] = await within(card).findAllByTestId("comparison-gap");
     expect(present).toHaveTextContent("already has this line.");
-    expect(
-      within(present).queryByRole("button", { name: "Add to resume" }),
-    ).toBeNull();
+    expect(within(present).queryByRole("button", { name: "Add to resume" })).toBeNull();
     expect(present).not.toHaveTextContent("Add it by hand");
-    expect(
-      within(present).getByRole("button", { name: "Dismiss" }),
-    ).toBeInTheDocument();
-    expect(listed).toHaveTextContent(
-      "Platform resume and Payments resume list it, but no line shows it in use.",
-    );
+    expect(within(present).getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
+    expect(listed).toHaveTextContent("Platform resume and Payments resume list it, but no line shows it in use.");
     expect(listed).not.toHaveTextContent("None of your resumes");
-    expect(
-      within(listed).getByRole("link", { name: "Craft a story" }),
-    ).toBeInTheDocument();
+    expect(within(listed).getByRole("link", { name: "Craft a story" })).toBeInTheDocument();
   });
 
   it("RC-6: a role with no interviews yet shows the resume of its latest analysis, not the main one", async () => {
     await addResume("Backend engineer, Python and Go.");
     const other = await addResume("Platform engineer, Kafka and Go.");
-    const { job_target: created } = await jobTargetsApi.create({
-      text: "Senior engineer, payments. ".repeat(5),
-    });
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
     await jobTargetsApi.get(created.id);
     await gapApi.start(created.id, { resume_id: other.id });
     renderApp(`/roles/${created.id}`);
-    expect(
-      await screen.findByRole("heading", { level: 1 }),
-    ).toBeInTheDocument();
-    await waitFor(() =>
-      expect(
-        screen.getByText(`${other.name} ·`, { exact: false }),
-      ).toBeInTheDocument(),
-    );
+    expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(`${other.name} ·`, { exact: false })).toBeInTheDocument());
     expect(screen.queryByText(/Default resume ·/)).toBeNull();
   });
 });

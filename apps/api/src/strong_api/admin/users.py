@@ -65,6 +65,7 @@ from strong_api.billing.entitlements import (
 )
 from strong_api.billing.settings import BillingSettings
 from strong_api.billing.webhooks import REFUND_ACTION
+from strong_api.sessions.failure import answered_session_ids
 from strong_api.sessions.router import OPEN, _end, _runners
 from strong_core.db.models import (
     AuditLog,
@@ -341,7 +342,11 @@ async def _detail(db: AsyncSession, request: Request, user: User) -> AdminUserDe
         )
     ).all()
     costs = await _costs(db, [s.id for s, _ in session_rows])
-    sessions = [_session_out(s, user, card, costs[s.id]) for s, card in session_rows]
+    answered = await answered_session_ids(db, (s.id for s, _ in session_rows))
+    sessions = [
+        _session_out(s, user, card, costs[s.id], answered=s.id in answered)
+        for s, card in session_rows
+    ]
 
     # Only the columns we show are read: no posting text, resume content or gap results.
     targets = await db.execute(

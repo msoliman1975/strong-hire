@@ -10,6 +10,7 @@ import { parseStoredKey } from "../pages/onboarding/acceptedIssues";
 import { checkResume, thisMonth } from "../pages/onboarding/resumeChecks";
 import type { MockStore } from "./db";
 import { EMPTY_PROFILE } from "./handlers";
+import type { StoryRecommendations } from "../pages/stories/api";
 import { mockStoryLibrary } from "./storyHandlers";
 
 const API = "*/api";
@@ -50,8 +51,8 @@ export function resumeHandlers(store: MockStore) {
   const ideasFor = (r: ResumeOut): StoryIdeasOut => {
     const resume = r.resume;
     if (!resume) return { ideas: [], used: [], skills: "ready" };
-    const gone = new Set(dismissed()[r.id] ?? []);
-    const stories = mockStoryLibrary().map((s) => ({
+    const gone = new Set(Object.values(dismissed()).flat()); // CS-3: on every version
+    const stories = mockStoryLibrary().filter((s) => !s.deleted_at).map((s) => ({
       story: s,
       text: normalize([s.context, s.stakes, s.action, s.result, s.reflection].filter(Boolean).join(" ")),
     }));
@@ -113,6 +114,25 @@ export function resumeHandlers(store: MockStore) {
       if (!r) return notFound();
       if (!r.resume) return reading();
       return HttpResponse.json(ideasFor(r));
+    }),
+
+    // CS-1 to CS-4: ideas pooled across resumes (same text = same idea), newest resume first.
+    // CS-11: no job gaps in the mock; tests add them with server.use.
+    http.get(`${API}/stories/recommendations`, () => {
+      const ideas = new Map<string, StoryRecommendations["ideas"][number]>();
+      const resumes = store.db.resumes
+        .filter((r) => !r.deleted && r.resume)
+        .sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
+      for (const r of resumes) {
+        for (const idea of ideasFor(r).ideas) {
+          const key = normalize(idea.achievement);
+          const seen = ideas.get(key);
+          if (seen) seen.resumes += 1;
+          else ideas.set(key, { kind: "resume_idea", ...idea, resume_id: r.id, resumes: 1 });
+        }
+      }
+      const body: StoryRecommendations = { skills: [], ideas: [...ideas.values()] };
+      return HttpResponse.json(body);
     }),
 
     // RSD-16: every read resume's counts in one request, with the rules above.
