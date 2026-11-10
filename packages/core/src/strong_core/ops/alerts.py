@@ -110,6 +110,14 @@ _DERIVED = (
         derived=True,
         aggregation=AlertAggregation.COUNT,
     ),
+    MetricInfo(
+        "tracing.deletes_overdue",
+        "LLM trace deletions (account deleted or consent withdrawn) asked for over 12 hours ago "
+        "and not done (LT-26)",
+        "requests",
+        derived=True,
+        aggregation=AlertAggregation.COUNT,
+    ),
 )
 
 METRICS: dict[str, MetricInfo] = {m.name: m for m in (*_SAMPLED, *_DERIVED)}
@@ -202,6 +210,9 @@ DEFAULT_RULES: tuple[DefaultRule, ...] = (
                 renotify_s=None),
     DefaultRule("Stripe silent", "stripe.webhook_age_s", _A.LAST, 900, _C.GT, 48 * 3600,
                 _S.WARNING),
+    # LT-26: a user's traces must be gone within 24 h of their request; this leaves 12 h to act.
+    DefaultRule("Trace deletion overdue", "tracing.deletes_overdue", _A.COUNT, 900, _C.GT, 0,
+                _S.CRITICAL),
 )  # fmt: skip
 
 DEFAULT_RULE_NAMES = frozenset(r.name for r in DEFAULT_RULES)

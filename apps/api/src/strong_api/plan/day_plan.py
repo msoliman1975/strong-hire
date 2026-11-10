@@ -312,7 +312,8 @@ async def practiced_types(
 
 
 async def live_story_ids(db: AsyncSession, user_id: uuid.UUID) -> set[uuid.UUID]:
-    return set(await db.scalars(select(Story.id).where(Story.user_id == user_id)))
+    """CS-14: archived and deleted stories are not in prep."""
+    return set(await db.scalars(select(Story.id).where(Story.user_id == user_id, Story.in_prep())))
 
 
 @router.get(

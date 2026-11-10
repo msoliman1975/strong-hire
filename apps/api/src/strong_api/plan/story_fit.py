@@ -210,7 +210,9 @@ async def _view(db: Db, me: Me, queue: Queue, request: Request, target: JobTarge
     stories = {
         r.id: r
         for r in await db.scalars(
-            select(StoryRow).where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id)
+            select(StoryRow).where(
+                StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id, StoryRow.in_prep()
+            )
         )
     }
     items = {i.competency: i for i in cached.fit.items}

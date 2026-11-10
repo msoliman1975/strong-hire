@@ -92,6 +92,7 @@ Derived (computed by the engine):
 | `spend.today_usd` | last | model cost since UTC midnight |
 | `spend.cap_pct` | last | that cost as a % of the runtime setting `daily_spend_cap_usd` (D-6: $25) |
 | `errors.new_groups` | count | error groups first seen in the window |
+| `tracing.deletes_overdue` | count | LLM trace deletions (`tracing.delete_requested`) older than 12 hours without their `tracing.traces_deleted` (LT-26) |
 
 ## Default rules
 
@@ -114,6 +115,7 @@ but not renamed or deleted, so they are not seeded again.
 | Spend cap reached | `spend.cap_pct >= 100` | critical, 4 h |
 | New error | `errors.new_groups > 0` over 10 min | warning, never |
 | Stripe silent | `stripe.webhook_age_s > 172800` (48 h), only with active subscriptions | warning, 24 h |
+| Trace deletion overdue | `tracing.deletes_overdue > 0` (LT-26) | critical, 4 h |
 
 API down uses the API heartbeat, because the API writes it while it serves; the dependency probes
 do not include the API.

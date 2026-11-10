@@ -27,6 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from strong_core import runtime_settings as rs
 from strong_core.db.models import (
     AlertRule,
+    AuditLog,
     ErrorGroup,
     InterviewSession,
     OpsSample,
@@ -223,6 +224,37 @@ async def _new_error_groups(db: AsyncSession, rule: AlertRule, now: datetime) ->
     return Reading(float(n or 0), 1)
 
 
+TRACE_DELETE_OVERDUE_AFTER = timedelta(hours=12)
+TRACE_DELETE_LOOKBACK = timedelta(days=30)
+
+
+async def _trace_deletes_overdue(db: AsyncSession, rule: AlertRule, now: datetime) -> Reading:
+    """LT-26: trace deletion requests over 12 h old with no success for their request id.
+
+    Both are audit rows (they outlive the account). Requests older than 30 days are not counted:
+    by then the 30-day retention has removed content and the alert has been firing for weeks.
+    """
+    from strong_worker.account.jobs import TRACES_DELETED, TRACES_REQUESTED
+
+    rows = (
+        await db.execute(
+            select(AuditLog.action, AuditLog.details_json, AuditLog.at).where(
+                AuditLog.action.in_((TRACES_REQUESTED, TRACES_DELETED)),
+                AuditLog.at >= now - TRACE_DELETE_LOOKBACK,
+            )
+        )
+    ).all()
+    done = {(d or {}).get("request_id") for action, d, _ in rows if action == TRACES_DELETED}
+    overdue = [
+        d
+        for action, d, at in rows
+        if action == TRACES_REQUESTED
+        and as_utc(at) <= now - TRACE_DELETE_OVERDUE_AFTER
+        and (d or {}).get("request_id") not in done
+    ]
+    return Reading(float(len(overdue)), 1)
+
+
 DERIVED: dict[str, Derived] = {
     "sessions.failure_rate": _failure_rate,
     "voice.e2e_p95_ms": _e2e_p95,
@@ -230,6 +262,7 @@ DERIVED: dict[str, Derived] = {
     "spend.today_usd": _spend_today,
     "spend.cap_pct": _spend_cap_pct,
     "errors.new_groups": _new_error_groups,
+    "tracing.deletes_overdue": _trace_deletes_overdue,
 }
 assert set(DERIVED) == {m.name for m in METRICS.values() if m.derived}, "derived metrics differ"
 

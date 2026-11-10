@@ -172,7 +172,9 @@ async def _story(db: AsyncSession, session: CoachSession) -> StoryRow | None:
     if session.story_id is None:
         return None
     return await db.scalar(
-        select(StoryRow).where(StoryRow.id == session.story_id, StoryRow.org_id == session.org_id)
+        select(StoryRow).where(
+            StoryRow.id == session.story_id, StoryRow.org_id == session.org_id, StoryRow.live()
+        )
     )
 
 
@@ -221,7 +223,10 @@ async def _owned(
 async def _owned_story(db: AsyncSession, me: Me, story_id: uuid.UUID) -> StoryRow:
     story = await db.scalar(
         select(StoryRow).where(
-            StoryRow.id == story_id, StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id
+            StoryRow.id == story_id,
+            StoryRow.org_id == me.org_id,
+            StoryRow.user_id == me.user_id,
+            StoryRow.live(),
         )
     )
     if story is None:
