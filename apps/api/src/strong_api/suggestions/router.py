@@ -208,6 +208,7 @@ async def _story(db: Db, me: Me, story_id: uuid.UUID | None) -> StoryRow:
                 StoryRow.id == story_id,
                 StoryRow.org_id == me.org_id,
                 StoryRow.user_id == me.user_id,
+                StoryRow.live(),
             )
         )
     if row is None:

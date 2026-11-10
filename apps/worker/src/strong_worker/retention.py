@@ -6,6 +6,8 @@ Runs as an Arq cron job (strong_worker.main.WorkerSettings.cron_jobs) and delete
     voice_turn_timings    older than VOICE_TIMING_RETENTION_DAYS (90)
     ops_samples           older than OPS_SAMPLE_RETENTION_DAYS (30)
     error_events          older than ERROR_EVENT_RETENTION_DAYS (30); error_groups are kept
+    stories               deleted more than STORY_RESTORE_DAYS (30) ago (CS-16), with their
+                          takes and the suggestions about them (foreign keys cascade)
 
 Transcripts (turns) are kept.
 """
@@ -23,11 +25,13 @@ from strong_core.db import get_sessionmaker
 from strong_core.db.models import (
     ERROR_EVENT_RETENTION_DAYS,
     OPS_SAMPLE_RETENTION_DAYS,
+    STORY_RESTORE_DAYS,
     TRACE_RETENTION_DAYS,
     VOICE_TIMING_RETENTION_DAYS,
     ErrorEvent,
     InterviewerTrace,
     OpsSample,
+    Story,
     VoiceTurnTiming,
 )
 
@@ -102,7 +106,26 @@ async def delete_old_ops_rows(
     return out
 
 
+async def purge_deleted_stories(
+    maker: async_sessionmaker[AsyncSession],
+    *,
+    now: datetime | None = None,
+    days: int = STORY_RESTORE_DAYS,
+) -> int:
+    """CS-16: remove stories deleted more than `days` days before `now`; until then they can be
+    restored (CS-15). Returns the stories removed."""
+    cutoff = (now or datetime.now(UTC)) - timedelta(days=days)
+    purged = await delete_in_batches(maker, Story, Story.deleted_at, cutoff)
+    log.info("story purge: removed %d stories deleted before %s", purged, cutoff.isoformat())
+    return purged
+
+
 async def trace_retention(ctx: dict[str, Any]) -> dict[str, int]:
-    """The Arq cron job: traces (R2), then the ops tables (OB-3..OB-5)."""
+    """The Arq cron job: traces (R2), then the ops tables (OB-3..OB-5), then deleted stories
+    (CS-16)."""
     maker = ctx.get(CTX_KEY) or get_sessionmaker()
-    return {"deleted": await delete_old_traces(maker), **await delete_old_ops_rows(maker)}
+    return {
+        "deleted": await delete_old_traces(maker),
+        **await delete_old_ops_rows(maker),
+        "stories": await purge_deleted_stories(maker),
+    }
