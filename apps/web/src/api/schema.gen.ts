@@ -2482,6 +2482,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/tracing-consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Tracing Consent
+         * @description LT-20, LT-24: let the team review my interview turns, off by default (D-12).
+         *
+         *     404 while LLM_TRACING_PROD_CONTENT is off (gate 2). Turning it off stops content from the
+         *     next turn and queues deletion of the content already kept, within 24 hours.
+         */
+        put: operations["set_tracing_consent_account_tracing_consent_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/export": {
         parameters: {
             query?: never;
@@ -5510,6 +5533,18 @@ export interface components {
              * @default false
              */
             profile_complete: boolean;
+            /**
+             * Tracing Consent
+             * @description LT-20: the user lets the team review their interview turns.
+             * @default false
+             */
+            tracing_consent: boolean;
+            /**
+             * Tracing Consent Available
+             * @description LT-20: show the tracing consent toggle (LLM_TRACING_PROD_CONTENT is on).
+             * @default false
+             */
+            tracing_consent_available: boolean;
         };
         /**
          * AutoProfileStatus
@@ -12406,6 +12441,19 @@ export interface components {
          * @enum {string}
          */
         Tone: "as_company" | "warm" | "neutral" | "direct";
+        /**
+         * TracingConsentIn
+         * @description LT-20: let the team review this user's interview turns (D-12).
+         */
+        TracingConsentIn: {
+            /** Tracing Consent */
+            tracing_consent: boolean;
+        };
+        /** TracingConsentOut */
+        TracingConsentOut: {
+            /** Tracing Consent */
+            tracing_consent: boolean;
+        };
         /** Transcript */
         Transcript: {
             /**
@@ -17333,6 +17381,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConsentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_tracing_consent_account_tracing_consent_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TracingConsentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TracingConsentOut"];
                 };
             };
             /** @description Validation Error */

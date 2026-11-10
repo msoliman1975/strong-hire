@@ -15,6 +15,9 @@ export const accountApi = {
   /** AC-2. Each change is written to the audit log. */
   setConsent: async (trainingConsent: boolean) =>
     unwrap(await apiClient.PUT("/account/consent", { body: { training_consent: trainingConsent } })),
+  /** LT-20: offered only while the user's `tracing_consent_available` is true. */
+  setTracingConsent: async (tracingConsent: boolean) =>
+    unwrap(await apiClient.PUT("/account/tracing-consent", { body: { tracing_consent: tracingConsent } })),
   /** AC-1. A background job prepares a zip; poll getExport until the status is "ready". */
   startExport: async () => unwrap(await apiClient.POST("/account/export")) as ExportJob,
   getExport: async (exportId: string) =>

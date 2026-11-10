@@ -48,6 +48,7 @@ from strong_api.auth.passwords import (
 from strong_api.auth.settings import AuthSettings
 from strong_api.auth.users import create_user, find_user, normalize_email
 from strong_api.controls import SIGNUPS_PAUSED, ControlRefusedError, ensure_signups_open
+from strong_core.config import get_settings
 from strong_core.db.models import AuditLog, User
 from strong_core.schemas import AuthProvider
 
@@ -81,6 +82,13 @@ class AuthUser(BaseModel):
     profile_complete: bool = Field(
         default=False, description="AC-3: false until the user saves the first sign-in profile."
     )
+    tracing_consent: bool = Field(
+        default=False, description="LT-20: the user lets the team review their interview turns."
+    )
+    tracing_consent_available: bool = Field(
+        default=False,
+        description="LT-20: show the tracing consent toggle (LLM_TRACING_PROD_CONTENT is on).",
+    )
 
     @classmethod
     def of(cls, user: User) -> AuthUser:
@@ -93,6 +101,8 @@ class AuthUser(BaseModel):
             created_at=user.created_at,
             full_name=user.full_name,
             profile_complete=user.profile_completed_at is not None,
+            tracing_consent=bool(user.tracing_consent),
+            tracing_consent_available=get_settings().llm_tracing_prod_content,
         )
 
 

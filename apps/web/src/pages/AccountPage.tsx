@@ -7,7 +7,7 @@ import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
 import { keys, POLL_MS, useAuth, usePlan, useProfile, useResumes, useUsage } from "../api/hooks";
 import type { AuthState, ExitReason, GotJob, Usage } from "../api/types";
-import { ConsentSwitch } from "../components/ConsentSwitch";
+import { ConsentSwitch, TracingConsentSwitch } from "../components/ConsentSwitch";
 import { ErrorNotice, PageHead } from "../components/ui";
 import { formatDate, levelLabel } from "../labels";
 import { MAX_RESUMES } from "../limits";
@@ -212,6 +212,15 @@ export function AccountPage() {
     },
   });
 
+  const tracing = useMutation({
+    mutationFn: accountApi.setTracingConsent,
+    onSuccess: ({ tracing_consent }) => {
+      queryClient.setQueryData<AuthState>(keys.me, (prev) =>
+        prev?.user ? { ...prev, user: { ...prev.user, tracing_consent } } : prev,
+      );
+    },
+  });
+
   const [exportId, setExportId] = useState<string | null>(null);
   const startExport = useMutation({ mutationFn: accountApi.startExport, onSuccess: (job) => setExportId(job.id) });
   const exportJob = useQuery({
@@ -237,6 +246,7 @@ export function AccountPage() {
 
   if (!user) return null;
   const consentValue = consent.isPending ? (consent.variables ?? user.training_consent) : user.training_consent;
+  const tracingValue = tracing.isPending ? (tracing.variables ?? user.tracing_consent) : user.tracing_consent;
 
   // R3 (v2): two columns, one on phones, in this order: Profile, Plan and usage, Sign-in, Privacy,
   // Your data, Delete. My questions moved into the Question bank. v1 keeps its one column.
@@ -307,6 +317,22 @@ export function AccountPage() {
           {consent.isSuccess && `Saved. Training-data use is ${consentValue ? "on" : "off"}.`}
         </p>
         {consent.isError && <ErrorNotice error={consent.error} />}
+        {user.tracing_consent_available && (
+          <>
+            <TracingConsentSwitch
+              checked={tracingValue}
+              onChange={(v) => tracing.mutate(v)}
+              disabled={tracing.isPending}
+            />
+            <p role="status" className="muted">
+              {tracing.isSuccess &&
+                (tracingValue
+                  ? "Saved. The team may review your interviews from your next answer."
+                  : "Saved. Nothing more is kept, and what was kept is deleted within 24 hours.")}
+            </p>
+            {tracing.isError && <ErrorNotice error={tracing.error} />}
+          </>
+        )}
       </section>
 
       <section className="panel" aria-labelledby="export-heading" data-order="5">

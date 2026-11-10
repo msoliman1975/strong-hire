@@ -36,6 +36,8 @@ function signIn(fullName: string | null) {
     created_at: "2026-10-01T10:00:00Z",
     full_name: fullName,
     profile_complete: true,
+    tracing_consent: false,
+    tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email, userEmail: email };
 }
@@ -160,6 +162,8 @@ describe("SV-7, NV-3 v2 top bar and old routes", () => {
       created_at: "2026-10-01T10:00:00Z",
       full_name: "Ana Lopez",
       profile_complete: true,
+      tracing_consent: false,
+      tracing_consent_available: false,
     };
     mockStore.db.auth = { status: "signed_in", email, userEmail: email };
     mockStore.db.usage = refreshUsage({ ...mockStore.db.usage, plan: "paid", minutes_used: 42, minutes_cap: 120 });

@@ -162,6 +162,8 @@ export function authHandlers(store: MockStore) {
         created_at: new Date().toISOString(),
         full_name: null,
         profile_complete: false,
+        tracing_consent: false,
+        tracing_consent_available: false,
       };
       store.db.auth = { status: "signed_in", email: auth.email, userEmail: auth.email };
       store.save();
@@ -190,6 +192,8 @@ export function authHandlers(store: MockStore) {
           created_at: new Date().toISOString(),
           full_name: body.full_name ?? null,
           profile_complete: false,
+          tracing_consent: false,
+          tracing_consent_available: false,
         };
         mockPasswords.set(email, body.password);
         mockUnconfirmed.add(email);
@@ -1278,6 +1282,15 @@ export function accountHandlers(store: MockStore) {
       if (email && db().users[email]) db().users[email].training_consent = body.training_consent;
       store.save();
       return HttpResponse.json({ training_consent: body.training_consent });
+    }),
+    http.put(`${API}/account/tracing-consent`, async ({ request }) => {
+      const body = (await request.json()) as { tracing_consent: boolean };
+      const email = db().auth.userEmail;
+      const user = email ? db().users[email] : undefined;
+      if (!user?.tracing_consent_available) return HttpResponse.json({ detail: "Not Found" }, { status: 404 });
+      user.tracing_consent = body.tracing_consent;
+      store.save();
+      return HttpResponse.json({ tracing_consent: body.tracing_consent });
     }),
     http.post(`${API}/account/export`, async () => {
       await pauseFor(store);
