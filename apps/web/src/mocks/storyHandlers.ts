@@ -3,6 +3,7 @@
  * bodies of apps/api strong_api.stories: newest first, `?status=` and `?skill=` filters, PATCH
  * changes only the fields sent and clears blank parts. The stories live in memory;
  * `resetMockStories` sets them (tests), and the seed gives a click-through something to show.
+ * CS-13 to CS-15: archive, unarchive, soft delete and restore; `?include=` lists them.
  */
 import { http, HttpResponse } from "msw/http";
 
@@ -31,6 +32,8 @@ export function mockStory(changes: Partial<Story> & Pick<Story, "id" | "title">)
     outline: null,
     flow_flags: [],
     hints: [],
+    archived_at: null,
+    deleted_at: null,
     created_at: "2026-10-20T10:00:00Z",
     updated_at: "2026-10-20T10:00:00Z",
     display_status: "draft",
@@ -76,7 +79,8 @@ export function resetMockStories(next: Story[] = SEED) {
   stories = structuredClone(next);
 }
 
-/** The live mock library, for other mocks that write stories (coachHandlers.ts, S31). */
+/** The live mock library, for other mocks that write stories (coachHandlers.ts, S31). Deleted
+ * stories (CS-15) stay in it until restored; readers that list stories leave them out. */
 export const mockStoryLibrary = () => stories;
 
 const clean = (text: string | null | undefined) => (text ?? "").trim() || null;
@@ -94,7 +98,10 @@ export function storyHandlers() {
       const url = new URL(request.url);
       const status = url.searchParams.get("status");
       const skill = url.searchParams.get("skill");
+      const include = url.searchParams.getAll("include");
       const list = stories
+        .filter((s) => include.includes("archived") || !s.archived_at)
+        .filter((s) => include.includes("deleted") || !s.deleted_at)
         .filter((s) => !status || s.status === status)
         .filter((s) => !skill || (s.skills as string[]).includes(skill))
         .sort((a, b) => b.created_at.localeCompare(a.created_at));
@@ -127,12 +134,38 @@ export function storyHandlers() {
     }),
 
     http.get(`${API}/stories/:id`, ({ params }) => {
-      const story = stories.find((s) => s.id === params.id);
+      const story = stories.find((s) => s.id === params.id && !s.deleted_at);
       return story ? HttpResponse.json(out(story)) : notFound();
     }),
 
+    // CS-13, CS-15: archive and unarchive; delete is soft and restore undoes it.
+    http.post(`${API}/stories/:id/archive`, ({ params }) => {
+      const story = stories.find((s) => s.id === params.id && !s.deleted_at);
+      if (!story) return notFound();
+      story.archived_at ??= new Date().toISOString();
+      return HttpResponse.json(out(story));
+    }),
+    http.post(`${API}/stories/:id/unarchive`, ({ params }) => {
+      const story = stories.find((s) => s.id === params.id && !s.deleted_at);
+      if (!story) return notFound();
+      story.archived_at = null;
+      return HttpResponse.json(out(story));
+    }),
+    http.delete(`${API}/stories/:id`, ({ params }) => {
+      const story = stories.find((s) => s.id === params.id && !s.deleted_at);
+      if (!story) return notFound();
+      story.deleted_at = new Date().toISOString();
+      return new HttpResponse(null, { status: 204 });
+    }),
+    http.post(`${API}/stories/:id/restore`, ({ params }) => {
+      const story = stories.find((s) => s.id === params.id && s.deleted_at);
+      if (!story) return notFound();
+      story.deleted_at = null;
+      return HttpResponse.json(out(story));
+    }),
+
     http.patch(`${API}/stories/:id`, async ({ params, request }) => {
-      const story = stories.find((s) => s.id === params.id);
+      const story = stories.find((s) => s.id === params.id && !s.deleted_at);
       if (!story) return notFound();
       const body = (await request.json()) as StoryPatch;
       if ("title" in body) {
@@ -159,7 +192,7 @@ export function storyHandlers() {
     http.post(`${API}/stories/ask`, async ({ request }) => {
       const { question } = (await request.json()) as { question: string };
       if (!question?.trim()) return HttpResponse.json({ detail: [{ msg: "Ask a question" }] }, { status: 422 });
-      const lead = stories.find((s) => s.result?.trim());
+      const lead = stories.find((s) => s.result?.trim() && !s.archived_at && !s.deleted_at);
       const answer: StoryAnswer = lead
         ? {
             answer: `Lead with “${lead.title}”. Say the result first: ${lead.result}`,

@@ -261,7 +261,9 @@ test("build a story: craft with Strova; write it yourself, review, accept an edi
   await shot(page, "30-stories");
 
   // Craft with Strova: answer in your own words, then save and open the story.
-  await page.getByRole("link", { name: /Craft with Strova/ }).first().click();
+  // CS-8: "+ New story" has a menu with the two ways to start.
+  await page.getByLabel("More ways to start", { exact: true }).click();
+  await page.getByRole("menuitem", { name: /Craft with Strova/ }).click();
   // SC-1: a new story starts with the STAR or CARL choice; take Strova's suggestion.
   await page.getByRole("button", { name: "Start crafting" }).click();
   const typeInstead = page.getByRole("button", { name: "Type instead" });

@@ -58,7 +58,9 @@ def best_line(items: list[Achievement], story_text: str) -> Achievement | None:
 async def _story(db: Any, org_id: str, story_id: str) -> StoryRow | None:
     row: StoryRow | None = await db.scalar(
         select(StoryRow).where(
-            StoryRow.id == uuid.UUID(story_id), StoryRow.org_id == uuid.UUID(org_id)
+            StoryRow.id == uuid.UUID(story_id),
+            StoryRow.org_id == uuid.UUID(org_id),
+            StoryRow.live(),
         )
     )
     return row

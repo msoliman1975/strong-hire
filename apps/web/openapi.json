@@ -1002,6 +1002,28 @@
         }
       }
     },
+    "/stories/recommendations": {
+      "get": {
+        "tags": [
+          "resume checks"
+        ],
+        "summary": "Story Recommendations",
+        "description": "CS-1 to CS-5, CS-11: the stories Strova recommends writing, without duplicates.",
+        "operationId": "story_recommendations_stories_recommendations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryRecommendations"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/story-ideas/counts": {
       "get": {
         "tags": [
@@ -2766,7 +2788,7 @@
           "stories"
         ],
         "summary": "List Stories",
-        "description": "ST-1: the user's stories, newest first.",
+        "description": "ST-1: the user's stories, newest first. CS-6: archived and deleted stories only when\nasked for with `include`; a deleted story is listed only while it can be restored.",
         "operationId": "list_stories_stories_get",
         "parameters": [
           {
@@ -2804,6 +2826,31 @@
               "title": "Skill"
             },
             "description": "Only stories with this tag."
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "archived",
+                      "deleted"
+                    ],
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "CS-6: also list archived stories, or deleted ones (restorable).",
+              "title": "Include"
+            },
+            "description": "CS-6: also list archived stories, or deleted ones (restorable)."
           }
         ],
         "responses": {
@@ -3015,7 +3062,7 @@
           "stories"
         ],
         "summary": "Delete Story",
-        "description": "ST-1: delete a story and its notes. Debriefs that used it keep their scores.",
+        "description": "ST-1, CS-15: delete a story. It is hidden at once and restorable for 30 days; the purge\njob then removes it with its notes and takes (CS-16). Debriefs that used it keep their\nscores.",
         "operationId": "delete_story_stories__story_id__delete",
         "parameters": [
           {
@@ -3032,6 +3079,138 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/restore": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Restore Story",
+        "description": "CS-15: undo a delete. After 30 days the story is gone (404).",
+        "operationId": "restore_story_stories__story_id__restore_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/archive": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Archive Story",
+        "description": "CS-13: archive a story. CS-14: it leaves skill coverage, story-fit, Ask Strova and\nStrova's picks, and keeps its takes, scores and Proven status.",
+        "operationId": "archive_story_stories__story_id__archive_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/unarchive": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Unarchive Story",
+        "description": "CS-13: bring an archived story back into the list and into prep.",
+        "operationId": "unarchive_story_stories__story_id__unarchive_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -18939,6 +19118,52 @@
         "title": "HireSignal",
         "description": "FB-1. Ordered from strongest to weakest."
       },
+      "IdeaMatch": {
+        "additionalProperties": false,
+        "description": "CS-2: the matcher's answer for one new resume line.",
+        "properties": {
+          "line": {
+            "description": "Index of the line in the new lines list.",
+            "minimum": 0,
+            "title": "Line",
+            "type": "integer"
+          },
+          "same_as": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Index of the earlier item that tells the same work; null when none does.",
+            "title": "Same As"
+          }
+        },
+        "required": [
+          "line"
+        ],
+        "title": "IdeaMatch",
+        "type": "object"
+      },
+      "IdeaMatches": {
+        "additionalProperties": false,
+        "description": "CS-2: which new resume lines describe the same work as an earlier idea or story.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IdeaMatch"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "IdeaMatches",
+        "type": "object"
+      },
       "ImproveAccept": {
         "properties": {
           "edits": {
@@ -24489,6 +24714,127 @@
         "title": "ReadinessStatus",
         "description": "RD-1: whether a skill has enough Realistic sessions for a readiness score."
       },
+      "RecommendedIdea": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "resume_idea",
+            "title": "Kind",
+            "default": "resume_idea"
+          },
+          "achievement": {
+            "type": "string",
+            "title": "Achievement",
+            "description": "The line as the newest resume words it."
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id",
+            "description": "The newest resume with the line: Start uses it."
+          },
+          "resume_line_ref": {
+            "type": "string",
+            "title": "Resume Line Ref"
+          },
+          "resumes": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Resumes",
+            "description": "How many resumes have the line (From 2 resumes)."
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "missing_parts": {
+            "items": {
+              "$ref": "#/components/schemas/StoryPart"
+            },
+            "type": "array",
+            "title": "Missing Parts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "achievement",
+          "role",
+          "resume_id",
+          "resume_line_ref",
+          "resumes",
+          "skills",
+          "missing_parts"
+        ],
+        "title": "RecommendedIdea",
+        "description": "CS-1, CS-4: one resume achievement, however many resumes it is on."
+      },
+      "RecommendedSkill": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "missing_skill",
+            "title": "Kind",
+            "default": "missing_skill"
+          },
+          "suggestion_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Suggestion Id"
+          },
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "job_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Title"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "suggestion_id",
+          "competency",
+          "job_target_id",
+          "company",
+          "job_title",
+          "reason"
+        ],
+        "title": "RecommendedSkill",
+        "description": "CS-11: a skill one of the user's target roles tests that no story covers."
+      },
       "RedirectOut": {
         "properties": {
           "url": {
@@ -28939,6 +29285,32 @@
             ],
             "description": "SC-2: the outline of a styled story; null when classic."
           },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At",
+            "description": "CS-13: when it was archived; null when not archived."
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At",
+            "description": "CS-15: when it was deleted; restorable for 30 days."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -29408,6 +29780,19 @@
             "const": "story_idea",
             "title": "Kind",
             "default": "story_idea"
+          },
+          "same_as": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same As",
+            "description": "CS-2: the first story_idea suggestion of the same achievement, on another resume. Null when this is the first one, or before the matcher ran."
           }
         },
         "additionalProperties": false,
@@ -29808,6 +30193,32 @@
             ],
             "description": "SC-2: the outline of a styled story; null when classic."
           },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At",
+            "description": "CS-13: when it was archived; null when not archived."
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At",
+            "description": "CS-15: when it was deleted; restorable for 30 days."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -30059,6 +30470,33 @@
         "type": "object",
         "title": "StoryPatch",
         "description": "ST-1: change the title, the skill tags or any part. Only the fields sent change; a part\nsent as null (or blank) is cleared. The status is never set by hand (ST-7)."
+      },
+      "StoryRecommendations": {
+        "properties": {
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendedSkill"
+            },
+            "type": "array",
+            "title": "Skills",
+            "description": "Job gaps first (CS-5 sort order)."
+          },
+          "ideas": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendedIdea"
+            },
+            "type": "array",
+            "title": "Ideas",
+            "description": "Newest resume first, in resume order."
+          }
+        },
+        "type": "object",
+        "required": [
+          "skills",
+          "ideas"
+        ],
+        "title": "StoryRecommendations",
+        "description": "CS-5: the Recommended rows of Career Stories."
       },
       "StoryRef": {
         "properties": {

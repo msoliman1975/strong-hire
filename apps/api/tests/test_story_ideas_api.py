@@ -203,7 +203,8 @@ async def test_rsd16_counts_for_every_resume_in_one_read(
     client: httpx.AsyncClient, fake_fixtures: Path
 ) -> None:
     """RSD-16: GET /story-ideas/counts gives each read resume's open and used ideas, the same
-    numbers as GET /resumes/{id}/story-ideas, so the Resumes list needs one request."""
+    numbers as GET /resumes/{id}/story-ideas, so the Resumes list needs one request. CS-3: a
+    line dismissed on one resume is dismissed on every resume that has it."""
     await sign_in(client)
     set_extractor_output(fake_fixtures, "StoryIdeas", SKILLS)
     first = await add_resume(client, fake_fixtures)
@@ -222,7 +223,7 @@ async def test_rsd16_counts_for_every_resume_in_one_read(
         one = await ideas(client, resume["id"])
         assert counts[resume["id"]]["ideas"] == len(one["ideas"])
         assert counts[resume["id"]]["used"] == len(one["used"])
-    assert counts[second["id"]]["ideas"] == counts[first["id"]]["ideas"] - 1
+    assert counts[second["id"]]["ideas"] == counts[first["id"]]["ideas"] == 4
 
 
 async def test_rsd16_counts_skip_a_resume_still_being_read(client: httpx.AsyncClient) -> None:

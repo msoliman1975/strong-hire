@@ -57,7 +57,12 @@ from strong_api.scoring.schemas import (
     ScoringAccepted,
     SessionBuyer,
 )
-from strong_api.sessions.failure import failed_before_start, failure_reason
+from strong_api.sessions.failure import (
+    answered_unless_failed,
+    failed_before_start,
+    failed_without_answers,
+    failure_reason,
+)
 from strong_api.suggestions.router import debrief_suggestions
 from strong_core.db.models import Company, InterviewSession, JobTarget
 from strong_core.db.models import GapAnalysis as GapRow
@@ -343,11 +348,12 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
     target = await db.get(JobTarget, session.job_target_id)
     row = await db.scalar(select(ScorecardRow).where(ScorecardRow.session_id == session.id))
     card = scorecard_contract(row) if row is not None else None
+    answered = await answered_unless_failed(db, session)
     state: DebriefStatus
     if card is not None:
         state = "ready"
-    elif failed_before_start(session):
-        state = "not_started"
+    elif failed_before_start(session) or failed_without_answers(session, answered):
+        state = "not_started"  # nothing to score; failure_reason says why (BL-3)
     elif session.status == SessionStatus.FAILED:
         state = "failed"
     elif session.status in NOT_ENDED:
@@ -388,7 +394,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
             started_at=session.started_at,
             ended_at=session.ended_at,
             minutes_billed=session.minutes_billed,
-            failure_reason=failure_reason(session),
+            failure_reason=failure_reason(session, answered=answered),
             buyer=_buyer(session),
         ),
         status=state,
@@ -498,5 +504,7 @@ async def score_session(session_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> 
         raise HTTPException(status.HTTP_409_CONFLICT, "End the session before scoring it")
     if failed_before_start(session):
         raise HTTPException(status.HTTP_409_CONFLICT, "This interview never started")
+    if failed_without_answers(session, await answered_unless_failed(db, session)):
+        raise HTTPException(status.HTTP_409_CONFLICT, "This interview has no answers to score")
     job_id = await start_scoring(db, queue, session)
     return ScoringAccepted(session_id=session.id, job_id=job_id, status=session.status)
