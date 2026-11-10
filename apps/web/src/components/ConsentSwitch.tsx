@@ -9,13 +9,7 @@ export const CONSENT_HINT =
   "Optional. Off unless you turn it on. When it is off, the team sees only dates, settings and scores. Audio is never kept. You can change this any time in Account.";
 
 /** The sign-up form: a plain, unticked checkbox. */
-export function ConsentCheckbox({
-  checked,
-  onChange,
-}: {
-  checked: boolean;
-  onChange: (value: boolean) => void;
-}) {
+export function ConsentCheckbox({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
   return (
     <div className="check">
       <input

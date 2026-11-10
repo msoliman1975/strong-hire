@@ -46,17 +46,12 @@ async function addResume() {
 
 /** A role whose interview uses this resume. */
 async function roleOn(resumeId: string) {
-  const { job_target: created } = await jobTargetsApi.create({
-    text: "Senior engineer, payments. ".repeat(5),
-  });
+  const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
   const job = await jobTargetsApi.get(created.id);
   await fetch(`${location.origin}/api/roles/${job.id}/interviews`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      interview_types: ["behavioral"],
-      resume_id: resumeId,
-    }),
+    body: JSON.stringify({ interview_types: ["behavioral"], resume_id: resumeId }),
   });
   return job;
 }
@@ -88,36 +83,22 @@ describe("RSD-6: one resume page", () => {
     const r = await addResume();
     renderAt(`/resumes/${r.id}?step=stories&from=email`);
     await ready();
-    expect(screen.getByTestId("where")).toHaveTextContent(
-      `/resumes/${r.id}/check?step=stories&from=email`,
-    );
-    expect(
-      screen.getByRole("button", { name: /Stories to tell/ }),
-    ).toHaveAttribute("aria-current", "step");
+    expect(screen.getByTestId("where")).toHaveTextContent(`/resumes/${r.id}/check?step=stories&from=email`);
+    expect(screen.getByRole("button", { name: /Stories to tell/ })).toHaveAttribute("aria-current", "step");
   });
 
   it("RSD-6: Home and What first link to the check page", async () => {
     const r = await addResume();
-    if (mockStore.db.profiles[EMAIL])
-      mockStore.db.profiles[EMAIL].plan_style = "weekly";
-    else
-      mockStore.db.profiles[EMAIL] = {
-        ...(await import("../../../mocks/handlers")).EMPTY_PROFILE,
-        plan_style: "weekly",
-      };
+    if (mockStore.db.profiles[EMAIL]) mockStore.db.profiles[EMAIL].plan_style = "weekly";
+    else mockStore.db.profiles[EMAIL] = { ...(await import("../../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
     renderAt("/");
     const links = await screen.findAllByRole("link");
     const toResume = await waitFor(() => {
-      const found = links.filter((a) =>
-        a.getAttribute("href")?.startsWith(`/resumes/${r.id}`),
-      );
+      const found = links.filter((a) => a.getAttribute("href")?.startsWith(`/resumes/${r.id}`));
       expect(found.length).toBeGreaterThan(0);
       return found;
     });
-    for (const a of toResume)
-      expect(a.getAttribute("href")).toMatch(
-        new RegExp(`^/resumes/${r.id}/check`),
-      );
+    for (const a of toResume) expect(a.getAttribute("href")).toMatch(new RegExp(`^/resumes/${r.id}/check`));
   });
 });
 
@@ -128,66 +109,42 @@ describe("RSD-11: stories to tell in interviews", () => {
     await ready();
     const view = await screen.findByTestId("stories-step");
     const card = await within(view).findByRole("article");
-    const position = () =>
-      within(card).getByTestId("idea-position").textContent ?? "";
+    const position = () => within(card).getByTestId("idea-position").textContent ?? "";
     expect(position()).toMatch(/^Story 1 of (\d+)$/);
     const total = Number(/of (\d+)/.exec(position())![1]);
     expect(within(card).getByText("Resume → Interview")).toBeInTheDocument();
     expect(within(card).getByText(/^Still needs: /)).toBeInTheDocument();
     const craft = within(card).getByRole("link", { name: "Craft with Strova" });
     expect(craft.getAttribute("href")).toMatch(/^\/coach\/new\?resume=/);
-    expect(
-      within(card).getByRole("button", { name: "Previous idea" }),
-    ).toBeDisabled();
+    expect(within(card).getByRole("button", { name: "Previous idea" })).toBeDisabled();
     const first = within(card).getByRole("heading").textContent;
 
     if (total > 1) {
       await user.click(within(card).getByRole("button", { name: "Next idea" }));
       expect(position()).toBe(`Story 2 of ${total}`);
-      await user.click(
-        within(card).getByRole("button", { name: "Previous idea" }),
-      );
+      await user.click(within(card).getByRole("button", { name: "Previous idea" }));
     }
     await user.click(within(card).getByRole("button", { name: "Not a story" }));
-    await waitFor(() =>
-      expect(
-        within(view).queryByRole("heading", { name: first ?? "" }),
-      ).not.toBeInTheDocument(),
-    );
+    await waitFor(() => expect(within(view).queryByRole("heading", { name: first ?? "" })).not.toBeInTheDocument());
     // RM-4: the dismissal is stored, so the idea stays gone.
-    const after = (await (
-      await fetch(`${location.origin}/api/resumes/${r.id}/story-ideas`)
-    ).json()) as { ideas: unknown[] };
+    const after = (await (await fetch(`${location.origin}/api/resumes/${r.id}/story-ideas`)).json()) as { ideas: unknown[] };
     expect(after.ideas).toHaveLength(total - 1);
     // The step count agrees (D-4).
     await waitFor(() =>
-      expect(
-        screen
-          .getByRole("button", { name: /Stories to tell/ })
-          .querySelector(".cvc-step__num"),
-      ).toHaveTextContent(String(total - 1)),
+      expect(screen.getByRole("button", { name: /Stories to tell/ }).querySelector(".cvc-step__num")).toHaveTextContent(String(total - 1)),
     );
   });
 
   it("RSD-11: with every idea set aside it says so; Already crafted links each story", async () => {
     const r = await addResume();
-    const ideas = (await (
-      await fetch(`${location.origin}/api/resumes/${r.id}/story-ideas`)
-    ).json()) as {
+    const ideas = (await (await fetch(`${location.origin}/api/resumes/${r.id}/story-ideas`)).json()) as {
       ideas: { resume_line_ref: string }[];
     };
-    for (const i of ideas.ideas)
-      await resumesApi.dismissIdea(r.id, i.resume_line_ref);
+    for (const i of ideas.ideas) await resumesApi.dismissIdea(r.id, i.resume_line_ref);
     renderAt(`/resumes/${r.id}/check?step=stories`);
     await ready();
-    expect(
-      await screen.findByText(
-        "No ideas left. Every achievement is a story or was set aside.",
-      ),
-    ).toBeInTheDocument();
-    expect(craftFromIdeaPath("r1", "roles[0].achievements[1]")).toBe(
-      "/coach/new?resume=r1&idea=roles%5B0%5D.achievements%5B1%5D",
-    );
+    expect(await screen.findByText("No ideas left. Every achievement is a story or was set aside.")).toBeInTheDocument();
+    expect(craftFromIdeaPath("r1", "roles[0].achievements[1]")).toBe("/coach/new?resume=r1&idea=roles%5B0%5D.achievements%5B1%5D");
   });
 });
 
@@ -196,42 +153,24 @@ describe("RSD-12: stronger resume lines", () => {
     const r = await addResume();
     const reads: string[] = [];
     const onStart = ({ request }: { request: Request }) => {
-      if (
-        request.method === "GET" &&
-        new URL(request.url).pathname === `/api/resumes/${r.id}`
-      )
-        reads.push(request.url);
+      if (request.method === "GET" && new URL(request.url).pathname === `/api/resumes/${r.id}`) reads.push(request.url);
     };
     server.events.on("request:start", onStart);
     try {
       const user = renderAt(`/resumes/${r.id}/check?step=lines`);
       await ready();
-      const card = await screen.findByRole("region", {
-        name: "Strova suggests a resume line",
-      });
+      const card = await screen.findByRole("region", { name: "Strova suggests a resume line" });
       expect(card).toHaveTextContent("Your stories → Resume");
       expect(card).toHaveTextContent(/^.*Line 1 of \d+/);
-      await waitFor(() =>
-        expect(card).toHaveTextContent('your story "Checkout migration"'),
-      );
-      expect(card.querySelector("del")?.textContent).toBe(
-        "Led checkout migration to new payments provider",
-      );
-      expect(card.querySelector("ins")?.textContent).toMatch(
-        /zero failed payments/,
-      );
+      await waitFor(() => expect(card).toHaveTextContent('your story "Checkout migration"'));
+      expect(card.querySelector("del")?.textContent).toBe("Led checkout migration to new payments provider");
+      expect(card.querySelector("ins")?.textContent).toMatch(/zero failed payments/);
       const before = reads.length;
-      await user.click(
-        within(card).getByRole("button", { name: "Add to resume" }),
-      );
-      expect(
-        await within(card).findByText("Added to your resume."),
-      ).toBeInTheDocument();
+      await user.click(within(card).getByRole("button", { name: "Add to resume" }));
+      expect(await within(card).findByText("Added to your resume.")).toBeInTheDocument();
       await waitFor(() => expect(reads.length).toBeGreaterThan(before));
       await user.click(within(card).getByRole("button", { name: "Undo" }));
-      await user.click(
-        await within(card).findByRole("button", { name: "Dismiss" }),
-      );
+      await user.click(await within(card).findByRole("button", { name: "Dismiss" }));
       expect(await screen.findByText(NO_REWRITES)).toBeInTheDocument();
     } finally {
       server.events.removeListener("request:start", onStart);
@@ -239,9 +178,7 @@ describe("RSD-12: stronger resume lines", () => {
   });
 
   it("RSD-12: with none it says when Strova suggests one", () => {
-    expect(NO_REWRITES).toBe(
-      "No rewrites yet. Strova suggests one when a story has a result your resume leaves out.",
-    );
+    expect(NO_REWRITES).toBe("No rewrites yet. Strova suggests one when a story has a result your resume leaves out.");
   });
 });
 
@@ -256,26 +193,18 @@ describe("RSD-14: the drawers", () => {
     await user.click(opener);
     const drawer = screen.getByRole("dialog", { name: "Used by 1 role" });
     expect(drawer).toHaveAttribute("aria-modal", "true");
-    const rows = within(drawer).getByRole("list", {
-      name: "Roles that use this resume",
-    });
+    const rows = within(drawer).getByRole("list", { name: "Roles that use this resume" });
     expect(within(rows).getAllByRole("listitem")).toHaveLength(1);
     expect(within(rows).getByText("No date yet")).toBeInTheDocument();
-    expect(within(rows).getByRole("link", { name: /^Open / })).toHaveAttribute(
+    expect(within(rows).getByRole("link", { name: /^Open / })).toHaveAttribute("href", `/roles/${job.id}`);
+    expect(within(drawer).getByRole("link", { name: "Add a target role with this resume" })).toHaveAttribute(
       "href",
-      `/roles/${job.id}`,
+      `/roles/new?resume=${r.id}`,
     );
-    expect(
-      within(drawer).getByRole("link", {
-        name: "Add a target role with this resume",
-      }),
-    ).toHaveAttribute("href", `/roles/new?resume=${r.id}`);
     expect(within(drawer).getByRole("button", { name: "Close" })).toHaveFocus();
 
     await user.keyboard("{Escape}");
-    expect(
-      screen.queryByRole("dialog", { name: "Used by 1 role" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Used by 1 role" })).not.toBeInTheDocument();
     expect(opener).toHaveFocus();
   });
 
@@ -296,14 +225,10 @@ describe("RSD-14: the drawers", () => {
     await user.tab({ shift: true });
     expect(close).toHaveFocus();
     await user.click(close);
-    expect(
-      screen.queryByRole("dialog", { name: "What Strova checks" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "What Strova checks" })).not.toBeInTheDocument();
     expect(opener).toHaveFocus();
 
-    await user.click(
-      screen.getByRole("button", { name: /^1 role uses this resume ›$/ }),
-    );
+    await user.click(screen.getByRole("button", { name: /^1 role uses this resume ›$/ }));
     drawer = screen.getByRole("dialog", { name: "Used by 1 role" });
     const items = [...drawer.querySelectorAll<HTMLElement>("a[href], button")];
     items[items.length - 1].focus();
@@ -311,38 +236,19 @@ describe("RSD-14: the drawers", () => {
     expect(items[0]).toHaveFocus();
     // A click on the backdrop lands on the dialog element itself.
     await user.click(drawer);
-    expect(
-      screen.queryByRole("dialog", { name: "Used by 1 role" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Used by 1 role" })).not.toBeInTheDocument();
   });
 
   it("RSD-14, IN-12: Findings you accepted lists each with its reason and Undo", async () => {
     const r = await addResume();
-    r.accepted_issues = [
-      {
-        key: "consistency.skills-missing:celery",
-        accepted_at: "2026-10-28T10:00:00Z",
-      },
-    ];
+    r.accepted_issues = [{ key: "consistency.skills-missing:celery", accepted_at: "2026-10-28T10:00:00Z" }];
     const user = renderAt(`/resumes/${r.id}/check`);
     await ready();
-    await user.click(
-      screen.getByRole("button", { name: "Findings you accepted · 1 ›" }),
-    );
-    const drawer = screen.getByRole("dialog", {
-      name: "Findings you accepted · 1",
-    });
-    expect(
-      within(drawer).getByText("✓ Accepted: A skill missing from Skills"),
-    ).toBeInTheDocument();
-    await user.click(
-      within(drawer).getByRole("button", {
-        name: "Undo accepting A skill missing from Skills",
-      }),
-    );
+    await user.click(screen.getByRole("button", { name: "Findings you accepted · 1 ›" }));
+    const drawer = screen.getByRole("dialog", { name: "Findings you accepted · 1" });
+    expect(within(drawer).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    await user.click(within(drawer).getByRole("button", { name: "Undo accepting A skill missing from Skills" }));
     await waitFor(() => expect(r.accepted_issues).toEqual([]));
-    expect(
-      within(drawer).getByText("Nothing accepted yet."),
-    ).toBeInTheDocument();
+    expect(within(drawer).getByText("Nothing accepted yet.")).toBeInTheDocument();
   });
 });

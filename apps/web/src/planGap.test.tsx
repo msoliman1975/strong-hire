@@ -34,18 +34,13 @@ function signedIn() {
   };
   mockStore.db.auth = { status: "signed_in", email, userEmail: email };
   // Keep the tour out of these screens.
-  globalThis.localStorage?.setItem(
-    "sh-tour-done-00000000-0000-4000-8000-0000000000a1",
-    "x",
-  );
+  globalThis.localStorage?.setItem("sh-tour-done-00000000-0000-4000-8000-0000000000a1", "x");
 }
 
 /** A job and a CV with a ready gap analysis. */
 async function interview() {
   signedIn();
-  const { job_target: job } = await jobTargetsApi.create({
-    text: "Senior engineer, payments. ".repeat(5),
-  });
+  const { job_target: job } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
   await jobTargetsApi.get(job.id);
   const form = new FormData();
   form.append("text", "Backend engineer, seven years of Python.");
@@ -75,35 +70,19 @@ describe("gap report (v2)", () => {
   it("GA-1: the v2 report with the match score, strengths, gaps, probes and practice plan", async () => {
     const { jobId, gap } = await interview();
     renderApp(`/jobs/${jobId}/gap-report`);
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "Gap report" }),
-    ).toBeInTheDocument();
-    expect(await screen.findByTestId("match-score")).toHaveTextContent(
-      String(gap.analysis?.match_score),
-    );
-    for (const name of [
-      "Match score",
-      "Strengths",
-      GAP_COPY.heading,
-      "Where they'll probe",
-      "Practice plan",
-    ]) {
-      expect(
-        screen.getByRole("heading", { level: 2, name }),
-      ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Gap report" })).toBeInTheDocument();
+    expect(await screen.findByTestId("match-score")).toHaveTextContent(String(gap.analysis?.match_score));
+    for (const name of ["Match score", "Strengths", GAP_COPY.heading, "Where they'll probe", "Practice plan"]) {
+      expect(screen.getByRole("heading", { level: 2, name })).toBeInTheDocument();
     }
     // U07: the plan page is retired; the report goes back to the role page.
-    expect(
-      screen.getByRole("link", { name: "← Back to the role" }),
-    ).toHaveAttribute("href", `/roles/${jobId}`);
+    expect(screen.getByRole("link", { name: "← Back to the role" })).toHaveAttribute("href", `/roles/${jobId}`);
   });
 
   it("R1: an earlier report link (/jobs/:id/gap?report=) opens the v2 report too", async () => {
     const { jobId, gap } = await interview();
     renderApp(`/jobs/${jobId}/gap?report=${gap.id}`);
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "Gap report" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Gap report" })).toBeInTheDocument();
   });
 });
 
@@ -114,8 +93,6 @@ describe("gap analysis on Interviews", () => {
     const list = await screen.findByRole("list", { name: "Your interviews" });
     const card = within(list).getAllByTestId("interview-card")[0];
     expect(await within(card).findByText(/Match/)).toBeInTheDocument();
-    expect(
-      within(card).getByRole("link", { name: "View gap report" }),
-    ).toHaveAttribute("href", `/jobs/${jobId}/gap-report`);
+    expect(within(card).getByRole("link", { name: "View gap report" })).toHaveAttribute("href", `/jobs/${jobId}/gap-report`);
   });
 });

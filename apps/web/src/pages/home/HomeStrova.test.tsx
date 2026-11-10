@@ -38,11 +38,7 @@ function signIn(style: "weekly" | "checklist") {
     tracing_consent_available: false,
   };
   mockStore.db.auth = { status: "signed_in", email: EMAIL, userEmail: EMAIL };
-  mockStore.db.profiles[EMAIL] = {
-    ...EMPTY_PROFILE,
-    full_name: "Ana Lopez",
-    plan_style: style,
-  };
+  mockStore.db.profiles[EMAIL] = { ...EMPTY_PROFILE, full_name: "Ana Lopez", plan_style: style };
 }
 
 beforeEach(() => setFeatureOverrides({ v2_enabled: true }));
@@ -65,15 +61,10 @@ function renderHome() {
 
 async function roleWithBehavioral(dateInDays: number | null = null) {
   const form = new FormData();
-  form.append(
-    "text",
-    "Backend engineer, Python and Go.\n\nEngineer, Shoply, 2021 to now\n- Built the refunds API\n",
-  );
+  form.append("text", "Backend engineer, Python and Go.\n\nEngineer, Shoply, 2021 to now\n- Built the refunds API\n");
   const { resume } = await resumesApi.upload(form);
   await resumesApi.get(resume.id);
-  const { job_target: created } = await jobTargetsApi.create({
-    text: "Senior engineer, payments. ".repeat(5),
-  });
+  const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
   const job = await jobTargetsApi.get(created.id);
   await fetch(`${location.origin}/api/roles/${job.id}/interviews`, {
     method: "POST",
@@ -82,11 +73,7 @@ async function roleWithBehavioral(dateInDays: number | null = null) {
   });
   await gapApi.start(job.id, { resume_id: resume.id });
   if (dateInDays !== null)
-    mockStore.db.interviewDates = {
-      [job.id]: new Date(Date.now() + dateInDays * 86_400_000)
-        .toISOString()
-        .slice(0, 10),
-    };
+    mockStore.db.interviewDates = { [job.id]: new Date(Date.now() + dateInDays * 86_400_000).toISOString().slice(0, 10) };
   return job;
 }
 
@@ -101,38 +88,17 @@ describe("Home with Strova", () => {
     signIn("weekly");
     const job = await roleWithBehavioral();
     renderHome();
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: /^Good (morning|afternoon|evening), Ana$/,
-      }),
-    ).toBeInTheDocument();
-    const hero = await screen.findByRole("region", {
-      name: "Strova's next step",
-    });
-    expect(
-      within(hero).getByRole("img", { name: "Strova is coaching" }),
-    ).toHaveAttribute("width", "64");
+    expect(await screen.findByRole("heading", { level: 1, name: /^Good (morning|afternoon|evening), Ana$/ })).toBeInTheDocument();
+    const hero = await screen.findByRole("region", { name: "Strova's next step" });
+    expect(within(hero).getByRole("img", { name: "Strova is coaching" })).toHaveAttribute("width", "64");
     expect(hero).toHaveTextContent(STROVA_INTRO);
     expect(hero).toHaveTextContent(/Rehearse .* · Behavioral\./);
-    expect(hero.querySelector(".home-strova__headline")).toHaveAttribute(
-      "title",
-      expect.stringMatching(/^Rehearse /),
-    );
-    expect(
-      within(hero).getByRole("link", { name: "Start the take" }),
-    ).toHaveAttribute("href", expect.stringMatching(/^\/interviews\//));
-    expect(within(hero).getByRole("link", { name: /^Open / })).toHaveAttribute(
-      "href",
-      `/roles/${job.id}`,
-    );
+    expect(hero.querySelector(".home-strova__headline")).toHaveAttribute("title", expect.stringMatching(/^Rehearse /));
+    expect(within(hero).getByRole("link", { name: "Start the take" })).toHaveAttribute("href", expect.stringMatching(/^\/interviews\//));
+    expect(within(hero).getByRole("link", { name: /^Open / })).toHaveAttribute("href", `/roles/${job.id}`);
     expect(screen.getByTestId("weekly-plan")).toBeInTheDocument();
     const cards = screen.getByRole("region", { name: "Summary" });
-    expect(
-      within(cards)
-        .getAllByRole("link")
-        .map((a) => a.getAttribute("href")),
-    ).toEqual([
+    expect(within(cards).getAllByRole("link").map((a) => a.getAttribute("href"))).toEqual([
       expect.stringMatching(/^\/resumes/),
       "/roles",
       "/rehearsals",
@@ -150,15 +116,7 @@ describe("Home with Strova", () => {
           items: [
             {
               interview: { id: "iv1", interview_type: "behavioral" },
-              readiness: {
-                interview_id: "iv1",
-                kind: "practice_estimate",
-                score: 78,
-                goal: 75,
-                competencies: [],
-                change: null,
-                takes_counted: 3,
-              },
+              readiness: { interview_id: "iv1", kind: "practice_estimate", score: 78, goal: 75, competencies: [], change: null, takes_counted: 3 },
               takes_count: 3,
               last_signal: "Hire",
               role: { id: "r1", company_name: "Stripe", name: null },
@@ -170,36 +128,24 @@ describe("Home with Strova", () => {
     );
     renderHome();
     const cards = await screen.findByRole("region", { name: "Summary" });
-    const ring = await within(cards).findByRole("meter", {
-      name: "Best readiness, Stripe",
-    });
-    expect(ring).toHaveAttribute(
-      "aria-valuetext",
-      "78 of 100, goal 75, goal reached",
-    );
+    const ring = await within(cards).findByRole("meter", { name: "Best readiness, Stripe" });
+    expect(ring).toHaveAttribute("aria-valuetext", "78 of 100, goal 75, goal reached");
     expect(within(cards).getByText(/Best: Stripe · 78/)).toBeInTheDocument();
   });
 
   it("HO-1: the summary cards sit right below Strova's next step, and a long resume name is cut to fit its card", async () => {
     signIn("weekly");
     await roleWithBehavioral();
-    const name =
-      "Senior Backend Engineer resume, payments and billing platforms, 2026 edition";
+    const name = "Senior Backend Engineer resume, payments and billing platforms, 2026 edition";
     const resume = mockStore.db.resumes[0];
     resume.name = name;
     renderHome();
-    const hero = await screen.findByRole("region", {
-      name: "Strova's next step",
-    });
+    const hero = await screen.findByRole("region", { name: "Strova's next step" });
     const cards = screen.getByRole("region", { name: "Summary" });
     const plan = await screen.findByTestId("weekly-plan");
     expect(hero.nextElementSibling).toBe(cards);
-    expect(
-      cards.compareDocumentPosition(plan) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(await within(cards).findByTitle(name)).toHaveClass(
-      "home-strova__truncate",
-    );
+    expect(cards.compareDocumentPosition(plan) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(await within(cards).findByTitle(name)).toHaveClass("home-strova__truncate");
   });
 
   it("PS-4: the weekly plan shows the week, a chip legend, one item a day, and today's item highlighted with its action", async () => {
@@ -207,91 +153,53 @@ describe("Home with Strova", () => {
     await roleWithBehavioral();
     renderHome();
     const plan = await screen.findByTestId("weekly-plan");
-    expect(
-      within(plan).getByRole("heading", { name: "This week's plan" }),
-    ).toBeInTheDocument();
-    expect(plan).toHaveTextContent(
-      /[A-Z][a-z]{2} \d+ to [A-Z][a-z]{2} \d+ · Change style/,
-    );
+    expect(within(plan).getByRole("heading", { name: "This week's plan" })).toBeInTheDocument();
+    expect(plan).toHaveTextContent(/[A-Z][a-z]{2} \d+ to [A-Z][a-z]{2} \d+ · Change style/);
     const legend = within(plan).getByLabelText("Legend");
-    expect(legend).toHaveTextContent(
-      "Rehearsalmock interviewsStorystory goalsResumeResume issues",
-    );
+    expect(legend).toHaveTextContent("Rehearsalmock interviewsStorystory goalsResumeResume issues");
     const rows = within(plan).getAllByTestId("plan-item");
-    const days = rows.map(
-      (r) => r.querySelector(".home-planitem__day")?.textContent,
-    );
+    const days = rows.map((r) => r.querySelector(".home-planitem__day")?.textContent);
     expect(new Set(days).size).toBe(days.length);
     expect(rows.length).toBeLessThanOrEqual(6);
     const today = new Date().getDay();
     if (today !== 0) {
-      const current = rows.find(
-        (r) => r.getAttribute("aria-current") === "step",
-      ) as HTMLElement;
+      const current = rows.find((r) => r.getAttribute("aria-current") === "step") as HTMLElement;
       expect(current).toHaveTextContent("Today");
-      expect(
-        within(current).getByRole("link", { name: "Start the take" }),
-      ).toBeInTheDocument();
+      expect(within(current).getByRole("link", { name: "Start the take" })).toBeInTheDocument();
     }
   });
 
   it("PS-3: the checklist has three groups, collapsed, each with chip, title, X of Y done, progress and status", async () => {
     signIn("checklist");
-    resetMockStories([
-      mockStory({
-        id: "s1",
-        title: "Checkout",
-        skills: ["ownership"],
-        status: "proven",
-      }),
-    ]);
+    resetMockStories([mockStory({ id: "s1", title: "Checkout", skills: ["ownership"], status: "proven" })]);
     await roleWithBehavioral();
     const user = renderHome();
     const plan = await screen.findByTestId("checklist-plan");
-    expect(
-      within(plan).getByRole("heading", { name: "Your readiness checklist" }),
-    ).toBeInTheDocument();
-    const groups = ["rehearsal", "story", "resume"].map((k) =>
-      within(plan).getByTestId(`group-${k}`),
-    );
+    expect(within(plan).getByRole("heading", { name: "Your readiness checklist" })).toBeInTheDocument();
+    const groups = ["rehearsal", "story", "resume"].map((k) => within(plan).getByTestId(`group-${k}`));
     for (const g of groups) expect(g).not.toHaveAttribute("open");
     expect(groups[0]).toHaveTextContent("Rehearsal");
     expect(groups[0]).toHaveTextContent("0 of 1 done");
-    expect(groups[0]).toHaveTextContent(
-      /Next: .* · Behavioral: readiness 75 or more, Not started · 1 open/,
-    );
+    expect(groups[0]).toHaveTextContent(/Next: .* · Behavioral: readiness 75 or more, Not started · 1 open/);
     // Six story skills (one Proven) and two story ideas from the resume.
     expect(groups[1]).toHaveTextContent("1 of 8 done");
-    expect(
-      within(groups[1]).getByRole("progressbar", {
-        name: "Story completion progress",
-      }),
-    ).toHaveAttribute("aria-valuenow", "13");
+    expect(within(groups[1]).getByRole("progressbar", { name: "Story completion progress" })).toHaveAttribute("aria-valuenow", "13");
     await user.click(within(groups[0]).getByText("Rehearsals"));
     expect(groups[0]).toHaveAttribute("open");
     const next = within(groups[0]).getByRole("listitem");
     expect(next).toHaveAttribute("aria-current", "step");
-    expect(
-      within(next).getByRole("link", { name: "Start the take" }),
-    ).toBeInTheDocument();
+    expect(within(next).getByRole("link", { name: "Start the take" })).toBeInTheDocument();
   });
 
   it("PS-5: before any role, no rehearsal items; the next step is a story or resume item", async () => {
     signIn("checklist");
     const form = new FormData();
-    form.append(
-      "text",
-      "Backend engineer.\n\nEngineer, Shoply, 2021 to now\n- Built the refunds API\n",
-    );
+    form.append("text", "Backend engineer.\n\nEngineer, Shoply, 2021 to now\n- Built the refunds API\n");
     await resumesApi.upload(form);
     renderHome();
     const plan = await screen.findByTestId("checklist-plan");
-    expect(within(plan).getByTestId("group-rehearsal")).toHaveTextContent(
-      "0 of 0 done",
-    );
-    expect(within(plan).getByTestId("group-rehearsal")).toHaveTextContent(
-      "Added when you add a target role",
-    );
+    expect(within(plan).getByTestId("group-rehearsal")).toHaveTextContent("0 of 0 done");
+    expect(within(plan).getByTestId("group-rehearsal")).toHaveTextContent("Added when you add a target role");
     const hero = screen.getByRole("region", { name: "Strova's next step" });
     expect(hero).not.toHaveTextContent("Rehearse");
   });
@@ -299,12 +207,7 @@ describe("Home with Strova", () => {
   it("PP-3, ST-4: the roles card lists roles with days left; the stories card counts by status", async () => {
     signIn("weekly");
     resetMockStories([
-      mockStory({
-        id: "s1",
-        title: "Checkout",
-        skills: ["ownership"],
-        status: "proven",
-      }),
+      mockStory({ id: "s1", title: "Checkout", skills: ["ownership"], status: "proven" }),
       mockStory({ id: "s2", title: "Pushback", skills: ["conflict_handling"] }),
     ]);
     await roleWithBehavioral(6);
