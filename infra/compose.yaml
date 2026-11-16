@@ -23,6 +23,11 @@ x-python-env: &python-env
   LLM_TRACING_DEV: ${LLM_TRACING_DEV:-off}
   MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-http://mlflow:5000}
   MLFLOW_EXPERIMENT: ${MLFLOW_EXPERIMENT:-dev}
+  # Phase 2, real users (LT-16 to LT-31): both off until their gates in
+  # docs/llm-tracing/phase2-gates.md are met (LT-30).
+  LLM_TRACING_PROD: ${LLM_TRACING_PROD:-off}
+  LLM_TRACING_PROD_CONTENT: ${LLM_TRACING_PROD_CONTENT:-off}
+  LLM_TRACING_SAMPLE: ${LLM_TRACING_SAMPLE:-1.0}
 
 x-healthcheck: &healthcheck
   interval: 5s
