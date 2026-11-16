@@ -182,6 +182,12 @@ In the UI copy the interface names her: "Strova is thinking", "Talk to Strova", 
 never "the coach" or "your coach" (the feature can still be called a coaching session). Earned
 moments say what earned them, and the copy has no empty praise ("Great job", "Amazing") (SV-15).
 
+In her emails (plan reminders) she speaks in the first person and says the gap with its fix:
+"Today we rehearse Stripe · Behavioral. Your readiness is 58, and the goal is 75.", "Do one take
+today, so we have time to work on what I find before the real one.", "2 of 5 parts are written;
+write the other 3 parts and it is Ready." Readiness is written as the score and the goal, never
+"58 of 75", which reads as a grade (SV-16).
+
 ## 5. Navigation and app shell
 
 Top bar: the Strong Hire logo (`BrandMark`) and name with "with Strova" (the lockup, section 4.5), the usage pill, and the profile button (initials)
@@ -446,6 +452,7 @@ section "v2.1 UX with Strova".
 - SV-13 Earned results carry a seal in the brand's ring shape and the celebrating green: Hire and Strong Hire show the verdict seal (a closed green ring with a check) beside the signal, in the debrief and wherever the check badge was; a Proven story shows the Proven seal (Strova's thinking zigzag, frozen and filled green, with a white check) beside the word Proven. Seals are decorative; the word carries the meaning.
 - SV-14 The coach prompts that speak to the candidate (turn, craft_turn, review, ask, suggest_tailor) open with "You are Strova" and carry her voice (section 4.6): candid, in the candidate's corner, and praise only when earned. Session prompts keep their no-praise rule.
 - SV-15 The UI copy names her Strova, never "the coach" or "your coach", and has no empty praise (section 4.6).
+- SV-16 Strova's emails speak in her voice (section 4.6): first person, the gap with its fix, and readiness as "N, and the goal is 75", never "N of 75".
 - SV-8 The marketing site has the "Meet Strova" section with the animated avatar and the approved copy.
 - SV-9 Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged.
 

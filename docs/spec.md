@@ -289,6 +289,7 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 | SV-13 | Earned results carry a seal in the brand's ring shape and the celebrating green: Hire and Strong Hire show the verdict seal (a closed green ring with a check) beside the signal, in the debrief and wherever the check badge was; a Proven story shows the Proven seal (Strova's thinking zigzag, frozen and filled green, with a white check) beside the word Proven. Seals are decorative; the word carries the meaning. | P1 |
 | SV-14 | The coach prompts that speak to the candidate (turn, craft_turn, review, ask, suggest_tailor) open with "You are Strova" and carry her voice (ux-spec section 4.6): candid, in the candidate's corner, and praise only when earned. Session prompts keep their no-praise rule. | P1 |
 | SV-15 | The UI copy names her Strova, never "the coach" or "your coach", and has no empty praise (ux-spec section 4.6). | P1 |
+| SV-16 | Strova's emails speak in her voice (ux-spec section 4.6): first person, the gap with its fix, and readiness as "N, and the goal is 75", never "N of 75". | P1 |
 
 **Onboarding**
 

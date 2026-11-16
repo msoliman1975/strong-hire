@@ -196,12 +196,11 @@ async def reminder_for(db: AsyncSession, user: User, today: date) -> Reminder | 
     countdown = [b for b in below if b[0] is not None and (b[0] - today).days == COUNTDOWN_DAYS]
     if countdown:
         _, name, score, iv = countdown[0]
-        now = "not started yet" if score is None else f"{score} of 75"
         return Reminder(
             subject=f"Your {name.split(' · ')[0]} interview is in {COUNTDOWN_DAYS} days",
             lines=[
-                f"Your {name} interview is in {COUNTDOWN_DAYS} days, and your readiness is {now}.",
-                "A take today gives you time to work on what it finds.",
+                f"Your {name} interview is in {COUNTDOWN_DAYS} days. {_where_you_are(score)}",
+                "Do one take today, so we have time to work on what I find before the real one.",
             ],
             action_label="Start a take",
             action_url=f"{WEB_BASE_URL}/interviews/{iv}",
@@ -209,11 +208,10 @@ async def reminder_for(db: AsyncSession, user: User, today: date) -> Reminder | 
     if below:
         below.sort(key=lambda b: (b[0] is None, b[0] or date.max, -1 if b[2] is None else b[2]))
         _, name, score, iv = below[0]
-        now = "Not started yet." if score is None else f"Readiness {score} of 75."
         return Reminder(
             subject=f"Today's plan: a take of {name}",
             lines=[
-                f"Today's item in your plan is a take of {name}. {now}",
+                f"Today we rehearse {name}. {_where_you_are(score)}",
             ],
             action_label="Start the take",
             action_url=f"{WEB_BASE_URL}/interviews/{iv}",
@@ -233,13 +231,24 @@ async def reminder_for(db: AsyncSession, user: User, today: date) -> Reminder | 
         return Reminder(
             subject=f"Today's plan: get “{story.title}” to Ready",
             lines=[
-                f"Today's item in your plan is your story “{story.title}”: {filled} of 5 parts "
-                "are written.",
+                f"Today we finish your story “{story.title}”. {filled} of 5 parts are written; "
+                f"write the other {_parts(5 - filled)} and it is Ready.",
             ],
             action_label="Open the story",
             action_url=f"{WEB_BASE_URL}/stories/{story.id}",
         )
     return None
+
+
+def _where_you_are(score: int | None) -> str:
+    """SV-16: readiness in plain words, the score and the goal, never "58 of 75"."""
+    if score is None:
+        return "You haven't done a Realistic take yet, so your readiness isn't set."
+    return f"Your readiness is {score}, and the goal is {READINESS_GOAL}."
+
+
+def _parts(n: int) -> str:
+    return "part" if n == 1 else f"{n} parts"
 
 
 def _company(target: JobTarget) -> str:

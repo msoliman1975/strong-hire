@@ -109,6 +109,9 @@ async def test_ps6_today_item_is_sent_once_a_day_at_8_local(
     assert subject == "Today's plan: a take of Stripe · Behavioral"
     assert f"/interviews/{iv}" in text and text.startswith("Hi Ana,")
     assert "Mute plan emails in Profile" in text
+    # SV-16: Strova speaks for herself, and readiness is never written as a grade.
+    assert "Today we rehearse Stripe · Behavioral." in text
+    assert "your readiness isn't set" in text and "of 75" not in text
     # A second pass the same day sends nothing more.
     assert await send_reminders(sessionmaker, sender, WEDNESDAY_8 + timedelta(minutes=20)) == {
         "sent": 0,
@@ -172,7 +175,9 @@ async def test_ps6_an_interview_3_days_away_below_75_comes_first(
     await send_reminders(sessionmaker, sender, WEDNESDAY_8)
     ((_, subject, text),) = sender.sent
     assert subject == "Your Stripe interview is in 3 days"
-    assert "your readiness is not started yet" in text and f"/interviews/{iv}" in text
+    assert "You haven't done a Realistic take yet" in text and f"/interviews/{iv}" in text
+    # SV-16: the gap and the fix in one breath, in the first person.
+    assert "so we have time to work on what I find" in text
 
 
 async def test_ps6_a_started_draft_is_todays_item_without_interviews(
@@ -185,7 +190,7 @@ async def test_ps6_a_started_draft_is_todays_item_without_interviews(
     await send_reminders(sessionmaker, sender, WEDNESDAY_8)
     ((_, subject, text),) = sender.sent
     assert subject == "Today's plan: get “Pushback from platform” to Ready"
-    assert "2 of 5 parts" in text
+    assert "2 of 5 parts are written; write the other 3 parts and it is Ready." in text
 
 
 async def test_ps6_nothing_open_means_no_email(
@@ -244,3 +249,13 @@ async def test_sv9_the_reminder_comes_from_strova_with_her_avatar_beside_the_log
     assert set(images) == {"strova", "strong-hire"}
     assert images["strova"][:8] == b"\x89PNG\r\n\x1a\n"
     assert "Start the take" in email.html and "Start the take: http" in email.text
+
+
+def test_sv16_readiness_reads_as_a_score_and_a_goal() -> None:
+    """SV-16: "Readiness is 58, goal 75", never "58 of 75", which reads as a grade."""
+    from strong_worker.reminders import _parts, _where_you_are
+
+    assert _where_you_are(58) == "Your readiness is 58, and the goal is 75."
+    unset = "You haven't done a Realistic take yet, so your readiness isn't set."
+    assert _where_you_are(None) == unset
+    assert _parts(1) == "part" and _parts(3) == "3 parts"
